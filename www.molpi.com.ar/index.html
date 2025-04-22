@@ -61,28 +61,46 @@
 			const loginForm = document.getElementById('loginForm');
 			if (!loginForm) return;
 		
-			loginForm.addEventListener('submit', async function(e) {
-			  e.preventDefault();
-		
-			  const username = document.getElementById('username').value;
-			  const password = document.getElementById('password').value;
-		
-			  const res = await fetch(`${window.env.API_URL}/login`, {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ username, password })
-			  });
-		
-			  const data = await res.json();
-		   
-			  if (res.ok) {
-				localStorage.setItem('token', data.token);
-				window.location.href = "admin.html";
-			  } else {
-				document.getElementById('loginStatus').innerText = data.message;
-				document.getElementById('loginStatus').style.color = "red";
-			  }
-			});
+// En tu función de login:
+
+loginForm.addEventListener('submit', async function(e) {
+  e.preventDefault();
+  
+  const username = document.getElementById('username').value;
+  const password = document.getElementById('password').value;
+  
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 segundos de timeout
+    
+    const res = await fetch(`${window.env.API_URL}/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password }),
+      signal: controller.signal
+    });
+    
+    clearTimeout(timeoutId); // Limpia el timeout si la respuesta llega
+    
+    const data = await res.json();
+    
+    if (res.ok) {
+      localStorage.setItem('token', data.token);
+      window.location.href = "admin.html";
+    } else {
+      document.getElementById('loginStatus').innerText = data.message || 'Error de autenticación';
+      document.getElementById('loginStatus').style.color = "red";
+    }
+  } catch (error) {
+    if (error.name === 'AbortError') {
+      document.getElementById('loginStatus').innerText = 'La conexión ha tardado demasiado. Inténtalo de nuevo.';
+    } else {
+      document.getElementById('loginStatus').innerText = `Error: ${error.message}`;
+    }
+    document.getElementById('loginStatus').style.color = "red";
+    console.error('Error en el login:', error);
+  }
+});
 		  });
 		</script>
 		
@@ -520,7 +538,7 @@
                     </blockquote>
                     <div class="testimonial-author">
                         <div class="testimonial-author-thumbnail">
-                            <img src="img/clients/client-1.jpg" class="img-responsive img-circle" alt="">
+                            <img src="img/clients/client-1.png" class="img-responsive img-circle" alt="">
                         </div>
                         <p><strong>Carlos Rodríguez</strong><span>Constructora Edificar</span></p>
                     </div>
@@ -533,7 +551,7 @@
                     </blockquote>
                     <div class="testimonial-author">
                         <div class="testimonial-author-thumbnail">
-                            <img src="img/clients/client-2.jpg" class="img-responsive img-circle" alt="">
+                            <img src="img/clients/client-1.png" class="img-responsive img-circle" alt="">
                         </div>
                         <p><strong>Martina López</strong><span>Pisos & Revestimientos SRL</span></p>
                     </div>
@@ -546,7 +564,7 @@
                     </blockquote>
                     <div class="testimonial-author">
                         <div class="testimonial-author-thumbnail">
-                            <img src="img/clients/client-3.jpg" class="img-responsive img-circle" alt="">
+                            <img src="img/clients/client-1.png" class="img-responsive img-circle" alt="">
                         </div>
                         <p><strong>Gabriel Méndez</strong><span>Urbana Construcciones</span></p>
                     </div>
