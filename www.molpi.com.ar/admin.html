@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>Panel de Administración | Molpi</title>
+  <link rel="icon" href="img/favicon.ico" type="image/x-icon">
+
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="css/general.css">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Open Sans', sans-serif;
+      margin: 0;
+      display: flex;
+    }
+
+    .sidebar {
+      width: 280px;
+      height: 100vh;
+      background-color: #0e2133;
+      color: white;
+      position: fixed;
+      left: 0;
+      top: 0;
+      padding: 30px 20px;
+      box-shadow: 2px 0 10px rgba(0,0,0,0.3);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .sidebar h2 {
+      font-size: 1.8em;
+      text-align: center;
+      margin-bottom: 30px;
+      font-weight: bold;
+    }
+
+    .sidebar-content {
+      flex-grow: 1;
+      overflow-y: auto;
+    }
+
+    .sidebar a {
+      display: block;
+      padding: 12px 20px;
+      margin-bottom: 8px;
+      text-decoration: none;
+      color: white;
+      font-size: 16px;
+      border-radius: 5px;
+      transition: background 0.3s ease;
+    }
+
+    .sidebar a:hover {
+      background-color: #294663;
+    }
+
+    .sidebar a.active {
+      background-color: #e74c3c;
+      font-weight: bold;
+    }
+
+    .sidebar a.exit-button {
+      margin-top: auto;
+      background-color: #32495f;
+      text-align: center;
+      font-weight: bold;
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+
+    .sidebar a.exit-button:hover {
+      background-color: #e74c3c;
+    }
+
+    .main-content {
+      margin-left: 280px;
+      padding: 40px;
+      width: 100%;
+      background-color: #f8f9fa;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="sidebar" id="adminSidebar">
+    <div class="d-flex align-items-center justify-content-center mb-3">
+      <img src="img/logo.png" alt="Molpi" style="height: 40px; margin-right: 10px;">
+      <h2 class="mb-0">MOLPI</h2>
+    </div>
+    <h2>Panel de Administración</h2>
+    <a href="#" data-section="dashboard" class="active">🏠 Dashboard</a>
+    <a href="#" data-section="productos">📦 Productos</a>
+    <a href="#" data-section="galeria">🖼️ Galería de Imágenes</a>
+    <a href="#" data-section="nosotros">🏢 Nosotros</a>
+    <a href="#" data-section="contacto">📍 Contacto</a>
+    <a href="#" data-section="clientes">🤝 Clientes / Logos</a>
+    <!--<a href="#" data-section="seo">🔍 SEO y Metadatos</a>-->
+    <a href="#" data-section="usuarios">👥 Usuarios del Panel</a>
+    <a href="#" data-section="config">⚙️ Configuraciones Generales</a>
+      <!-- Botón de salir -->
+  <a href="index.html" class="exit-button">🚪 SALIR</a>
+  </div>
+
+
+
+  <div class="main-content" id="adminContent">
+    <h1 class="text-danger">Panel de Administración de Molpi</h1>
+    <p class="text-muted">Desde aquí podés editar contenido del sitio.</p>
+  </div>
+  
+  
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const sidebarLinks = document.querySelectorAll("#adminSidebar a[data-section]");
+      const contentArea = document.getElementById("adminContent");
+sidebarLinks.forEach((link) => {
+  link.addEventListener("click", async function (e) {
+    e.preventDefault();
+    const section = this.getAttribute("data-section");
+
+    sidebarLinks.forEach(l => l.classList.remove("active"));
+    this.classList.add("active");
+
+    try {
+      if (section === "productos") {
+        contentArea.innerHTML = getProductosHTML();
+        initProductosScript();
+      } else if (section === "dashboard") {
+        contentArea.innerHTML = getDashboardHTML();
+      } else if (section === "galeria") {
+        contentArea.innerHTML = getGaleriaHTML();
+      } else if (section === "nosotros") {
+        contentArea.innerHTML = getNosotrosHTML();
+      } else if (section === "contacto") {
+        contentArea.innerHTML = getContactoHTML();
+      } else if (section === "clientes") {
+        contentArea.innerHTML = getClientesHTML();
+      } else if (section === "usuarios") {
+        contentArea.innerHTML = getUsuariosHTML();
+      } else if (section === "config") {
+        contentArea.innerHTML = getConfigHTML();
+      } else {
+        // Sección desconocida
+        contentArea.innerHTML = `
+          <div class="alert alert-warning">
+            <h3>Sección en desarrollo</h3>
+            <p>La sección "${section}" está actualmente en desarrollo.</p>
+          </div>
+        `;
+      }
+    } catch (error) {
+      console.error("Error al cargar la sección:", error);
+      contentArea.innerHTML = `
+        <div class="alert alert-danger">
+          <h3>Error al cargar la sección</h3>
+          <p>No se pudo cargar la sección "${section}". Por favor intente nuevamente.</p>
+        </div>
+      `;
+    }
+  });
+});
+// Agregar estas funciones para cada sección
+function getDashboardHTML() {
+  return `
+    <h1 class="mb-4">Dashboard</h1>
+    <div class="row">
+      <div class="col-md-4 mb-4">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Productos</h5>
+            <p class="card-text">Total: 42 productos</p>
+            <a href="#" class="btn btn-primary btn-sm" data-section="productos">Ver productos</a>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4 mb-4">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Clientes</h5>
+            <p class="card-text">Total: 15 logos de clientes</p>
+            <a href="#" class="btn btn-primary btn-sm" data-section="clientes">Ver clientes</a>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4 mb-4">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Galería</h5>
+            <p class="card-text">Total: 28 imágenes</p>
+            <a href="#" class="btn btn-primary btn-sm" data-section="galeria">Ver galería</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card mt-4">
+      <div class="card-body">
+        <h5 class="card-title">Actividad reciente</h5>
+        <ul class="list-group">
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            Producto actualizado: Baldosa 40x40
+            <span class="badge badge-primary badge-pill">Hace 2 días</span>
+          </li>
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            Nueva imagen en galería
+            <span class="badge badge-primary badge-pill">Hace 5 días</span>
+          </li>
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            Información de contacto actualizada
+            <span class="badge badge-primary badge-pill">Hace 1 semana</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  `;
+}
+
+function getGaleriaHTML() {
+  return `
+    <h1 class="mb-4">Galería de Imágenes</h1>
+    <p class="text-muted">Administrá las imágenes de la galería del sitio.</p>
+    
+    <form class="mb-4">
+      <div class="form-group">
+        <label for="nuevaImagen">Agregar nueva imagen</label>
+        <input type="file" class="form-control-file" id="nuevaImagen" accept="image/*">
+      </div>
+      <div class="form-group">
+        <label for="tituloImagen">Título/descripción</label>
+        <input type="text" class="form-control" id="tituloImagen" placeholder="Ingrese un título para la imagen">
+      </div>
+      <button type="submit" class="btn btn-success">Agregar imagen</button>
+    </form>
+    
+    <h3>Imágenes existentes</h3>
+    <div class="alert alert-info">Arrastre y suelte para reordenar las imágenes.</div>
+    
+    <div class="row" id="galeriaExistente">
+      <div class="col-md-3 mb-3">
+        <div class="card">
+          <img src="img/placeholder-image.jpg" class="card-img-top" alt="Imagen">
+          <div class="card-body">
+            <p class="card-text">Imagen ejemplo</p>
+            <div class="d-flex justify-content-between">
+              <button class="btn btn-sm btn-danger">Eliminar</button>
+              <button class="btn btn-sm btn-info">Editar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function getNosotrosHTML() {
+  return `
+    <h1 class="mb-4">Administrar sección 'Nosotros'</h1>
+    <p class="text-muted">Edite la información de la empresa.</p>
+    
+    <form>
+      <div class="form-group">
+        <label for="nosotrosTitulo">Título principal</label>
+        <input type="text" class="form-control" id="nosotrosTitulo" value="Sobre Molpi">
+      </div>
+      <div class="form-group">
+        <label for="nosotrosDescripcion">Descripción</label>
+        <textarea class="form-control" id="nosotrosDescripcion" rows="5">Somos una empresa dedicada a la fabricación y comercialización de moldes para la industria de la construcción...</textarea>
+      </div>
+      <div class="form-group">
+        <label for="nosotrosImagen">Imagen principal</label>
+        <input type="file" class="form-control-file" id="nosotrosImagen">
+        <small class="text-muted">Imagen actual:</small>
+        <img src="img/placeholder-image.jpg" alt="Imagen actual" style="max-width: 200px; display: block; margin-top: 10px;">
+      </div>
+      <button type="submit" class="btn btn-primary">Guardar cambios</button>
+    </form>
+  `;
+}
+
+function getContactoHTML() {
+  return `
+    <h1 class="mb-4">Administrar información de contacto</h1>
+    
+    <form>
+      <div class="form-group">
+        <label for="direccion">Dirección</label>
+        <input type="text" class="form-control" id="direccion" value="Av. Ejemplo 1234, Buenos Aires">
+      </div>
+      <div class="form-group">
+        <label for="telefono">Teléfono</label>
+        <input type="text" class="form-control" id="telefono" value="11-3556-8417">
+      </div>
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" class="form-control" id="email" value="info@molpi.com.ar">
+      </div>
+      <div class="form-group">
+        <label for="horarios">Horarios de atención</label>
+        <input type="text" class="form-control" id="horarios" value="Lunes a Viernes de 9 a 18hs">
+      </div>
+      
+      <h3 class="mt-4">Redes sociales</h3>
+      <div class="form-group">
+        <label for="facebook">Facebook URL</label>
+        <input type="url" class="form-control" id="facebook" value="https://facebook.com/molpi">
+      </div>
+      <div class="form-group">
+        <label for="instagram">Instagram URL</label>
+        <input type="url" class="form-control" id="instagram" value="https://instagram.com/molpi">
+      </div>
+      
+      <button type="submit" class="btn btn-primary">Guardar cambios</button>
+    </form>
+  `;
+}
+function getClientesHTML() {
+  return `
+    <h1 class="mb-4">Administrar Clientes / Logos</h1>
+    <p class="text-muted">Agregá o modificá los logos de clientes que aparecen en la sección.</p>
+    
+    <form class="mb-4">
+      <div class="form-group">
+        <label for="nuevoLogo">Agregar nuevo logo</label>
+        <input type="file" class="form-control-file" id="nuevoLogo" accept="image/*">
+      </div>
+      <div class="form-group">
+        <label for="nombreCliente">Nombre del cliente</label>
+        <input type="text" class="form-control" id="nombreCliente" placeholder="Ingrese el nombre del cliente">
+      </div>
+      <button type="submit" class="btn btn-success">Agregar cliente</button>
+    </form>
+    
+    <h3>Logos existentes</h3>
+    <div class="alert alert-info">Arrastre y suelte para reordenar los logos.</div>
+    
+    <div class="row" id="logosExistentes">
+      <div class="col-md-2 mb-3 text-center">
+        <img src="img/placeholder-logo.png" class="img-fluid mb-2" alt="Logo Cliente">
+        <p>Cliente Ejemplo</p>
+        <button class="btn btn-sm btn-danger">Eliminar</button>
+      </div>
+    </div>
+  `;
+}
+
+function getUsuariosHTML() {
+  return `
+    <h1 class="mb-4">Administración de Usuarios</h1>
+    <p class="text-muted">Gestione los usuarios con acceso al panel administrativo.</p>
+    
+    <button class="btn btn-success mb-4" data-toggle="modal" data-target="#nuevoUsuarioModal">Agregar nuevo usuario</button>
+    
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Usuario</th>
+          <th>Email</th>
+          <th>Rol</th>
+          <th>Última actividad</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>admin</td>
+          <td>admin@molpi.com.ar</td>
+          <td><span class="badge badge-primary">Administrador</span></td>
+          <td>Hoy</td>
+          <td>
+            <button class="btn btn-sm btn-info">Editar</button>
+            <button class="btn btn-sm btn-danger">Eliminar</button>
+          </td>
+        </tr>
+        <tr>
+          <td>editor</td>
+          <td>editor@molpi.com.ar</td>
+          <td><span class="badge badge-secondary">Editor</span></td>
+          <td>Hace 3 días</td>
+          <td>
+            <button class="btn btn-sm btn-info">Editar</button>
+            <button class="btn btn-sm btn-danger">Eliminar</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    
+    <!-- Modal para nuevo usuario -->
+    <div class="modal fade" id="nuevoUsuarioModal" tabindex="-1" role="dialog" aria-labelledby="nuevoUsuarioModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="nuevoUsuarioModalLabel">Agregar nuevo usuario</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form>
+              <div class="form-group">
+                <label for="newUsername">Nombre de usuario</label>
+                <input type="text" class="form-control" id="newUsername" required>
+              </div>
+              <div class="form-group">
+                <label for="newEmail">Email</label>
+                <input type="email" class="form-control" id="newEmail" required>
+              </div>
+              <div class="form-group">
+                <label for="newPassword">Contraseña</label>
+                <input type="password" class="form-control" id="newPassword" required>
+              </div>
+              <div class="form-group">
+                <label for="newRole">Rol</label>
+                <select class="form-control" id="newRole">
+                  <option value="admin">Administrador</option>
+                  <option value="editor">Editor</option>
+                </select>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+            <button type="button" class="btn btn-primary">Guardar usuario</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function getConfigHTML() {
+  return `
+    <h1 class="mb-4">Configuraciones Generales</h1>
+    <p class="text-muted">Configuraciones generales del sitio web.</p>
+    
+    <form>
+      <h3>Información del sitio</h3>
+      <div class="form-group">
+        <label for="siteName">Nombre del sitio</label>
+        <input type="text" class="form-control" id="siteName" value="Molpi">
+      </div>
+      <div class="form-group">
+        <label for="siteTagline">Eslogan</label>
+        <input type="text" class="form-control" id="siteTagline" value="Expertos en moldes para la construcción">
+      </div>
+      
+      <h3 class="mt-4">Configuración de email</h3>
+      <div class="form-group">
+        <label for="emailContact">Email de contacto (recibe los mensajes del formulario)</label>
+        <input type="email" class="form-control" id="emailContact" value="info@molpi.com.ar">
+      </div>
+      
+      <h3 class="mt-4">Personalización</h3>
+      <div class="form-group">
+        <label for="siteLogo">Logo del sitio</label>
+        <input type="file" class="form-control-file" id="siteLogo">
+        <small class="text-muted">Logo actual:</small>
+        <img src="img/logo.png" alt="Logo actual" style="max-width: 200px; display: block; margin-top: 10px;">
+      </div>      
+      <button type="submit" class="btn btn-primary">Guardar configuración</button>
+    </form>
+  `;
+}
+      function getProductosHTML() {
+        return `
+          <h1 class="mb-4">Gestión de Productos</h1>
+          <form id="productosForm" class="mb-4">
+            <div class="form-row">
+              <div class="form-group col-md-4">
+                <label for="productoSelect">Producto</label>
+                <select id="productoSelect" class="form-control">
+                  <option selected disabled>Elegí un producto</option>
+                  <option value="general">General</option>
+                  <option value="insumos">Insumos</option>
+                  <option value="nuevo">➕ Agregar un nuevo Producto</option>
+                </select>
+              </div>
+              <div class="form-group col-md-4">
+                <label for="categoriaSelect">Categoría</label>
+                <select id="categoriaSelect" class="form-control" disabled>
+                  <option selected disabled>Elegí una categoría</option>
+                  <option value="Pisos y Zócalos">Pisos y Zócalos</option>
+                  <option value="Podotáctiles - Discapacidad">Podotáctiles - Discapacidad</option>
+                  <option value="Green">Green</option>
+                  <option value="Piscinas">Piscinas</option>
+                  <option value="Revestimientos">Revestimientos</option>
+                  <option value="Placas Antihumedad">Placas Antihumedad</option>
+                  <option value="nueva_categoria">➕ Agregar Categoría</option>
+                </select>
+              </div>
+              <div class="form-group col-md-4">
+                <label for="subcategoriaSelect">Subcategoría</label>
+                <select id="subcategoriaSelect" class="form-control" disabled>
+                  <option selected disabled>Elegí una subcategoría</option>
+                  <option data-cat="Pisos y Zócalos">Línea 20x20</option>
+                  <option data-cat="Pisos y Zócalos">Línea 40x40</option>
+                  <option data-cat="Pisos y Zócalos">Línea 50x50</option>
+                  <option value="nueva_subcategoria">➕ Nueva subcategoría</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="descripcionProducto">Descripción</label>
+              <textarea id="descripcionProducto" class="form-control" rows="3"></textarea>
+            </div>
+            <div class="form-group">
+              <label for="imagenProducto">Imágen para el Banner</label>
+              <input type="file" id="imagenProducto" class="form-control-file">
+            </div>
+            <button type="submit" class="btn btn-success">Guardar</button>
+          </form>
+          <div id="productosList" class="row"></div>
+        `;
+      }
+
+      function initProductosScript() {
+        const productoSelect = document.getElementById("productoSelect");
+        const categoriaSelect = document.getElementById("categoriaSelect");
+        const subcategoriaSelect = document.getElementById("subcategoriaSelect");
+
+        const subcategoriasPorCategoria = {
+          "Pisos y Zócalos": ["Línea 20x20", "Línea 40x40", "Línea 50x50"]
+        };
+
+        // Mapa de categorías disponibles por producto
+        const categoriasPorProducto = {
+          "general": ["Pisos y Zócalos", "Podotáctiles - Discapacidad", "Green", "Piscinas", "Revestimientos", "Placas Antihumedad"]
+          // insumos no tiene categorías predefinidas
+        };
+
+        productoSelect.addEventListener("change", () => {
+          const val = productoSelect.value;
+          categoriaSelect.disabled = false;
+          
+          // Limpiar categorías existentes
+          categoriaSelect.innerHTML = '<option selected disabled>Elegí una categoría</option>';
+          
+          // Si es insumos, solo mostrar opción para crear nueva categoría
+          if (val === "insumos") {
+            const nuevaOpt = document.createElement("option");
+            nuevaOpt.value = "nueva_categoria";
+            nuevaOpt.textContent = "➕ Agregar una Nueva Categoría";
+            categoriaSelect.appendChild(nuevaOpt);
+          } 
+          // Si es general, mostrar todas las categorías predefinidas
+          else if (val === "general") {
+            categoriasPorProducto.general.forEach(cat => {
+              const opt = document.createElement("option");
+              opt.value = cat;
+              opt.textContent = cat;
+              categoriaSelect.appendChild(opt);
+            });
+            
+            // Agregar opción para nueva categoría al final
+            const nuevaOpt = document.createElement("option");
+            nuevaOpt.value = "nueva_categoria";
+            nuevaOpt.textContent = "➕ Agregar una Nueva Categoría";
+            categoriaSelect.appendChild(nuevaOpt);
+          }
+          // Si es nuevo producto
+          else if (val === "nuevo") {
+            alert("🆕 Funcionalidad para agregar producto será implementada.");
+          }
+
+                // Añadir evento para los botones del dashboard que apuntan a secciones
+      document.addEventListener('click', function(e) {
+        if (e.target && e.target.matches('a[data-section]')) {
+          const section = e.target.getAttribute('data-section');
+          const sidebarLink = document.querySelector(`#adminSidebar a[data-section="${section}"]`);
+          if (sidebarLink) {
+            sidebarLink.click();
+          }
+        }
+      });
+          
+          // Resetear subcategoría
+          subcategoriaSelect.innerHTML = '<option selected disabled>Elegí una subcategoría</option>';
+          subcategoriaSelect.disabled = true;
+        });
+
+        categoriaSelect.addEventListener("change", () => {
+          const cat = categoriaSelect.value;
+          subcategoriaSelect.innerHTML = '<option selected disabled>Elegí una subcategoría</option>';
+
+          if (subcategoriasPorCategoria[cat]) {
+            subcategoriasPorCategoria[cat].forEach(sc => {
+              const opt = document.createElement("option");
+              opt.textContent = sc;
+              opt.value = sc;
+              subcategoriaSelect.appendChild(opt);
+            });
+          }
+
+          const nuevaOpt = document.createElement("option");
+          nuevaOpt.value = "nueva_subcategoria";
+          nuevaOpt.textContent = "➕ Agregar Nueva Subcategoría";
+          subcategoriaSelect.appendChild(nuevaOpt);
+
+          subcategoriaSelect.disabled = false;
+
+          if (cat === "nueva_categoria") {
+            alert("⚠️ Funcionalidad para agregar nueva categoría será implementada.");
+            // Si se selecciona nueva categoría, desactivar subcategoría temporalmente
+            subcategoriaSelect.disabled = true;
+          }
+        });
+
+        document.getElementById("productosForm").addEventListener("submit", function(e) {
+          e.preventDefault();
+          alert("✅ Producto guardado correctamente (mock)");
+        });
+      }
+
+      document.querySelector('#adminSidebar a.active').click();
+    });
+  </script>
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

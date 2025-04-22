@@ -1,0 +1,63 @@
+[
+  {
+    "fondo": "img/slides/slide-bg.jpg",
+    "elementos": [
+      {
+        "tipo": "img",
+        "src": "img/slides/slide-molde-ilus4.png",
+        "data_x": "550",
+        "data_y": "220",
+        "data_start": "250",
+        "data_transform": "y:[400%];opacity:0;s:2200;",
+        "class": "sfb"
+      },
+      {
+        "tipo": "img",
+        "src": "img/slides/slide-molde-ilus2.png",
+        "data_x": "550",
+        "data_y": "165",
+        "data_start": "400",
+        "data_transform": "y:[400%];opacity:0;s:2000;",
+        "class": "sfb"
+      },
+      {
+        "tipo": "img",
+        "src": "img/slides/slide-molde-ilus1.png",
+        "data_x": "550",
+        "data_y": "100",
+        "data_start": "500",
+        "data_transform": "y:[-400%];opacity:0;s:2100;",
+        "class": "sfb"
+      },
+      {
+        "tipo": "text",
+        "texto": "MOLDES",
+        "data_x": "161",
+        "data_y": "190",
+        "data_start": "1200",
+        "data_transform": "y:[100%];s:500;",
+        "data_mask": "x:0px;y:0px;",
+        "class": "main-label"
+      },
+      {
+        "tipo": "text",
+        "texto": "AUTOAPILABLES!",
+        "data_x": "25",
+        "data_y": "250",
+        "data_start": "1600",
+        "data_transform": "y:[100%];s:500;",
+        "data_mask": "x:0px;y:0px;",
+        "class": "main-label"
+      },
+      {
+        "tipo": "text",
+        "texto": "QUE AHORRAN ESPACIO Y DINERO.",
+        "data_x": "75",
+        "data_y": "340",
+        "data_start": "2000",
+        "data_transform": "y:[100%];opacity:0;s:500;",
+        "class": "bottom-label"
+      }
+    ]
+  }
+]

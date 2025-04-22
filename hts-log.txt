@@ -1,0 +1,46 @@
+HTTrack3.49-2+htsswf+htsjava launched on Sat, 12 Apr 2025 15:24:12 at https://www.molpi.com.ar/ +*.png +*.gif +*.jpg +*.jpeg +*.css +*.js -ad.doubleclick.net/* -mime:application/foobar
+(winhttrack -qYC2%Ps2u1%s%uN0%I0p3DaK0H0%kf2A25000%f#f -F "Mozilla/4.5 (compatible; HTTrack 3.0x; Windows 98)" -%F "<!-- Mirrored from %s%s by HTTrack Website Copier/3.x [XR&CO'2014], %s -->" -%l "en, *" -Y https://www.molpi.com.ar/ -O1 "C:\Mis lugares Web\Molpi" +*.png +*.gif +*.jpg +*.jpeg +*.css +*.js -ad.doubleclick.net/* -mime:application/foobar )
+
+Information, Warnings and Errors reported for this mirror:
+note:	the hts-log.txt file, and hts-cache folder, may contain sensitive information,
+	such as username/password authentication for websites mirrored in this project
+	do not share these files/folders if you want these information to remain private
+
+15:25:52	Warning: 	Moved Permanently for https://www.facebook.com/Molpi-171678872861954/
+15:25:52	Warning: 	File has moved from https://www.facebook.com/Molpi-171678872861954/ to https://www.facebook.com/MolpiMoldes
+15:25:53	Warning: 	Moved Permanently for www.instagram.com/robots.txt
+15:25:53	Warning: 	Redirected link is identical because of 'URL Hack' option: www.instagram.com/robots.txt and https://www.instagram.com/robots.txt
+15:25:53	Warning: 	Warning moved treated for www.instagram.com/robots.txt (real one is https://www.instagram.com/robots.txt)
+15:25:53	Warning: 	Moved Permanently for www.instagram.com/molpi.moldes/
+15:25:53	Warning: 	Redirected link is identical because of 'URL Hack' option: www.instagram.com/molpi.moldes/ and https://www.instagram.com/molpi.moldes/
+15:25:53	Warning: 	File has moved from www.instagram.com/molpi.moldes/ to https://www.instagram.com/molpi.moldes/
+15:26:00	Error: 	"Not Found" (404) at link https://www.molpi.com.ar/img/custom-header-bg.jpg (from https://www.molpi.com.ar/css/general.css)
+15:26:00	Error: 	"Not Found" (404) at link https://www.molpi.com.ar/img/video-overlay.png (from https://www.molpi.com.ar/css/general.css)
+15:26:00	Error: 	"Not Found" (404) at link https://www.molpi.com.ar/img/map.png (from https://www.molpi.com.ar/css/general.css)
+15:26:00	Error: 	"Not Found" (404) at link https://www.molpi.com.ar/img/map-2.png (from https://www.molpi.com.ar/css/general.css)
+15:26:00	Error: 	"Not Found" (404) at link https://www.molpi.com.ar/img/home-concept-icons.png (from https://www.molpi.com.ar/css/general.css)
+15:26:00	Error: 	"Not Found" (404) at link https://www.molpi.com.ar/img/home-concept.png (from https://www.molpi.com.ar/css/general.css)
+15:26:00	Error: 	"Not Found" (404) at link https://www.molpi.com.ar/img/home-concept-item.png (from https://www.molpi.com.ar/css/general.css)
+15:26:00	Error: 	"Not Found" (404) at link https://www.molpi.com.ar/img/map-dark.png (from https://www.molpi.com.ar/css/general.css)
+15:26:00	Error: 	"Not Found" (404) at link https://www.molpi.com.ar/img/home-concept-dark.png (from https://www.molpi.com.ar/css/general.css)
+15:26:00	Error: 	"Not Found" (404) at link https://www.molpi.com.ar/img/home-concept-item-dark.png (from https://www.molpi.com.ar/css/general.css)
+15:26:00	Error: 	"Not Found" (404) at link https://www.molpi.com.ar/img/home-concept-icons-dark.png (from https://www.molpi.com.ar/css/general.css)
+15:26:00	Error: 	"Not Found" (404) at link https://www.molpi.com.ar/img/history-thumb-dark.png (from https://www.molpi.com.ar/css/general.css)
+15:26:00	Error: 	"Not Found" (404) at link https://www.molpi.com.ar/img/video-overlay-dark.png (from https://www.molpi.com.ar/css/elementos-generales.css)
+15:26:00	Error: 	"Not Found" (404) at link https://www.molpi.com.ar/img/custom-underline.png (from https://www.molpi.com.ar/css/elementos-generales.css)
+15:26:00	Error: 	"Not Found" (404) at link https://www.molpi.com.ar/img/flags.png (from https://www.molpi.com.ar/css/elementos-generales.css)
+15:26:00	Error: 	"Not Found" (404) at link https://www.molpi.com.ar/img/history-thumb.png (from https://www.molpi.com.ar/css/elementos-generales.css)
+15:26:00	Error: 	"Not Found" (404) at link https://www.molpi.com.ar/img/products/vainilla_de_4_mosaico.png (from https://www.molpi.com.ar/linea_moldes_para_pisos_20x20.html)
+15:26:00	Error: 	"Not Found" (404) at link https://www.molpi.com.ar/img/products/vainilla_de_5_mosaico.png (from https://www.molpi.com.ar/linea_moldes_para_pisos_20x20.html)
+15:26:00	Error: 	"Not Found" (404) at link https://www.molpi.com.ar/img/products/laja_20x40_yeso_mosaico.png (from https://www.molpi.com.ar/linea_moldes_para_pisos_20x20.html)
+15:26:00	Error: 	"Not Found" (404) at link https://www.molpi.com.ar/img/products/laja_san_pedro_mosaico.png (from https://www.molpi.com.ar/linea_moldes_para_pisos_40x40.html)
+15:26:00	Error: 	"Not Found" (404) at link https://www.molpi.com.ar/img/products/flor_circular_mosaico.png (from https://www.molpi.com.ar/linea_moldes_para_pisos_40x40.html)
+15:26:00	Error: 	"Not Found" (404) at link https://www.molpi.com.ar/img/products/antideslizante_mosaico.png (from https://www.molpi.com.ar/linea_moldes_para_pisos_40x40.html)
+15:26:00	Error: 	"Not Found" (404) at link https://www.molpi.com.ar/img/products/piscina_borderecto_40x50_mosaico.png (from https://www.molpi.com.ar/piscinas.html)
+15:26:00	Error: 	"Not Found" (404) at link https://www.molpi.com.ar/img/products/piscina_escalon_32x18_mosaico.png (from https://www.molpi.com.ar/piscinas.html)
+15:26:00	Error: 	"Not Found" (404) at link https://www.molpi.com.ar/img/products/simil_piedra_mosaico.png (from https://www.molpi.com.ar/revestimientos.html)
+15:26:00	Error: 	"Not Found" (404) at link https://www.molpi.com.ar/img/products/revestimiento_20x40_yeso_mosaico.png (from https://www.molpi.com.ar/revestimientos.html)
+15:26:01	Error: 	"Not Found" (404) at link fonts.googleapis.com/ (from https://www.seonet.com.ar/blog/marketing-para-pymes/)
+
+HTTrack Website Copier/3.49-2 mirror complete in 1 minutes 51 seconds : 326 links scanned, 291 files written (18521968 bytes overall) [17404877 bytes received at 156800 bytes/sec], 1853330 bytes transferred using HTTP compression in 54 files, ratio 27%, 1.0 requests per connection
+(27 errors, 8 warnings, 0 messages)
