@@ -1,8 +1,29 @@
-from flask import Flask, render_template_string, request, jsonify, send_from_directory, send_file, redirect, render_template
+from flask import Flask, render_template_string, request, jsonify, send_from_directory, send_file, redirect, render_template,edirect, url_for
 from flask_cors import CORS
 import os
 import sqlite3
 import json
+
+@app.route('/admin')
+def admin():
+    return render_template('admin.html')  # o lo que corresponda
+
+
+# ========= Login =========
+app = Flask(__name__)
+
+@app.route('/login', methods=['POST'])
+def login():
+    data = request.get_json()
+    username = data.get('username')
+    password = data.get('password')
+
+    if username == 'admin' and password == '1234':
+        return jsonify({'token': 'valid-token'}), 200
+    else:
+        return jsonify({'message': 'Credenciales inválidas'}), 401
+    
+    
 
 # ========= Configuración de Flask =========
 app = Flask(__name__)

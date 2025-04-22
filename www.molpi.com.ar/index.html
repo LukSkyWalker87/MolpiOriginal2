@@ -75,12 +75,9 @@
 				const data = await res.json();
 				if (res.ok) {
   localStorage.setItem('token', data.token);
-  document.getElementById('loginStatus').innerText = "Login correcto";
-  document.getElementById('loginStatus').style.color = "green";
-
-  // Redirige al panel de administración (asegurate de que exista)
-  window.location.href = "admin.html";
+  window.location.href = "/admin"; // Redirige al panel admin
 }
+
 else {
 				  document.getElementById('loginStatus').innerText = data.message;
 				  document.getElementById('loginStatus').style.color = "red";
