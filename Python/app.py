@@ -1,35 +1,38 @@
-from flask import Flask, render_template_string, request, jsonify, send_from_directory, send_file, redirect, render_template,edirect, url_for
+from flask import Flask, render_template_string, request, jsonify, send_from_directory, send_file, redirect, render_template, url_for
 from flask_cors import CORS
 import os
 import sqlite3
 import json
 
-@app.route('/admin')
-def admin():
-    return render_template('admin.html')  # o lo que corresponda
-
-
-# ========= Login =========
-app = Flask(__name__)
-
-@app.route('/login', methods=['POST'])
-def login():
-    data = request.get_json()
-    username = data.get('username')
-    password = data.get('password')
-
-    if username == 'admin' and password == '1234':
-        return jsonify({'token': 'valid-token'}), 200
-    else:
-        return jsonify({'message': 'Credenciales inválidas'}), 401
-    
-    
-
 # ========= Configuración de Flask =========
+# ✅ Instancia única con configuración
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '123456'
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
 CORS(app)
+
+# ========= Login =========
+@app.route('/login', methods=['POST'])
+def login():
+    # Determinar si es JSON o formulario
+    if request.is_json:
+        data = request.get_json()
+        username = data.get('username')
+        password = data.get('password')
+        
+        if username == 'admin' and password == '1234':
+            return jsonify({'token': 'valid-token'}), 200
+        else:
+            return jsonify({'message': 'Credenciales inválidas'}), 401
+    else:
+        # Formulario HTML
+        username = request.form.get('username')
+        password = request.form.get('password')
+        
+        if username == 'admin' and password == 'admin123':
+            return redirect('/admin')
+        else:
+            return "Credenciales inválidas", 401
 
 # ========= Página principal y archivos estáticos =========
 @app.route('/')
@@ -157,17 +160,6 @@ def delete_producto(producto_id):
     conn.commit()
     conn.close()
     return jsonify({ 'message': 'Producto eliminado' })
-
-# ========= Login básico =========
-@app.route('/login', methods=['POST'])
-def login():
-    username = request.form.get('username')
-    password = request.form.get('password')
-    
-    if username == 'admin' and password == 'admin123':
-        return redirect('/admin')
-    else:
-        return "Credenciales inválidas", 401
 
 # ========= Admin y componentes =========
 @app.route('/admin')
