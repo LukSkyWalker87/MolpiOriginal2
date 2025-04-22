@@ -55,37 +55,37 @@
 	<body>
 
 
+		<script src="env.js"></script>
 		<script>
-			document.addEventListener('DOMContentLoaded', () => {
-			  const loginForm = document.getElementById('loginForm');
-			  if (!loginForm) return;
-		  
-			  loginForm.addEventListener('submit', async function(e) {
-				e.preventDefault();
-		  
-				const username = document.getElementById('username').value;
-				const password = document.getElementById('password').value;
-		  
-				const res = await fetch('molpisoloback-production.up.railway.app/login', {
-
-				  method: 'POST',
-				  headers: { 'Content-Type': 'application/json' },
-				  body: JSON.stringify({ username, password })
-				});
-		  
-				const data = await res.json();
-				if (res.ok) {
-  localStorage.setItem('token', data.token);
-  window.location.href = "/admin"; // Redirige al panel admin
-}
-
-else {
-				  document.getElementById('loginStatus').innerText = data.message;
-				  document.getElementById('loginStatus').style.color = "red";
-				}
+		  document.addEventListener('DOMContentLoaded', () => {
+			const loginForm = document.getElementById('loginForm');
+			if (!loginForm) return;
+		
+			loginForm.addEventListener('submit', async function(e) {
+			  e.preventDefault();
+		
+			  const username = document.getElementById('username').value;
+			  const password = document.getElementById('password').value;
+		
+			  const res = await fetch(`${window.env.API_URL}/login`, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ username, password })
 			  });
+		
+			  const data = await res.json();
+		
+			  if (res.ok) {
+				localStorage.setItem('token', data.token);
+				window.location.href = "/admin";
+			  } else {
+				document.getElementById('loginStatus').innerText = data.message;
+				document.getElementById('loginStatus').style.color = "red";
+			  }
 			});
-		  </script>
+		  });
+		</script>
+		
 
 		  			<!-- LOGIN MODAL -->
 <div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="loginModalLabel">
@@ -106,6 +106,8 @@ else {
 			<div class="form-group">
 			  <label for="password">Contraseña</label>
 			  <input type="password" class="form-control" name="password" required placeholder="Ingresá tu contraseña" autocomplete="current-password"> 
+			  <p id="loginStatus" style="text-align: center;"></p>
+
 			</div>
 		  </div>
 		  <div class="modal-footer">
