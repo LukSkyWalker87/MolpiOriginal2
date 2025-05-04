@@ -1,0 +1,20 @@
+Pasos para ejecutar Molpi
+
+✅ PASO 1: Activá el entorno virtual
+Veo que ya lo hiciste y estás en:
+(venv) PS C:\Users\lucas\OneDrive\Documentos\GitHub\MolpiOriginal\python>
+
+✅ PASO 2: Instalá Flask en ese entorno
+pip install flask flask-cors
+Si querés que se guarde en un requirements.txt para que quede registrado, podés hacer:
+
+pip freeze > requirements.txt
+✅ PASO 3: Ejecutá tu servidor Flask
+Estás en la carpeta python, así que si tu app.py está ahí, ejecutá:
+python app.py
+Si te dice algo como ModuleNotFoundError, asegurate de estar en el entorno correcto (parece que lo estás), y de tener Flask instalado.
+
+✅ ¿Querés que revise si tu archivo app.py está en la ruta correcta?
+Podés probar este comando para listar los archivos:
+dir
+Así sabés si realmente app.py está en esa carpeta.

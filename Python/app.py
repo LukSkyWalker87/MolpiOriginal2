@@ -3,6 +3,14 @@ from flask_cors import CORS
 import os
 import sqlite3
 import json
+from flask_sqlalchemy import SQLAlchemy
+
+db = SQLAlchemy(app)
+class Testimonio(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    autor = db.Column(db.String(100), nullable=False)
+    texto = db.Column(db.Text, nullable=False)
+    fecha = db.Column(db.DateTime, default=datetime.utcnow)
 
 # ========= Configuración de Flask =========
 # ✅ Instancia única con configuración
@@ -185,6 +193,37 @@ def cargar_componente(section):
     except Exception as e:
         return f"Error al cargar la sección {section}: {str(e)}", 500
     
+
+# ========= Testimonios =========
+#GET /testimonios
+@app.route('/testimonios', methods=['GET'])
+def obtener_testimonios():
+    testimonios = Testimonio.query.order_by(Testimonio.fecha.desc()).all()
+    return jsonify([
+        {'id': t.id, 'autor': t.autor, 'texto': t.texto, 'fecha': t.fecha.strftime('%Y-%m-%d')}
+        for t in testimonios
+    ])
+#POST /testimonios
+@app.route('/testimonios', methods=['POST'])
+def crear_testimonio():
+    data = request.get_json()
+    nuevo = Testimonio(
+        autor=data.get('autor'),
+        texto=data.get('texto')
+    )
+    db.session.add(nuevo)
+    db.session.commit()
+    return jsonify({'message': 'Testimonio creado correctamente'}), 201
+
+#DELETE /testimonios/<id>
+@app.route('/testimonios/<int:id>', methods=['DELETE'])
+def borrar_testimonio(id):
+    testimonio = Testimonio.query.get_or_404(id)
+    db.session.delete(testimonio)
+    db.session.commit()
+    return jsonify({'message': 'Testimonio eliminado'})
+
+
 
 # ========= Main =========
 if __name__ == '__main__':
