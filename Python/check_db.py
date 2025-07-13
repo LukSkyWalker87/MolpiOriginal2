@@ -3,27 +3,31 @@ import sqlite3
 conn = sqlite3.connect('molpi.db')
 c = conn.cursor()
 
-# Verificar qué tablas existen
-c.execute("SELECT name FROM sqlite_master WHERE type='table'")
-tablas = c.fetchall()
-print("Tablas en la base de datos:")
-for tabla in tablas:
-    print(f"  - {tabla[0]}")
+# Verificar las categorías y subcategorías exactas
+print('=== CATEGORÍAS ÚNICAS ===')
+c.execute('SELECT DISTINCT categoria FROM productos WHERE activo = 1')
+for row in c.fetchall():
+    print(f'Categoria: "{row[0]}" (len={len(row[0])})')
 
-print("\n" + "="*50)
-
-# Verificar la estructura de cada tabla
-for tabla in tablas:
-    tabla_nombre = tabla[0]
-    print(f"\nEstructura de la tabla {tabla_nombre}:")
-    c.execute(f"PRAGMA table_info({tabla_nombre})")
-    columns = c.fetchall()
-    for col in columns:
-        print(f"  {col[1]} ({col[2]})")
+print('\n=== SUBCATEGORÍAS ÚNICAS ===')
+c.execute('SELECT DISTINCT subcategoria FROM productos WHERE activo = 1')
+for row in c.fetchall():
+    print(f'Subcategoria: "{row[0]}" (len={len(row[0])})')
     
-    # Contar registros
-    c.execute(f"SELECT COUNT(*) FROM {tabla_nombre}")
-    count = c.fetchone()[0]
-    print(f"  Registros: {count}")
+print('\n=== PRODUCTOS POR CATEGORÍA ===')
+c.execute('SELECT categoria, COUNT(*) FROM productos WHERE activo = 1 GROUP BY categoria')
+for row in c.fetchall():
+    print(f'{row[0]}: {row[1]} productos')
+
+print('\n=== PRODUCTOS POR SUBCATEGORÍA ===')
+c.execute('SELECT subcategoria, COUNT(*) FROM productos WHERE activo = 1 GROUP BY subcategoria')
+for row in c.fetchall():
+    print(f'{row[0]}: {row[1]} productos')
+
+# Verificar productos específicos de "Pisos y Zócalos"
+print('\n=== PRODUCTOS DE "Pisos y Zócalos" ===')
+c.execute('SELECT nombre, categoria, subcategoria FROM productos WHERE categoria = "Pisos y Zócalos" AND activo = 1')
+for row in c.fetchall():
+    print(f'Nombre: "{row[0]}", Categoria: "{row[1]}", Subcategoria: "{row[2]}"')
 
 conn.close()

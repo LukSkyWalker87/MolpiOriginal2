@@ -24,7 +24,17 @@
       color: white;
       position: fixed;
       left: 0;
-      top: 0;
+      to        // Cargar productos con filtros del backend
+        fetch(url)
+          .then(response => response.json())
+          .then(productos => {
+            console.log('📦 Productos recibidos del backend:', productos.length);
+            console.log('📦 Primeros 3 productos:');
+            productos.slice(0, 3).forEach((p, i) => {
+              console.log(`  ${i+1}. "${p.nombre}" - Categoria: "${p.categoria}" - Subcategoria: "${p.subcategoria}"`);
+            });
+            
+            let productosFiltrados = productos;
       padding: 30px 20px;
       box-shadow: 2px 0 10px rgba(0,0,0,0.3);
       display: flex;
@@ -700,38 +710,49 @@ function getConfigHTML() {
         filtrandoProductos = true;
         
         // Obtener valores de los filtros
-        const categoria = document.getElementById('filtroCategoria').value;
-        const subcategoria = document.getElementById('filtroSubcategoria').value;
-        const busqueda = document.getElementById('buscarProducto').value.toLowerCase();
+        const selectCategoria = document.getElementById('filtroCategoria');
+        const selectSubcategoria = document.getElementById('filtroSubcategoria');
+        const inputBusqueda = document.getElementById('buscarProducto');
         
-        console.log('🔍 Filtrando productos:', { categoria, subcategoria, busqueda });
+        const categoria = selectCategoria.value;
+        const subcategoria = selectSubcategoria.value;
+        const busqueda = inputBusqueda.value.toLowerCase();
         
-        // Cargar productos y aplicar filtros
-        fetch('/productos')
+        console.log('🔍 Filtrando productos:');
+        console.log('  - Categoria selected index:', selectCategoria.selectedIndex);
+        console.log('  - Categoria selected option:', selectCategoria.options[selectCategoria.selectedIndex]);
+        console.log('  - Categoria value:', categoria);
+        console.log('  - Categoria value length:', categoria.length);
+        console.log('  - Categoria value (hex):', Array.from(categoria).map(c => c.charCodeAt(0).toString(16)).join(' '));
+        console.log('  - Subcategoria:', subcategoria);
+        console.log('  - Busqueda:', busqueda);
+        
+        // Construir URL con parámetros de filtro
+        let url = '/productos';
+        const params = new URLSearchParams();
+        
+        if (categoria && categoria !== '') {
+          params.append('categoria', categoria);
+        }
+        
+        if (subcategoria && subcategoria !== '') {
+          params.append('subcategoria', subcategoria);
+        }
+        
+        if (params.toString()) {
+          url += '?' + params.toString();
+        }
+        
+        console.log(`🌐 Llamando a: ${url}`);
+        
+        // Cargar productos con filtros del backend
+        fetch(url)
           .then(response => response.json())
           .then(productos => {
-            console.log('📦 Productos recibidos:', productos.length);
+            console.log('� Productos recibidos del backend:', productos.length);
             let productosFiltrados = productos;
             
-            // Filtrar por categoría
-            if (categoria && categoria !== '') {
-              productosFiltrados = productosFiltrados.filter(p => {
-                const match = p.categoria === categoria;
-                if (!match) console.log(`❌ Producto ${p.nombre} no coincide con categoría ${categoria} (tiene: ${p.categoria})`);
-                return match;
-              });
-              console.log(`📊 Después de filtrar por categoría "${categoria}": ${productosFiltrados.length} productos`);
-            }
-            
-            // Filtrar por subcategoría
-            if (subcategoria && subcategoria !== '') {
-              productosFiltrados = productosFiltrados.filter(p => 
-                p.subcategoria === subcategoria
-              );
-              console.log(`📊 Después de filtrar por subcategoría "${subcategoria}": ${productosFiltrados.length} productos`);
-            }
-            
-            // Filtrar por búsqueda de texto
+            // Solo filtrar por búsqueda de texto en el frontend (ya que el backend no lo soporta)
             if (busqueda && busqueda !== '') {
               productosFiltrados = productosFiltrados.filter(p => 
                 p.nombre.toLowerCase().includes(busqueda) ||
