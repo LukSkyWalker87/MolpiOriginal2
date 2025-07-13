@@ -137,9 +137,7 @@ sidebarLinks.forEach((link) => {
     try {
       if (section === "productos") {
         console.log('Loading productos section');
-        contentArea.innerHTML = getProductosHTML();
-        console.log('HTML set, calling initProductosScript');
-        initProductosScript();
+        loadProductosComponent();
       } else if (section === "dashboard") {
         contentArea.innerHTML = getDashboardHTML();
       } else if (section === "galeria") {
@@ -474,6 +472,414 @@ function getConfigHTML() {
     </form>
   `;
 }
+      async function loadProductosComponent() {
+        try {
+          console.log('Fetching productos component...');
+          const response = await fetch('/admin/component/productos');
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          const componentHTML = await response.text();
+          contentArea.innerHTML = componentHTML;
+          console.log('Productos component loaded successfully');
+          
+          // Esperar un poco para que el DOM se actualice y luego inicializar
+          setTimeout(() => {
+            console.log('Iniciando carga de productos...');
+            initComponenteProductos();
+          }, 300);
+          
+        } catch (error) {
+          console.error('Error loading productos component:', error);
+          contentArea.innerHTML = `
+            <div class="alert alert-danger">
+              <h4>Error al cargar el componente de productos</h4>
+              <p>No se pudo cargar el componente de productos. Error: ${error.message}</p>
+              <p>Verifica que el archivo /components/productos.html existe y el servidor está funcionando correctamente.</p>
+            </div>
+          `;
+        }
+      }
+
+      // Función para inicializar completamente el componente productos
+      async function initComponenteProductos() {
+        console.log('=== Iniciando componente productos ===');
+        
+        // Variables locales para el componente
+        let productos = [];
+        let categorias = [];
+        let productoEditando = null;
+        
+        // 1. Cargar categorías
+        try {
+          console.log('Cargando categorías...');
+          const response = await fetch('/categorias');
+          categorias = await response.json();
+          
+          const selectCategoria = document.getElementById('productoCategoria');
+          const filtroCategoria = document.getElementById('filtroCategoria');
+          
+          if (selectCategoria) {
+            selectCategoria.innerHTML = '<option value="">Selecciona una categoría</option>';
+            categorias.forEach(categoria => {
+              const option = new Option(categoria.nombre, categoria.nombre);
+              selectCategoria.add(option);
+            });
+          }
+          
+          if (filtroCategoria) {
+            filtroCategoria.innerHTML = '<option value="">Todas las categorías</option>';
+            categorias.forEach(categoria => {
+              const option = new Option(categoria.nombre, categoria.nombre);
+              filtroCategoria.add(option);
+            });
+          }
+          
+          console.log('Categorías cargadas:', categorias.length);
+        } catch (error) {
+          console.error('Error cargando categorías:', error);
+        }
+        
+        // 2. Cargar productos
+        try {
+          console.log('Cargando productos...');
+          const response = await fetch('/productos');
+          productos = await response.json();
+          mostrarProductos(productos);
+          console.log('Productos cargados:', productos.length);
+        } catch (error) {
+          console.error('Error cargando productos:', error);
+          const tbody = document.getElementById('tablaProductos');
+          if (tbody) {
+            tbody.innerHTML = '<tr><td colspan="8" class="text-center text-danger">Error al cargar productos</td></tr>';
+          }
+        }
+        
+        // 3. Función para mostrar productos en la tabla
+        function mostrarProductos(productosAMostrar) {
+          const tbody = document.getElementById('tablaProductos');
+          if (!tbody) return;
+          
+          tbody.innerHTML = '';
+          
+          if (productosAMostrar.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="8" class="text-center">No hay productos para mostrar</td></tr>';
+            return;
+          }
+          
+          productosAMostrar.forEach(producto => {
+            const fila = document.createElement('tr');
+            fila.innerHTML = `
+              <td>${producto.id}</td>
+              <td>
+                ${producto.imagen_url ? 
+                  `<img src="${producto.imagen_url}" alt="${producto.nombre}" style="width: 60px; height: 60px; object-fit: cover;" class="rounded">` : 
+                  '<span class="text-muted">Sin imagen</span>'
+                }
+              </td>
+              <td>
+                <strong>${producto.nombre}</strong>
+                ${producto.descripcion ? `<br><small class="text-muted">${producto.descripcion.substring(0, 100)}...</small>` : ''}
+              </td>
+              <td><span class="badge badge-info">${producto.categoria}</span></td>
+              <td><span class="badge badge-secondary">${producto.subcategoria}</span></td>
+              <td>${producto.precio ? '$' + producto.precio.toFixed(2) : 'No definido'}</td>
+              <td>
+                <span class="badge badge-${producto.activo ? 'success' : 'danger'}">
+                  ${producto.activo ? 'Activo' : 'Inactivo'}
+                </span>
+              </td>
+              <td>
+                <button class="btn btn-sm btn-primary btn-editar" data-id="${producto.id}" title="Editar">
+                  <i class="fa fa-edit"></i>
+                </button>
+                <button class="btn btn-sm btn-danger btn-eliminar" data-id="${producto.id}" title="Eliminar">
+                  <i class="fa fa-trash"></i>
+                </button>
+                ${producto.pdf_url ? 
+                  `<a href="${producto.pdf_url}" target="_blank" class="btn btn-sm btn-info" title="Ver PDF">
+                    <i class="fa fa-file-pdf-o"></i>
+                  </a>` : ''
+                }
+              </td>
+            `;
+            tbody.appendChild(fila);
+          });
+          
+          // Configurar botones de editar y eliminar
+          document.querySelectorAll('.btn-editar').forEach(btn => {
+            btn.addEventListener('click', function() {
+              const id = parseInt(this.dataset.id);
+              editarProducto(id);
+            });
+          });
+          
+          document.querySelectorAll('.btn-eliminar').forEach(btn => {
+            btn.addEventListener('click', function() {
+              const id = parseInt(this.dataset.id);
+              eliminarProducto(id);
+            });
+          });
+        }
+        
+        // 4. Función para filtrar productos
+        function filtrarProductos() {
+          const filtroCategoria = document.getElementById('filtroCategoria');
+          const filtroSubcategoria = document.getElementById('filtroSubcategoria');
+          const buscarProducto = document.getElementById('buscarProducto');
+          
+          const categoria = filtroCategoria ? filtroCategoria.value : '';
+          const subcategoria = filtroSubcategoria ? filtroSubcategoria.value : '';
+          const busqueda = buscarProducto ? buscarProducto.value.toLowerCase() : '';
+          
+          let productosFiltrados = productos;
+          
+          if (categoria) {
+            productosFiltrados = productosFiltrados.filter(p => p.categoria === categoria);
+          }
+          
+          if (subcategoria) {
+            productosFiltrados = productosFiltrados.filter(p => p.subcategoria === subcategoria);
+          }
+          
+          if (busqueda) {
+            productosFiltrados = productosFiltrados.filter(p => 
+              p.nombre.toLowerCase().includes(busqueda) || 
+              (p.descripcion && p.descripcion.toLowerCase().includes(busqueda))
+            );
+          }
+          
+          mostrarProductos(productosFiltrados);
+        }
+        
+        // 5. Función para mostrar modal de nuevo producto
+        function mostrarModalProducto() {
+          productoEditando = null;
+          const modalTitle = document.getElementById('modalProductoTitle');
+          const formProducto = document.getElementById('formProducto');
+          const productoId = document.getElementById('productoId');
+          
+          if (modalTitle) modalTitle.textContent = 'Nuevo Producto';
+          if (formProducto) formProducto.reset();
+          if (productoId) productoId.value = '';
+          
+          mostrarVistaPrevia('');
+          
+          if (typeof $ !== 'undefined' && $('#modalProducto').length) {
+            $('#modalProducto').modal('show');
+          }
+        }
+        
+        // 6. Función para mostrar vista previa de imagen
+        function mostrarVistaPrevia(url) {
+          const imgPrevia = document.getElementById('imagenPrevia');
+          const sinImagen = document.getElementById('sinImagen');
+          
+          if (!imgPrevia || !sinImagen) return;
+          
+          if (url && url.trim() !== '') {
+            imgPrevia.src = url;
+            imgPrevia.style.display = 'block';
+            sinImagen.style.display = 'none';
+            
+            imgPrevia.onerror = function() {
+              imgPrevia.style.display = 'none';
+              sinImagen.style.display = 'block';
+              sinImagen.textContent = 'Error al cargar la imagen';
+            };
+          } else {
+            imgPrevia.style.display = 'none';
+            sinImagen.style.display = 'block';
+            sinImagen.textContent = 'No hay imagen para mostrar';
+          }
+        }
+        
+        // 7. Función para cargar subcategorías dinámicamente
+        async function cargarSubcategorias() {
+          const categoriaSeleccionada = document.getElementById('productoCategoria').value;
+          const selectSubcategoria = document.getElementById('productoSubcategoria');
+          
+          if (selectSubcategoria) {
+            selectSubcategoria.innerHTML = '<option value="">Selecciona una subcategoría</option>';
+          }
+          
+          if (!categoriaSeleccionada) return;
+          
+          try {
+            const response = await fetch('/subcategorias');
+            const todasSubcategorias = await response.json();
+            
+            // Filtrar subcategorías por categoría
+            const categoria = categorias.find(c => c.nombre === categoriaSeleccionada);
+            if (categoria && selectSubcategoria) {
+              const subcategoriasFiltered = todasSubcategorias.filter(s => s.categoria_id === categoria.id);
+              
+              subcategoriasFiltered.forEach(subcategoria => {
+                const option = new Option(subcategoria.nombre, subcategoria.nombre);
+                selectSubcategoria.add(option);
+              });
+            }
+          } catch (error) {
+            console.error('Error cargando subcategorías:', error);
+          }
+        }
+        
+        // 8. Función para guardar producto
+        async function guardarProducto() {
+          const formProducto = document.getElementById('formProducto');
+          if (!formProducto) return;
+          
+          const formData = new FormData(formProducto);
+          const productoData = Object.fromEntries(formData);
+          
+          try {
+            const url = productoEditando ? `/productos/${productoEditando}` : '/productos';
+            const method = productoEditando ? 'PUT' : 'POST';
+            
+            const response = await fetch(url, {
+              method: method,
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(productoData)
+            });
+            
+            const result = await response.json();
+            
+            if (response.ok) {
+              if (typeof $ !== 'undefined' && $('#modalProducto').length) {
+                $('#modalProducto').modal('hide');
+              }
+              // Recargar productos
+              const response2 = await fetch('/productos');
+              productos = await response2.json();
+              mostrarProductos(productos);
+              alert('Producto guardado correctamente');
+            } else {
+              alert('Error al guardar: ' + result.message);
+            }
+          } catch (error) {
+            console.error('Error:', error);
+            alert('Error al guardar el producto');
+          }
+        }
+        
+        // 9. Función para editar producto
+        function editarProducto(id) {
+          const producto = productos.find(p => p.id === id);
+          if (!producto) return;
+          
+          productoEditando = id;
+          
+          const modalTitle = document.getElementById('modalProductoTitle');
+          const productoIdInput = document.getElementById('productoId');
+          const productoNombre = document.getElementById('productoNombre');
+          const productoDescripcion = document.getElementById('productoDescripcion');
+          const productoCategoria = document.getElementById('productoCategoria');
+          const productoPrecio = document.getElementById('productoPrecio');
+          const productoImagen = document.getElementById('productoImagen');
+          const productoPdf = document.getElementById('productoPdf');
+          
+          if (modalTitle) modalTitle.textContent = 'Editar Producto';
+          if (productoIdInput) productoIdInput.value = producto.id;
+          if (productoNombre) productoNombre.value = producto.nombre;
+          if (productoDescripcion) productoDescripcion.value = producto.descripcion || '';
+          if (productoCategoria) productoCategoria.value = producto.categoria;
+          if (productoPrecio) productoPrecio.value = producto.precio || '';
+          if (productoImagen) productoImagen.value = producto.imagen_url || '';
+          if (productoPdf) productoPdf.value = producto.pdf_url || '';
+          
+          // Cargar subcategorías y seleccionar la correcta
+          cargarSubcategorias().then(() => {
+            const productoSubcategoria = document.getElementById('productoSubcategoria');
+            if (productoSubcategoria) {
+              productoSubcategoria.value = producto.subcategoria;
+            }
+          });
+          
+          mostrarVistaPrevia(producto.imagen_url || '');
+          
+          if (typeof $ !== 'undefined' && $('#modalProducto').length) {
+            $('#modalProducto').modal('show');
+          }
+        }
+        
+        // 10. Función para eliminar producto
+        async function eliminarProducto(id) {
+          if (!confirm('¿Estás seguro de que quieres eliminar este producto?')) {
+            return;
+          }
+          
+          try {
+            const response = await fetch(`/productos/${id}`, {
+              method: 'DELETE'
+            });
+            
+            if (response.ok) {
+              // Recargar productos
+              const response2 = await fetch('/productos');
+              productos = await response2.json();
+              mostrarProductos(productos);
+              alert('Producto eliminado correctamente');
+            } else {
+              alert('Error al eliminar el producto');
+            }
+          } catch (error) {
+            console.error('Error:', error);
+            alert('Error al eliminar el producto');
+          }
+        }
+        
+        // 11. Configurar event listeners
+        const btnNuevoProducto = document.getElementById('btnNuevoProducto');
+        if (btnNuevoProducto) {
+          btnNuevoProducto.addEventListener('click', function() {
+            mostrarModalProducto();
+          });
+        }
+        
+        const filtroCategoria = document.getElementById('filtroCategoria');
+        const filtroSubcategoria = document.getElementById('filtroSubcategoria');
+        const buscarProducto = document.getElementById('buscarProducto');
+        
+        if (filtroCategoria) {
+          filtroCategoria.addEventListener('change', filtrarProductos);
+        }
+        
+        if (filtroSubcategoria) {
+          filtroSubcategoria.addEventListener('change', filtrarProductos);
+        }
+        
+        if (buscarProducto) {
+          buscarProducto.addEventListener('input', filtrarProductos);
+        }
+        
+        // Configurar cambio de categoria en el modal
+        const productoCategoria = document.getElementById('productoCategoria');
+        if (productoCategoria) {
+          productoCategoria.addEventListener('change', cargarSubcategorias);
+        }
+        
+        // Configurar vista previa de imagen
+        const productoImagen = document.getElementById('productoImagen');
+        if (productoImagen) {
+          productoImagen.addEventListener('input', function() {
+            mostrarVistaPrevia(this.value);
+          });
+        }
+        
+        // Configurar formulario
+        const formProducto = document.getElementById('formProducto');
+        if (formProducto) {
+          formProducto.addEventListener('submit', function(e) {
+            e.preventDefault();
+            guardarProducto();
+          });
+        }
+        
+        console.log('=== Componente productos inicializado correctamente ===');
+      }
+
       function getProductosHTML() {
         return `
           <div class="container-fluid">
