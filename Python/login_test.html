@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Molpi</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 400px;
+            margin: 100px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .login-container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+        }
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        .login-btn {
+            width: 100%;
+            padding: 12px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .login-btn:hover {
+            background-color: #0056b3;
+        }
+        .credentials-info {
+            background-color: #e9ecef;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+            text-align: center;
+        }
+        .credentials-info h4 {
+            margin-top: 0;
+            color: #495057;
+        }
+        .credentials-info p {
+            margin: 5px 0;
+            color: #6c757d;
+        }
+        .test-buttons {
+            margin-top: 20px;
+        }
+        .test-btn {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .test-json {
+            background-color: #28a745;
+            color: white;
+        }
+        .test-json:hover {
+            background-color: #218838;
+        }
+        .response {
+            margin-top: 15px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            border-left: 4px solid #007bff;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h2>Login Molpi</h2>
+        
+        <!-- Formulario HTML tradicional -->
+        <form action="/login" method="POST">
+            <div class="form-group">
+                <label for="username">Usuario:</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Contraseña:</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            
+            <button type="submit" class="login-btn">Iniciar Sesión (Form)</button>
+        </form>
+        
+        <!-- Botones de prueba -->
+        <div class="test-buttons">
+            <button class="test-btn test-json" onclick="testJsonLogin()">
+                Probar Login JSON
+            </button>
+        </div>
+        
+        <div id="response" class="response" style="display: none;">
+            <h4>Respuesta:</h4>
+            <pre id="responseContent"></pre>
+        </div>
+        
+        <!-- Información de credenciales -->
+        <div class="credentials-info">
+            <h4>Credenciales de Prueba</h4>
+            <p><strong>Usuario:</strong> admin</p>
+            <p><strong>Contraseña:</strong> 1234</p>
+        </div>
+    </div>
+
+    <script>
+        async function testJsonLogin() {
+            const responseDiv = document.getElementById('response');
+            const responseContent = document.getElementById('responseContent');
+            
+            try {
+                const response = await fetch('/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        username: 'admin',
+                        password: '1234'
+                    })
+                });
+                
+                const result = await response.json();
+                
+                responseContent.textContent = JSON.stringify({
+                    status: response.status,
+                    response: result
+                }, null, 2);
+                
+                responseDiv.style.display = 'block';
+                
+                if (response.ok) {
+                    alert('✅ Login JSON exitoso!');
+                } else {
+                    alert('❌ Error en login JSON');
+                }
+            } catch (error) {
+                responseContent.textContent = `Error: ${error.message}`;
+                responseDiv.style.display = 'block';
+                alert('❌ Error de conexión');
+            }
+        }
+        
+        // Auto-completar el formulario para pruebas
+        document.getElementById('username').value = 'admin';
+        document.getElementById('password').value = '1234';
+    </script>
+</body>
+</html>
