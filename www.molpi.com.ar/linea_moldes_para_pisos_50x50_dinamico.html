@@ -488,6 +488,243 @@ function crearProducto50x50HTML(producto, delay) {
 }
 </script>
 
+<style>
+/* Estilos para productos dinámicos con soporte de mosaicos 50x50 */
+.producto-animate {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.6s ease;
+}
+
+.producto-animate.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.producto-titulo {
+    opacity: 0;
+    transform: translateX(-20px);
+    transition: all 0.4s ease;
+}
+
+.producto-titulo.show {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.producto-imagen-container {
+    position: relative;
+    display: inline-block;
+}
+
+.producto-imagen {
+    opacity: 0;
+    transform: scale(0.8);
+    transition: all 0.5s ease;
+}
+
+.producto-imagen.show {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.mosaico-overlay {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    max-width: 80px;
+    max-height: 80px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    z-index: 2;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: all 0.6s ease;
+}
+
+.mosaico-overlay.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.producto-50x50 {
+    margin-bottom: 40px;
+}
+
+/* Animación para hover en productos con mosaico */
+.producto-imagen-container:hover .mosaico-overlay {
+    transform: translateY(-5px) scale(1.1);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+}
+
+/* Indicador de mosaico disponible */
+.mosaico-indicator {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    background: rgba(40, 167, 69, 0.9);
+    color: white;
+    padding: 2px 6px;
+    border-radius: 12px;
+    font-size: 10px;
+    font-weight: bold;
+    z-index: 3;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.mosaico-indicator.show {
+    opacity: 1;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    cargarProductos50x50();
+});
+
+function cargarProductos50x50() {
+    // Intentar cargar desde el servidor
+    fetch('http://127.0.0.1:5000/productos/linea/50x50')
+        .then(response => response.json())
+        .then(productos => {
+            console.log('Productos 50x50 cargados:', productos);
+            // Ordenar productos según el orden de la base de datos (por ID)
+            const productosOrdenados = productos.sort((a, b) => a.id - b.id);
+            mostrarProductos50x50(productosOrdenados);
+        })
+        .catch(error => {
+            console.error('Error cargando productos del servidor:', error);
+            // Si falla, mostrar un mensaje de error
+            const container = document.getElementById('productos-container');
+            if (container) {
+                container.innerHTML = '<div class="col-md-12"><p>Error cargando productos. Por favor, recargue la página.</p></div>';
+            }
+        });
+}
+
+function mostrarProductos50x50(productos) {
+    const container = document.getElementById('productos-container');
+    if (!container) return;
+    
+    let html = '';
+    let isFirstRow = true;
+    
+    for (let i = 0; i < productos.length; i += 2) {
+        if (!isFirstRow) {
+            html += '<div class="col-md-12"><hr></div>';
+        }
+        
+        const producto1 = productos[i];
+        const producto2 = productos[i + 1];
+        
+        // Calcular el delay base para la fila (cada fila aparece 400ms después de la anterior)
+        const filaIndex = Math.floor(i / 2);
+        const baseDelay = filaIndex * 400;
+        
+        // Primer producto de la fila (aparece primero)
+        html += crearProducto50x50HTML(producto1, baseDelay);
+        
+        // Segundo producto de la fila (aparece 200ms después del primero)
+        if (producto2) {
+            html += crearProducto50x50HTML(producto2, baseDelay + 200);
+        }
+        
+        isFirstRow = false;
+    }
+    
+    container.innerHTML = html;
+    
+    // Activar animaciones personalizadas
+    setTimeout(() => {
+        activarAnimaciones50x50();
+    }, 100);
+}
+
+function activarAnimaciones50x50() {
+    // Obtener todos los elementos que necesitan animación
+    const productosAnimate = document.querySelectorAll('.producto-animate');
+    const titulosAnimate = document.querySelectorAll('.producto-titulo');
+    const imagenesAnimate = document.querySelectorAll('.producto-imagen');
+    const mosaicosAnimate = document.querySelectorAll('.mosaico-overlay');
+    const indicadoresAnimate = document.querySelectorAll('.mosaico-indicator');
+    
+    // Animar productos
+    productosAnimate.forEach(elemento => {
+        const delay = parseInt(elemento.dataset.delay) || 0;
+        setTimeout(() => {
+            elemento.classList.add('show');
+        }, delay);
+    });
+    
+    // Animar títulos
+    titulosAnimate.forEach(elemento => {
+        const delay = parseInt(elemento.dataset.delay) || 0;
+        setTimeout(() => {
+            elemento.classList.add('show');
+        }, delay);
+    });
+    
+    // Animar imágenes
+    imagenesAnimate.forEach(elemento => {
+        const delay = parseInt(elemento.dataset.delay) || 0;
+        setTimeout(() => {
+            elemento.classList.add('show');
+        }, delay);
+    });
+    
+    // Animar mosaicos
+    mosaicosAnimate.forEach(elemento => {
+        const delay = parseInt(elemento.dataset.delay) || 0;
+        setTimeout(() => {
+            elemento.classList.add('show');
+        }, delay + 200); // Mosaicos aparecen después de las imágenes principales
+    });
+    
+    // Animar indicadores
+    indicadoresAnimate.forEach(elemento => {
+        const delay = parseInt(elemento.dataset.delay) || 0;
+        setTimeout(() => {
+            elemento.classList.add('show');
+        }, delay + 400); // Indicadores aparecen al final
+    });
+}
+
+function crearProducto50x50HTML(producto, delay) {
+    // Obtener la imagen del molde
+    let imagenMolde = producto.imagen_url || 'img/products/default_molde.jpg';
+    let imagenMosaico = producto.imagen_mosaico_url || '';
+    
+    // Determinar si tiene mosaico
+    const tieneMosaico = imagenMosaico && imagenMosaico.trim() !== '';
+    
+    // HTML para el mosaico overlay (solo si existe)
+    let mosaicoHTML = '';
+    let indicadorHTML = '';
+    
+    if (tieneMosaico) {
+        mosaicoHTML = `<img src="${imagenMosaico}" class="mosaico-overlay" data-delay="${delay + 300}" alt="Mosaico ${producto.nombre}" />`;
+        indicadorHTML = `<span class="mosaico-indicator" data-delay="${delay + 400}">MOSAICO</span>`;
+    }
+    
+    return `
+        <div class="col-md-6 producto-animate producto-50x50" data-delay="${delay}">
+            <div class="col-md-12">
+                <h4 class="mb-xl mt-xlg producto-titulo" data-delay="${delay + 100}">${producto.nombre}</h4>
+                <div class="divider divider-primary divider-small mb-xl producto-titulo" data-delay="${delay + 150}"> 
+                    <hr>
+                </div>
+            </div>
+            <div class="producto-imagen-container">
+                ${indicadorHTML}
+                <img src="${imagenMolde}" class="custom-product-image-pos-1 _relative img-responsive producto-imagen" data-delay="${delay + 200}" alt="${producto.nombre}" />
+                ${mosaicoHTML}
+            </div>
+        </div>
+    `;
+}
+</script>
+
 		  			<!-- LOGIN MODAL -->
 <div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="loginModalLabel">
 	<div class="modal-dialog" role="document">

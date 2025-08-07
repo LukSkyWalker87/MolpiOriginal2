@@ -1,32 +1,22 @@
-import requests
 import json
+from urllib.request import urlopen
 
-print("🔍 Probando API corregida...")
 try:
-    response = requests.get('http://127.0.0.1:5000/productos')
+    # Probar la API
+    with urlopen('http://localhost:5000/productos') as response:
+        data = json.loads(response.read().decode())
     
-    if response.status_code == 200:
-        productos = response.json()
-        print(f"✅ API responde con {len(productos)} productos")
-        
-        # Verificar IDs únicos
-        ids = [p['id'] for p in productos]
-        ids_unicos = set(ids)
-        
-        if len(ids) == len(ids_unicos):
-            print("✅ Todos los IDs son únicos")
-        else:
-            print(f"⚠️ Hay {len(ids) - len(ids_unicos)} productos duplicados")
-            
-        # Verificar producto específico ID 39
-        productos_39 = [p for p in productos if p['id'] == 39]
-        print(f"🔍 Producto ID 39 aparece {len(productos_39)} vez(es)")
-        
-        if productos_39:
-            print(f"   Nombre: {productos_39[0]['nombre']}")
-            
-    else:
-        print(f"❌ Error: {response.status_code}")
+    # Filtrar productos Vainilla
+    vainilla_products = [p for p in data if 'Vainilla' in p.get('nombre', '')]
+    
+    print("=== PRODUCTOS VAINILLA DESDE LA API ===")
+    for producto in vainilla_products:
+        print(f"ID: {producto.get('id')}")
+        print(f"Nombre: {producto.get('nombre')}")
+        print(f"Imagen molde: {producto.get('imagen_url')}")
+        print(f"Imagen mosaico: {producto.get('imagen_mosaico_url')}")
+        print(f"Claves disponibles: {sorted(producto.keys())}")
+        print("-" * 60)
         
 except Exception as e:
-    print(f"❌ Error: {e}")
+    print(f"Error: {e}")

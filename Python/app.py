@@ -1,8 +1,10 @@
 from flask import Flask, render_template_string, request, jsonify, send_from_directory, send_file, redirect, render_template, url_for, make_response, make_response
 from flask_cors import CORS
+from werkzeug.utils import secure_filename
 import os
 import sqlite3
 import json
+import time
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 
@@ -13,7 +15,29 @@ app.config['SECRET_KEY'] = '123456'
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///molpi.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+# Configuración para archivos permitidos
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp', 'pdf'}
+
+def allowed_file(filename):
+    """Verificar si el archivo tiene una extensión permitida"""
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+def is_image_file(filename):
+    """Verificar si el archivo es una imagen"""
+    image_extensions = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in image_extensions
+
+def is_pdf_file(filename):
+    """Verificar si el archivo es un PDF"""
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() == 'pdf'
 CORS(app)
+
+# ========= Ruta de la base de datos =========
+DB_PATH = os.path.join(os.path.dirname(__file__), 'molpi.db')
 
 # ========= Configuración de SQLAlchemy =========
 db = SQLAlchemy(app)
@@ -40,6 +64,22 @@ def login_debug():
 @app.route('/admin/component/productos')
 def admin_component_productos():
     response = make_response(send_from_directory(os.path.join(app.root_path, '..', 'www.molpi.com.ar', 'components'), 'productos.html'))
+    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '0'
+    return response
+
+@app.route('/admin/component/testimonios')
+def admin_component_testimonios():
+    response = make_response(send_from_directory(os.path.join(app.root_path, '..', 'www.molpi.com.ar', 'components'), 'testimonios.html'))
+    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '0'
+    return response
+
+@app.route('/admin/component/promociones')
+def admin_component_promociones():
+    response = make_response(send_from_directory(os.path.join(app.root_path, '..', 'www.molpi.com.ar', 'components'), 'promociones.html'))
     response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
     response.headers['Pragma'] = 'no-cache'
     response.headers['Expires'] = '0'
@@ -107,7 +147,7 @@ def guardar_slider_json():
 
 # ========= Base de datos: Productos =========
 def init_db():
-    conn = sqlite3.connect('molpi.db')
+    conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     
     # Tabla principal de productos
@@ -203,13 +243,13 @@ def get_productos():
     categoria = request.args.get('categoria')
     subcategoria = request.args.get('subcategoria')
     
-    conn = sqlite3.connect('molpi.db')
+    conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     
     # Consulta simple sin JOINs para evitar duplicados
     query = """
-        SELECT id, nombre, descripcion, pdf_url, imagen_url, categoria, subcategoria, 
-               precio, activo, fecha_creacion, fecha_modificacion
+        SELECT id, nombre, descripcion, pdf_url, imagen_url, imagen_mosaico_url, categoria, subcategoria, 
+               precio, precio_usd, activo, fecha_creacion, fecha_modificacion
         FROM productos 
         WHERE activo = 1
     """
@@ -238,12 +278,14 @@ def get_productos():
             'descripcion': row[2],
             'pdf_url': row[3],
             'imagen_url': row[4],
-            'categoria': row[5],
-            'subcategoria': row[6],
-            'precio': row[7],
-            'activo': row[8],
-            'fecha_creacion': row[9],
-            'fecha_modificacion': row[10]
+            'imagen_mosaico_url': row[5],
+            'categoria': row[6],
+            'subcategoria': row[7],
+            'precio': row[8],
+            'precio_usd': row[9],
+            'activo': row[10],
+            'fecha_creacion': row[11],
+            'fecha_modificacion': row[12]
         })
     
     return jsonify(productos)
@@ -252,12 +294,12 @@ def get_productos():
 def add_producto():
     data = request.get_json()
     
-    conn = sqlite3.connect('molpi.db')
+    conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     
     c.execute("""
-        INSERT INTO productos (nombre, descripcion, categoria, subcategoria, pdf_url, imagen_url, precio)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO productos (nombre, descripcion, categoria, subcategoria, pdf_url, imagen_url, imagen_mosaico_url, precio, precio_usd)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     """, (
         data.get('nombre'),
         data.get('descripcion'),
@@ -265,7 +307,9 @@ def add_producto():
         data.get('subcategoria'),
         data.get('pdf_url'),
         data.get('imagen_url'),
-        data.get('precio', 0)
+        data.get('imagen_mosaico_url'),
+        data.get('precio', 0),
+        data.get('precio_usd', 0)
     ))
     
     producto_id = c.lastrowid
@@ -277,14 +321,16 @@ def add_producto():
 @app.route('/productos/<int:producto_id>', methods=['PUT'])
 def update_producto(producto_id):
     data = request.get_json()
+    print(f"[DEBUG] Actualizando producto {producto_id} con datos:", data)
+    print(f"[DEBUG] Campo activo recibido:", data.get('activo', 'NO PRESENTE'))
     
-    conn = sqlite3.connect('molpi.db')
+    conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     
     c.execute("""
         UPDATE productos 
         SET nombre = ?, descripcion = ?, categoria = ?, subcategoria = ?, 
-            pdf_url = ?, imagen_url = ?, precio = ?, fecha_modificacion = CURRENT_TIMESTAMP
+            pdf_url = ?, imagen_url = ?, imagen_mosaico_url = ?, precio = ?, precio_usd = ?, activo = ?, fecha_modificacion = CURRENT_TIMESTAMP
         WHERE id = ?
     """, (
         data.get('nombre'),
@@ -293,18 +339,135 @@ def update_producto(producto_id):
         data.get('subcategoria'),
         data.get('pdf_url'),
         data.get('imagen_url'),
+        data.get('imagen_mosaico_url'),
         data.get('precio', 0),
+        data.get('precio_usd', 0),
+        data.get('activo', 1),
         producto_id
     ))
+    
+    print(f"[DEBUG] Producto {producto_id} actualizado. Rows affected: {c.rowcount}")
     
     conn.commit()
     conn.close()
     
     return jsonify({'message': 'Producto actualizado correctamente'})
 
+# ========= Endpoints específicos para líneas de productos =========
+
+@app.route('/productos/linea/20x20', methods=['GET'])
+def get_productos_linea_20x20():
+    """Obtener productos específicos de la línea 20x20"""
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    
+    c.execute("""
+        SELECT id, nombre, descripcion, pdf_url, imagen_url, imagen_mosaico_url, categoria, subcategoria, 
+               precio, precio_usd, activo, fecha_creacion, fecha_modificacion
+        FROM productos 
+        WHERE activo = 1 AND categoria = 'Pisos y Zócalos' AND subcategoria = 'Línea 20x20'
+        ORDER BY nombre
+    """)
+    rows = c.fetchall()
+    conn.close()
+    
+    productos = []
+    for row in rows:
+        productos.append({
+            'id': row[0],
+            'nombre': row[1],
+            'descripcion': row[2],
+            'pdf_url': row[3],
+            'imagen_url': row[4],
+            'imagen_mosaico_url': row[5],
+            'categoria': row[6],
+            'subcategoria': row[7],
+            'precio': row[8],
+            'precio_usd': row[9],
+            'activo': row[10],
+            'fecha_creacion': row[11],
+            'fecha_modificacion': row[12]
+        })
+    
+    return jsonify(productos)
+
+@app.route('/productos/linea/40x40', methods=['GET'])
+def get_productos_linea_40x40():
+    """Obtener productos específicos de la línea 40x40"""
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    
+    c.execute("""
+        SELECT id, nombre, descripcion, pdf_url, imagen_url, imagen_mosaico_url, categoria, subcategoria, 
+               precio, precio_usd, activo, fecha_creacion, fecha_modificacion
+        FROM productos 
+        WHERE activo = 1 AND categoria = 'Pisos y Zócalos' AND subcategoria = 'Línea 40x40'
+        ORDER BY nombre
+    """)
+    rows = c.fetchall()
+    conn.close()
+    
+    productos = []
+    for row in rows:
+        productos.append({
+            'id': row[0],
+            'nombre': row[1],
+            'descripcion': row[2],
+            'pdf_url': row[3],
+            'imagen_url': row[4],
+            'imagen_mosaico_url': row[5],
+            'categoria': row[6],
+            'subcategoria': row[7],
+            'precio': row[8],
+            'precio_usd': row[9],
+            'activo': row[10],
+            'fecha_creacion': row[11],
+            'fecha_modificacion': row[12]
+        })
+    
+    return jsonify(productos)
+
+@app.route('/productos/linea/50x50', methods=['GET'])
+def get_productos_linea_50x50():
+    """Obtener productos específicos de la línea 50x50"""
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    
+    c.execute("""
+        SELECT id, nombre, descripcion, pdf_url, imagen_url, imagen_mosaico_url, categoria, subcategoria, 
+               precio, precio_usd, activo, fecha_creacion, fecha_modificacion
+        FROM productos 
+        WHERE activo = 1 AND categoria = 'Pisos y Zócalos' AND subcategoria = 'Línea 50x50'
+        ORDER BY nombre
+    """)
+    rows = c.fetchall()
+    conn.close()
+    
+    productos = []
+    for row in rows:
+        productos.append({
+            'id': row[0],
+            'nombre': row[1],
+            'descripcion': row[2],
+            'pdf_url': row[3],
+            'imagen_url': row[4],
+            'imagen_mosaico_url': row[5],
+            'categoria': row[6],
+            'subcategoria': row[7],
+            'precio': row[8],
+            'precio_usd': row[9],
+            'activo': row[10],
+            'fecha_creacion': row[11],
+            'fecha_modificacion': row[12]
+        })
+    
+    return jsonify(productos)
+
+# ========= Fin de endpoints de líneas =========
+
 @app.route('/productos/<int:producto_id>', methods=['DELETE'])
 def delete_producto(producto_id):
-    conn = sqlite3.connect('molpi.db')
+    conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     
     # Eliminación lógica
@@ -317,7 +480,7 @@ def delete_producto(producto_id):
 
 @app.route('/categorias', methods=['GET'])
 def get_categorias():
-    conn = sqlite3.connect('molpi.db')
+    conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     
     c.execute("SELECT * FROM categorias WHERE activo = 1 ORDER BY nombre")
@@ -339,7 +502,7 @@ def get_categorias():
 def get_subcategorias():
     categoria_id = request.args.get('categoria_id')
     
-    conn = sqlite3.connect('molpi.db')
+    conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     
     if categoria_id:
@@ -432,34 +595,389 @@ def cargar_componente(section):
     
 
 # ========= Testimonios =========
-#GET /testimonios
 @app.route('/testimonios', methods=['GET'])
-def obtener_testimonios():
-    testimonios = Testimonio.query.order_by(Testimonio.fecha.desc()).all()
-    return jsonify([
-        {'id': t.id, 'autor': t.autor, 'texto': t.texto, 'fecha': t.fecha.strftime('%Y-%m-%d')}
-        for t in testimonios
-    ])
-#POST /testimonios
+def get_testimonios():
+    """Obtener todos los testimonios activos ordenados por orden"""
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        
+        cursor.execute('''
+            SELECT id, nombre, empresa, testimonio, imagen, orden, activo, fecha_creacion
+            FROM testimonios 
+            WHERE activo = 1 
+            ORDER BY orden ASC, id ASC
+        ''')
+        
+        testimonios = []
+        for row in cursor.fetchall():
+            testimonios.append({
+                'id': row[0],
+                'nombre': row[1],
+                'empresa': row[2],
+                'testimonio': row[3],
+                'imagen': row[4],
+                'orden': row[5],
+                'activo': row[6],
+                'fecha_creacion': row[7]
+            })
+        
+        conn.close()
+        return jsonify(testimonios)
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 @app.route('/testimonios', methods=['POST'])
 def crear_testimonio():
-    data = request.get_json()
-    nuevo = Testimonio(
-        autor=data.get('autor'),
-        texto=data.get('texto')
-    )
-    db.session.add(nuevo)
-    db.session.commit()
-    return jsonify({'message': 'Testimonio creado correctamente'}), 201
+    """Crear un nuevo testimonio"""
+    try:
+        data = request.get_json()
+        
+        # Validar datos requeridos
+        if not all(key in data for key in ['nombre', 'empresa', 'testimonio']):
+            return jsonify({'error': 'Faltan campos requeridos: nombre, empresa, testimonio'}), 400
+        
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        
+        # Obtener el próximo orden
+        cursor.execute('SELECT MAX(orden) FROM testimonios')
+        max_orden = cursor.fetchone()[0] or 0
+        nuevo_orden = max_orden + 1
+        
+        cursor.execute('''
+            INSERT INTO testimonios (nombre, empresa, testimonio, imagen, orden, activo)
+            VALUES (?, ?, ?, ?, ?, ?)
+        ''', (
+            data['nombre'],
+            data['empresa'],
+            data['testimonio'],
+            data.get('imagen', 'img/clients/client-1.png'),
+            data.get('orden', nuevo_orden),
+            data.get('activo', 1)
+        ))
+        
+        testimonio_id = cursor.lastrowid
+        conn.commit()
+        conn.close()
+        
+        return jsonify({'id': testimonio_id, 'message': 'Testimonio creado exitosamente'}), 201
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
-#DELETE /testimonios/<id>
-@app.route('/testimonios/<int:id>', methods=['DELETE'])
-def borrar_testimonio(id):
-    testimonio = Testimonio.query.get_or_404(id)
-    db.session.delete(testimonio)
-    db.session.commit()
-    return jsonify({'message': 'Testimonio eliminado'})
+@app.route('/testimonios/<int:testimonio_id>', methods=['PUT'])
+def actualizar_testimonio(testimonio_id):
+    """Actualizar un testimonio existente"""
+    try:
+        data = request.get_json()
+        
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        
+        # Verificar que el testimonio existe
+        cursor.execute('SELECT id FROM testimonios WHERE id = ?', (testimonio_id,))
+        if not cursor.fetchone():
+            conn.close()
+            return jsonify({'error': 'Testimonio no encontrado'}), 404
+        
+        # Actualizar testimonio
+        cursor.execute('''
+            UPDATE testimonios 
+            SET nombre = ?, empresa = ?, testimonio = ?, imagen = ?, orden = ?, activo = ?,
+                fecha_modificacion = CURRENT_TIMESTAMP
+            WHERE id = ?
+        ''', (
+            data.get('nombre'),
+            data.get('empresa'),
+            data.get('testimonio'),
+            data.get('imagen', 'img/clients/client-1.png'),
+            data.get('orden'),
+            data.get('activo', 1),
+            testimonio_id
+        ))
+        
+        conn.commit()
+        conn.close()
+        
+        return jsonify({'message': 'Testimonio actualizado exitosamente'})
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
+@app.route('/testimonios/<int:testimonio_id>', methods=['DELETE'])
+def eliminar_testimonio(testimonio_id):
+    """Eliminar un testimonio (marcar como inactivo)"""
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        
+        # Verificar que el testimonio existe
+        cursor.execute('SELECT id FROM testimonios WHERE id = ?', (testimonio_id,))
+        if not cursor.fetchone():
+            conn.close()
+            return jsonify({'error': 'Testimonio no encontrado'}), 404
+        
+        # Marcar como inactivo en lugar de eliminar
+        cursor.execute('''
+            UPDATE testimonios 
+            SET activo = 0, fecha_modificacion = CURRENT_TIMESTAMP
+            WHERE id = ?
+        ''', (testimonio_id,))
+        
+        conn.commit()
+        conn.close()
+        
+        return jsonify({'message': 'Testimonio eliminado exitosamente'})
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/testimonios/admin', methods=['GET'])
+def get_testimonios_admin():
+    """Obtener todos los testimonios para administración (incluye inactivos)"""
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        
+        cursor.execute('''
+            SELECT id, nombre, empresa, testimonio, imagen, orden, activo, fecha_creacion, fecha_modificacion
+            FROM testimonios 
+            ORDER BY orden ASC, id ASC
+        ''')
+        
+        testimonios = []
+        for row in cursor.fetchall():
+            testimonios.append({
+                'id': row[0],
+                'nombre': row[1],
+                'empresa': row[2],
+                'testimonio': row[3],
+                'imagen': row[4],
+                'orden': row[5],
+                'activo': row[6],
+                'fecha_creacion': row[7],
+                'fecha_modificacion': row[8]
+            })
+        
+        conn.close()
+        return jsonify(testimonios)
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+# ========= ENDPOINTS PROMOCIONES =========
+
+@app.route('/promociones', methods=['GET'])
+def get_promociones():
+    """Obtener todas las promociones activas"""
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        
+        cursor.execute('''
+            SELECT id, titulo, imagen, cartilla_pdf, orden 
+            FROM promociones 
+            WHERE activo = 1 
+            ORDER BY orden ASC, id ASC
+        ''')
+        
+        promociones = []
+        for row in cursor.fetchall():
+            promociones.append({
+                'id': row[0],
+                'titulo': row[1],
+                'imagen': row[2],
+                'cartilla_pdf': row[3],
+                'orden': row[4]
+            })
+        
+        conn.close()
+        return jsonify(promociones)
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/promociones', methods=['POST'])
+def create_promocion():
+    """Crear una nueva promoción"""
+    try:
+        data = request.json
+        titulo = data.get('titulo', '')
+        imagen = data.get('imagen', '')
+        cartilla_pdf = data.get('cartilla_pdf', '')
+        
+        if not imagen:
+            return jsonify({'error': 'La imagen es requerida'}), 400
+        
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        
+        cursor.execute('''
+            INSERT INTO promociones (titulo, imagen, cartilla_pdf, orden, activo, fecha_creacion, fecha_modificacion)
+            VALUES (?, ?, ?, 0, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+        ''', (titulo, imagen, cartilla_pdf))
+        
+        promocion_id = cursor.lastrowid
+        conn.commit()
+        conn.close()
+        
+        return jsonify({
+            'message': 'Promoción creada exitosamente',
+            'id': promocion_id
+        }), 201
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/promociones/<int:promocion_id>', methods=['PUT'])
+def update_promocion(promocion_id):
+    """Actualizar una promoción existente"""
+    try:
+        data = request.json
+        titulo = data.get('titulo', '')
+        imagen = data.get('imagen', '')
+        cartilla_pdf = data.get('cartilla_pdf', '')
+        activo = data.get('activo', 1)
+        
+        if not imagen:
+            return jsonify({'error': 'La imagen es requerida'}), 400
+        
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        
+        # Verificar si la promoción existe
+        cursor.execute('SELECT id FROM promociones WHERE id = ?', (promocion_id,))
+        if not cursor.fetchone():
+            return jsonify({'error': 'Promoción no encontrada'}), 404
+        
+        cursor.execute('''
+            UPDATE promociones 
+            SET titulo = ?, imagen = ?, cartilla_pdf = ?, activo = ?, fecha_modificacion = CURRENT_TIMESTAMP
+            WHERE id = ?
+        ''', (titulo, imagen, cartilla_pdf, activo, promocion_id))
+        
+        conn.commit()
+        conn.close()
+        
+        return jsonify({'message': 'Promoción actualizada exitosamente'})
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/promociones/<int:promocion_id>', methods=['DELETE'])
+def delete_promocion(promocion_id):
+    """Eliminar una promoción (marcar como inactiva)"""
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        
+        # Verificar si la promoción existe
+        cursor.execute('SELECT id FROM promociones WHERE id = ?', (promocion_id,))
+        if not cursor.fetchone():
+            return jsonify({'error': 'Promoción no encontrada'}), 404
+        
+        # Marcar como inactiva en lugar de eliminar
+        cursor.execute('''
+            UPDATE promociones 
+            SET activo = 0, fecha_modificacion = CURRENT_TIMESTAMP
+            WHERE id = ?
+        ''', (promocion_id,))
+        
+        conn.commit()
+        conn.close()
+        
+        return jsonify({'message': 'Promoción eliminada exitosamente'})
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/promociones/admin', methods=['GET'])
+def get_promociones_admin():
+    """Obtener todas las promociones para administración (incluye inactivas)"""
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        
+        cursor.execute('''
+            SELECT id, titulo, imagen, cartilla_pdf, orden, activo, fecha_inicio, fecha_fin, fecha_creacion, fecha_modificacion
+            FROM promociones 
+            ORDER BY orden ASC, id ASC
+        ''')
+        
+        promociones = []
+        for row in cursor.fetchall():
+            promociones.append({
+                'id': row[0],
+                'titulo': row[1],
+                'imagen': row[2],
+                'cartilla_pdf': row[3],
+                'orden': row[4],
+                'activo': row[5],
+                'fecha_inicio': row[6],
+                'fecha_fin': row[7],
+                'fecha_creacion': row[8],
+                'fecha_modificacion': row[9]
+            })
+        
+        conn.close()
+        return jsonify(promociones)
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/upload/promocion', methods=['POST'])
+def upload_promocion_file():
+    """Subir imagen o PDF de promoción"""
+    try:
+        if 'file' not in request.files:
+            return jsonify({'error': 'No se envió ningún archivo'}), 400
+        
+        file = request.files['file']
+        if file.filename == '':
+            return jsonify({'error': 'No se seleccionó ningún archivo'}), 400
+        
+        if file and file.filename and allowed_file(file.filename):
+            # Determinar el tipo de archivo y la carpeta de destino
+            filename = secure_filename(file.filename)
+            timestamp = int(time.time())
+            name, ext = os.path.splitext(filename)
+            
+            if is_image_file(file.filename):
+                # Para imágenes
+                upload_folder = os.path.join(app.root_path, '..', 'www.molpi.com.ar', 'img', 'promociones')
+                unique_filename = f"promo_{timestamp}_{name}{ext}"
+                relative_path = f"img/promociones/{unique_filename}"
+                file_type = "imagen"
+            elif is_pdf_file(file.filename):
+                # Para PDFs
+                upload_folder = os.path.join(app.root_path, '..', 'www.molpi.com.ar', 'pdf', 'promociones')
+                unique_filename = f"cartilla_{timestamp}_{name}{ext}"
+                relative_path = f"pdf/promociones/{unique_filename}"
+                file_type = "PDF"
+            else:
+                return jsonify({'error': 'Tipo de archivo no soportado'}), 400
+            
+            # Crear directorio si no existe
+            os.makedirs(upload_folder, exist_ok=True)
+            
+            # Guardar archivo
+            file_path = os.path.join(upload_folder, unique_filename)
+            file.save(file_path)
+            
+            return jsonify({
+                'message': f'{file_type} subido exitosamente',
+                'filename': unique_filename,
+                'path': relative_path,
+                'type': file_type.lower()
+            }), 200
+        else:
+            return jsonify({'error': 'Tipo de archivo no permitido. Solo se permiten imágenes (PNG, JPG, JPEG, GIF, WEBP) y PDFs'}), 400
+            
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 
 # ========= Servir imágenes con headers correctos =========
@@ -468,6 +986,18 @@ def serve_images(filename):
     """Servir imágenes con headers correctos y sin cache"""
     folder = os.path.abspath(os.path.join(app.root_path, '..', 'www.molpi.com.ar', 'img'))
     response = send_from_directory(folder, filename)
+    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '0'
+    return response
+
+# ========= Servir PDFs con headers correctos =========
+@app.route('/pdf/<path:filename>')
+def serve_pdfs(filename):
+    """Servir archivos PDF con headers correctos"""
+    folder = os.path.abspath(os.path.join(app.root_path, '..', 'www.molpi.com.ar', 'pdf'))
+    response = send_from_directory(folder, filename)
+    response.headers['Content-Type'] = 'application/pdf'
     response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
     response.headers['Pragma'] = 'no-cache'
     response.headers['Expires'] = '0'

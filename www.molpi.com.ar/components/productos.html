@@ -42,7 +42,31 @@
           </button>
         </div>
         <div class="card-body">
-          <!-- Filtros -->
+          <!-- Filtros rápidos por línea -->
+          <div class="row mb-3">
+            <div class="col-12">
+              <h6 class="text-muted mb-2">Filtros rápidos por línea:</h6>
+              <div class="btn-group mr-2" role="group">
+                <button type="button" class="btn btn-outline-primary btn-sm" id="filtroTodos">
+                  <i class="fa fa-list mr-1"></i>Todos los productos
+                </button>
+                <button type="button" class="btn btn-outline-info btn-sm" id="filtro20x20">
+                  <i class="fa fa-square mr-1"></i>Línea 20x20
+                </button>
+                <button type="button" class="btn btn-outline-warning btn-sm" id="filtro40x40">
+                  <i class="fa fa-square mr-1"></i>Zócalos 40x40
+                </button>
+                <button type="button" class="btn btn-outline-success btn-sm" id="filtro50x50">
+                  <i class="fa fa-square mr-1"></i>Zócalos 50x50
+                </button>
+                <button type="button" class="btn btn-outline-danger btn-sm" id="filtroPodotactiles">
+                  <i class="fa fa-universal-access mr-1"></i>Podotáctiles - Discapacidad
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Filtros tradicionales -->
           <div class="row mb-3">
             <div class="col-md-3">
               <select class="form-control" id="filtroCategoria">
@@ -69,14 +93,15 @@
                   <th>Producto</th>
                   <th>Categoría</th>
                   <th>Subcategoría</th>
-                  <th>Precio</th>
+                  <th>Precio en Pesos</th>
+                  <th>Precio en Dólares</th>
                   <th>Estado</th>
                   <th>Acciones</th>
                 </tr>
               </thead>
               <tbody id="tablaProductos">
                 <tr>
-                  <td colspan="8" class="text-center">
+                  <td colspan="9" class="text-center">
                     <div class="spinner-border" role="status">
                       <span class="sr-only">Cargando productos...</span>
                     </div>
@@ -115,8 +140,10 @@
             </div>
             <div class="col-md-6">
               <div class="form-group">
-                <label for="productoPrecio">Precio</label>
-                <input type="number" class="form-control" id="productoPrecio" name="precio" step="0.01" min="0">
+                <label for="productoCategoria">Categoría *</label>
+                <select class="form-control" id="productoCategoria" name="categoria" required>
+                  <option value="">Selecciona una categoría</option>
+                </select>
               </div>
             </div>
           </div>
@@ -124,12 +151,19 @@
           <div class="row">
             <div class="col-md-6">
               <div class="form-group">
-                <label for="productoCategoria">Categoría *</label>
-                <select class="form-control" id="productoCategoria" name="categoria" required>
-                  <option value="">Selecciona una categoría</option>
-                </select>
+                <label for="productoPrecio">Precio en Pesos</label>
+                <input type="number" class="form-control" id="productoPrecio" name="precio" step="0.01" min="0" placeholder="0.00">
               </div>
             </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="productoPrecioUsd">Precio en Dólares</label>
+                <input type="number" class="form-control" id="productoPrecioUsd" name="precio_usd" step="0.01" min="0" placeholder="0.00">
+              </div>
+            </div>
+          </div>
+          
+          <div class="row">
             <div class="col-md-6">
               <div class="form-group">
                 <label for="productoSubcategoria">Subcategoría *</label>
@@ -148,31 +182,196 @@
           <div class="row">
             <div class="col-md-6">
               <div class="form-group">
-                <label for="productoImagen">URL de Imagen</label>
-                <input type="url" class="form-control" id="productoImagen" name="imagen_url" placeholder="https://ejemplo.com/imagen.jpg">
+                <label for="productoImagen">URL de Imagen del Molde</label>
+                <input type="text" class="form-control" id="productoImagen" name="imagen_url" placeholder="img/products/nombre_molde.jpg">
               </div>
             </div>
             <div class="col-md-6">
               <div class="form-group">
+                <label for="productoImagenMosaico">URL de Imagen del Mosaico (Opcional)</label>
+                <input type="text" class="form-control" id="productoImagenMosaico" name="imagen_mosaico_url" placeholder="img/products/nombre_mosaico.png">
+                <small class="form-text text-muted">Para mostrar el resultado final del cerámico sobre el molde</small>
+              </div>
+            </div>
+          </div>
+          
+          <div class="row">
+            <div class="col-md-12">
+              <div class="form-group">
                 <label for="productoPdf">URL del PDF</label>
-                <input type="url" class="form-control" id="productoPdf" name="pdf_url" placeholder="https://ejemplo.com/catalogo.pdf">
+                <input type="text" class="form-control" id="productoPdf" name="pdf_url" placeholder="https://ejemplo.com/catalogo.pdf">
               </div>
             </div>
           </div>
           
           <!-- Vista previa de imagen -->
           <div class="form-group">
-            <label>Vista Previa de Imagen</label>
-            <div id="vistaPrevia" class="border p-3 text-center" style="min-height: 200px; background-color: #f8f9fa;">
-              <img id="imagenPrevia" src="" alt="Vista previa" style="max-width: 100%; max-height: 200px; display: none;">
-              <p id="sinImagen" class="text-muted">No hay imagen para mostrar</p>
+            <label>Vista Previa de Imágenes</label>
+            <div id="vistaPrevia" class="border p-3" style="min-height: 350px; background-color: #f8f9fa;">
+              
+              <!-- Vista individual de cada imagen -->
+              <div id="vistasIndividuales" style="display: none;">
+                <div class="row">
+                  <div class="col-md-6 text-center">
+                    <h6 class="text-muted mb-2">Molde</h6>
+                    <div style="min-height: 200px; display: flex; align-items: center; justify-content: center; border: 1px dashed #ddd; border-radius: 8px;">
+                      <img id="soloMolde" src="" alt="Solo molde" style="max-width: 150px; max-height: 150px; border-radius: 8px;">
+                    </div>
+                  </div>
+                  <div class="col-md-6 text-center">
+                    <h6 class="text-muted mb-2">Mosaico</h6>
+                    <div style="min-height: 200px; display: flex; align-items: center; justify-content: center; border: 1px dashed #ddd; border-radius: 8px;">
+                      <img id="soloMosaico" src="" alt="Solo mosaico" style="max-width: 150px; max-height: 150px; border-radius: 8px; display: none;">
+                      <span id="sinMosaico" class="text-muted" style="font-size: 12px;">Sin mosaico</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Mensaje cuando no hay imágenes -->
+              <div id="sinImagen" class="text-center" style="padding: 100px 0;">
+                <i class="fa fa-image text-muted" style="font-size: 48px; margin-bottom: 10px;"></i>
+                <p class="text-muted">No hay imagen para mostrar</p>
+              </div>
             </div>
+            <small class="form-text text-muted">
+              <strong>Molde:</strong> Imagen del molde de concreto | 
+              <strong>Mosaico:</strong> Patrón cerámico que se superpone | 
+              <strong>Resultado:</strong> Vista final del producto terminado
+            </small>
           </div>
         </form>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
         <button type="submit" class="btn btn-primary" form="formProducto">Guardar Producto</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal especial para editar textos descriptivos de podotáctiles -->
+<div class="modal fade" id="modalEditarPodotactil" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">
+          <i class="fa fa-universal-access mr-2"></i>Editar Producto Podotáctil
+        </h5>
+        <button type="button" class="close" data-dismiss="modal">
+          <span>&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="formEditarPodotactil">
+          <input type="hidden" id="podotactilId" name="id">
+          
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="podotactilNombre">Nombre del Producto *</label>
+                <input type="text" class="form-control" id="podotactilNombre" name="nombre" required>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="podotactilCategoria">Categoría</label>
+                <input type="text" class="form-control" id="podotactilCategoria" value="Podotáctiles" readonly style="background-color: #e9ecef;">
+              </div>
+            </div>
+          </div>
+          
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="podotactilSubcategoria">Subcategoría</label>
+                <input type="text" class="form-control" id="podotactilSubcategoria" value="Discapacidad" readonly style="background-color: #e9ecef;">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="podotactilActivo">Estado</label>
+                <select class="form-control" id="podotactilActivo" name="activo">
+                  <option value="1">Activo</option>
+                  <option value="0">Inactivo</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="podotactilDescripcion">Descripción / Especificaciones</label>
+            <textarea class="form-control" id="podotactilDescripcion" name="descripcion" rows="4" required placeholder="Escribe aquí las especificaciones y descripción del producto podotáctil..."></textarea>
+            <small class="form-text text-muted">
+              Esta descripción se mostrará como información técnica del producto. Incluye características, usos y beneficios.
+            </small>
+          </div>
+          
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="podotactilImagenMolde">URL de Imagen del Molde</label>
+                <input type="text" class="form-control" id="podotactilImagenMolde" name="imagen_url" placeholder="img/products/nombre_molde.jpg">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="podotactilImagenMosaico">URL de Imagen del Mosaico</label>
+                <input type="text" class="form-control" id="podotactilImagenMosaico" name="imagen_mosaico_url" placeholder="img/products/nombre_mosaico.png">
+                <small class="form-text text-muted">Para mostrar el resultado final del cerámico sobre el molde</small>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Vista previa de imagen -->
+          <div class="form-group">
+            <label>Vista Previa de Imágenes</label>
+            <div id="vistaPreviaPodotactil" class="border p-3" style="min-height: 300px; background-color: #f8f9fa;">
+              
+              <!-- Vista individual de cada imagen -->
+              <div id="vistasIndividualesPodotactil" style="display: none;">
+                <div class="row">
+                  <div class="col-md-6 text-center">
+                    <h6 class="text-muted mb-2">Molde</h6>
+                    <div style="min-height: 150px; display: flex; align-items: center; justify-content: center; border: 1px dashed #ddd; border-radius: 8px;">
+                      <img id="podotactilMoldeImg" src="" alt="Molde" style="max-width: 120px; max-height: 120px; border-radius: 8px;">
+                    </div>
+                  </div>
+                  <div class="col-md-6 text-center">
+                    <h6 class="text-muted mb-2">Mosaico</h6>
+                    <div style="min-height: 150px; display: flex; align-items: center; justify-content: center; border: 1px dashed #ddd; border-radius: 8px;">
+                      <img id="podotactilMosaicoImg" src="" alt="Mosaico" style="max-width: 120px; max-height: 120px; border-radius: 8px; display: none;">
+                      <span id="sinMosaicoPodotactil" class="text-muted" style="font-size: 12px;">Sin mosaico</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Mensaje cuando no hay imágenes -->
+              <div id="sinImagenPodotactil" class="text-center" style="padding: 80px 0;">
+                <i class="fa fa-image text-muted" style="font-size: 48px; margin-bottom: 10px;"></i>
+                <p class="text-muted">No hay imagen para mostrar</p>
+              </div>
+            </div>
+            <small class="form-text text-muted">
+              <strong>Molde:</strong> Imagen del molde de concreto | 
+              <strong>Mosaico:</strong> Patrón cerámico que se superpone
+            </small>
+          </div>
+          
+          <div class="alert alert-info">
+            <h6><i class="fa fa-info-circle mr-1"></i>Información:</h6>
+            <p class="mb-0">Los productos podotáctiles son elementos especializados para accesibilidad. Puedes modificar las imágenes cambiando las URLs arriba.</p>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">
+          <i class="fa fa-times mr-1"></i>Cancelar
+        </button>
+        <button type="submit" class="btn btn-primary" form="formEditarPodotactil">
+          <i class="fa fa-save mr-1"></i>Guardar Cambios
+        </button>
       </div>
     </div>
   </div>

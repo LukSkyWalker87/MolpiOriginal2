@@ -3,12 +3,10 @@
 <head>
   <meta charset="utf-8">
   <title>Panel de Administración | Molpi</title>
-  <!-- Cache buster: Actualizado 5 Agosto 2025 - Precios USD -->
   <link rel="icon" href="img/favicon.ico" type="image/x-icon">
 
 
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
   <link rel="stylesheet" href="css/general.css">
   <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700&display=swap" rel="stylesheet">
 
@@ -199,6 +197,7 @@
     <h2>Panel de Administración</h2>
     <a href="#" data-section="productos" class="active">📦 Productos</a>
     <a href="#" data-section="promociones">📢 Promociones</a>
+    <a href="#" data-section="contacto">📍 Contacto</a>
     <a href="#" data-section="testimonios">💬 Testimonios</a>
       <!-- Botón de salir -->
   <a href="index.html" class="exit-button">🚪 SALIR</a>
@@ -264,56 +263,6 @@
       
       // ========== FIN FUNCIONES TOAST ==========
       
-      // ========== FUNCIÓN PARA CONFIRMACIONES DE ELIMINACIÓN ==========
-      
-      function showDeleteConfirmation(options = {}) {
-        const {
-          title = 'Confirmar eliminación',
-          message = '¿Estás seguro de eliminar este elemento?',
-          description = 'Esta acción no se puede deshacer. El elemento será eliminado permanentemente del sistema.',
-          confirmText = 'Sí, eliminar',
-          cancelText = 'Cancelar',
-          onConfirm = () => {},
-          itemName = ''
-        } = options;
-        
-        // Resetear estilos del modal a los valores por defecto (eliminación)
-        const modal = document.getElementById('deleteConfirmModal');
-        const header = modal.querySelector('.modal-header');
-        const icon = modal.querySelector('.modal-body i');
-        const confirmBtn = document.getElementById('confirmDeleteBtn');
-        
-        header.className = 'modal-header bg-danger text-white';
-        icon.style.color = '#dc3545';
-        icon.className = 'fa fa-trash-o';
-        confirmBtn.className = 'btn btn-danger ml-2';
-        
-        // Actualizar contenido del modal
-        document.getElementById('deleteConfirmModalLabel').innerHTML = `
-          <i class="fa fa-exclamation-triangle mr-2"></i>${title}
-        `;
-        document.getElementById('deleteConfirmMessage').textContent = itemName ? 
-          `¿Estás seguro de eliminar ${itemName}?` : message;
-        document.getElementById('deleteConfirmDescription').textContent = description;
-        document.getElementById('confirmDeleteBtn').innerHTML = `
-          <i class="fa fa-trash-o mr-1"></i> ${confirmText}
-        `;
-        
-        // Configurar evento de confirmación
-        const newConfirmBtn = confirmBtn.cloneNode(true);
-        confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
-        
-        newConfirmBtn.addEventListener('click', function() {
-          $('#deleteConfirmModal').modal('hide');
-          onConfirm();
-        });
-        
-        // Mostrar modal
-        $('#deleteConfirmModal').modal('show');
-      }
-      
-      // ========== FIN FUNCIÓN CONFIRMACIONES ==========
-      
       console.log('Found sidebar links:', sidebarLinks.length);
       console.log('Content area:', contentArea);
 sidebarLinks.forEach((link) => {
@@ -336,6 +285,8 @@ sidebarLinks.forEach((link) => {
       } else if (section === "promociones") {
         console.log('Loading promociones section');
         loadPromocionesComponent();
+      } else if (section === "contacto") {
+        contentArea.innerHTML = getContactoHTML();
       } else if (section === "testimonios") {
         console.log('Loading testimonios section');
         loadTestimoniosComponent();
@@ -360,12 +311,48 @@ sidebarLinks.forEach((link) => {
   });
 });
 
-// La carga por defecto se maneja ahora en loadSectionFromHash()
-// console.log('Cargando sección productos por defecto...');
-// loadProductosComponent();
+// Cargar la sección productos por defecto al inicializar
+console.log('Cargando sección productos por defecto...');
+loadProductosComponent();
 
 // Agregar estas funciones para cada sección
 
+function getContactoHTML() {
+  return `
+    <h1 class="mb-4">Administrar información de contacto</h1>
+    
+    <form>
+      <div class="form-group">
+        <label for="direccion">Dirección</label>
+        <input type="text" class="form-control" id="direccion" value="Av. Ejemplo 1234, Buenos Aires">
+      </div>
+      <div class="form-group">
+        <label for="telefono">Teléfono</label>
+        <input type="text" class="form-control" id="telefono" value="11-3556-8417">
+      </div>
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" class="form-control" id="email" value="info@molpi.com.ar">
+      </div>
+      <div class="form-group">
+        <label for="horarios">Horarios de atención</label>
+        <input type="text" class="form-control" id="horarios" value="Lunes a Viernes de 9 a 18hs">
+      </div>
+      
+      <h3 class="mt-4">Redes sociales</h3>
+      <div class="form-group">
+        <label for="facebook">Facebook URL</label>
+        <input type="url" class="form-control" id="facebook" value="https://facebook.com/molpi">
+      </div>
+      <div class="form-group">
+        <label for="instagram">Instagram URL</label>
+        <input type="url" class="form-control" id="instagram" value="https://instagram.com/molpi">
+      </div>
+      
+      <button type="submit" class="btn btn-primary">Guardar cambios</button>
+    </form>
+  `;
+}
 function getClientesHTML() {
   return `
     <h1 class="mb-4">Administrar Clientes / Logos</h1>
@@ -482,7 +469,7 @@ function getClientesHTML() {
           console.error('Error cargando productos:', error);
           const tbody = document.getElementById('tablaProductos');
           if (tbody) {
-            tbody.innerHTML = '<tr><td colspan="9" class="text-center text-danger">Error al cargar productos</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="8" class="text-center text-danger">Error al cargar productos</td></tr>';
           }
         }
         
@@ -494,33 +481,27 @@ function getClientesHTML() {
           tbody.innerHTML = '';
           
           if (productosAMostrar.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="9" class="text-center">No hay productos para mostrar</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="8" class="text-center">No hay productos para mostrar</td></tr>';
             return;
           }
           
           productosAMostrar.forEach(producto => {
             const fila = document.createElement('tr');
-            
-            // Detectar si es un producto podotáctil
-            const esPodotactil = producto.categoria === 'Podotáctiles' || producto.id.toString().includes('podotactil');
-            
             fila.innerHTML = `
               <td>${producto.id}</td>
               <td>
                 ${producto.imagen_url ? 
-                  `<img src="${producto.imagen_url}" alt="${producto.nombre}" style="width: 60px; height: 60px; object-fit: cover;" class="rounded" onerror="this.src='img/placeholder.png'; this.onerror=null;">` : 
+                  `<img src="${producto.imagen_url}" alt="${producto.nombre}" style="width: 60px; height: 60px; object-fit: cover;" class="rounded">` : 
                   '<span class="text-muted">Sin imagen</span>'
                 }
               </td>
               <td>
                 <strong>${producto.nombre}</strong>
                 ${producto.descripcion ? `<br><small class="text-muted">${producto.descripcion.substring(0, 100)}...</small>` : ''}
-                ${esPodotactil ? '<br><span class="badge badge-warning">Podotáctil</span>' : ''}
               </td>
               <td><span class="badge badge-info">${producto.categoria}</span></td>
               <td><span class="badge badge-secondary">${producto.subcategoria}</span></td>
               <td>${producto.precio ? '$' + producto.precio.toFixed(2) : 'No definido'}</td>
-              <td>${producto.precio_usd ? 'U$D ' + producto.precio_usd.toFixed(2) : 'No definido'}</td>
               <td>
                 <span class="badge badge-${producto.activo ? 'success' : 'danger'}">
                   ${producto.activo ? 'Activo' : 'Inactivo'}
@@ -528,20 +509,12 @@ function getClientesHTML() {
               </td>
               <td>
                 <div class="btn-group" role="group">
-                  ${esPodotactil ? 
-                    `<button class="btn btn-outline-primary btn-sm btn-editar-podotactil" data-id="${producto.id}" title="Editar producto podotáctil">
-                      <i class="fa fa-pencil mr-1"></i>Editar
-                    </button>
-                    <button class="btn btn-outline-danger btn-sm btn-eliminar" data-id="${producto.id}" title="Eliminar producto podotáctil">
-                      <i class="fa fa-trash mr-1"></i>Eliminar
-                    </button>` :
-                    `<button class="btn btn-outline-primary btn-sm btn-editar" data-id="${producto.id}" title="Editar producto">
-                      <i class="fa fa-pencil mr-1"></i>Editar
-                    </button>
-                    <button class="btn btn-outline-danger btn-sm btn-eliminar" data-id="${producto.id}" title="Eliminar producto">
-                      <i class="fa fa-trash mr-1"></i>Eliminar
-                    </button>`
-                  }
+                  <button class="btn btn-outline-primary btn-sm btn-editar" data-id="${producto.id}" title="Editar producto">
+                    <i class="fa fa-pencil mr-1"></i>Editar
+                  </button>
+                  <button class="btn btn-outline-danger btn-sm btn-eliminar" data-id="${producto.id}" title="Eliminar producto">
+                    <i class="fa fa-trash mr-1"></i>Eliminar
+                  </button>
                   ${producto.pdf_url ? 
                     `<a href="${producto.pdf_url}" target="_blank" class="btn btn-outline-info btn-sm" title="Ver catálogo PDF">
                       <i class="fa fa-file-pdf-o mr-1"></i>PDF
@@ -567,18 +540,10 @@ function getClientesHTML() {
               eliminarProducto(id);
             });
           });
-          
-          // Configurar botones de editar podotáctiles
-          document.querySelectorAll('.btn-editar-podotactil').forEach(btn => {
-            btn.addEventListener('click', function() {
-              const id = parseInt(this.dataset.id);
-              editarPodotactil(id);
-            });
-          });
         }
         
         // 4. Función para filtrar productos
-        async function filtrarProductos() {
+        function filtrarProductos() {
           const filtroCategoria = document.getElementById('filtroCategoria');
           const filtroSubcategoria = document.getElementById('filtroSubcategoria');
           const buscarProducto = document.getElementById('buscarProducto');
@@ -587,95 +552,6 @@ function getClientesHTML() {
           const subcategoria = filtroSubcategoria ? filtroSubcategoria.value : '';
           const busqueda = buscarProducto ? buscarProducto.value.toLowerCase() : '';
           
-          // Si se está filtrando por categoría "Podotáctiles", cargar desde BD
-          if (categoria === 'Podotáctiles') {
-            try {
-              // Cargar productos podotáctiles desde la base de datos
-              const response = await fetch('/productos');
-              const todosProductos = await response.json();
-              
-              // Filtrar solo productos podotáctiles
-              let productosPodotactiles = todosProductos.filter(p => p.categoria === 'Podotáctiles');
-              
-              // Si no hay productos podotáctiles en la BD, crear los predefinidos
-              if (productosPodotactiles.length === 0) {
-                const productosPredefinidos = [
-                  {
-                    id: 200,
-                    nombre: 'Pisos Podotáctiles con Círculos',
-                    categoria: 'Podotáctiles',
-                    subcategoria: 'Discapacidad',
-                    descripcion: 'Los pisos podotáctiles de advertencia funcionan para todos, nos advierten a todos de que hay peligro inminente en nuestro camino, y sobre todo les ayuda a personas ciegas a saber que no deben avanzar; son conocidos también como señal de Stop.',
-                    imagen_url: 'img/products/circulos_ciegos_molde.jpg',
-                    imagen_mosaico_url: 'img/products/circulos_ciegos_mosaico.png',
-                    precio: 0,
-                    precio_usd: 0,
-                    pdf_url: '',
-                    activo: 1
-                  },
-                  {
-                    id: 201,
-                    nombre: 'Pisos Podotáctiles con Barras',
-                    categoria: 'Podotáctiles',
-                    subcategoria: 'Discapacidad',
-                    descripcion: 'Los pisos podotáctiles de guía o baldosas de barras como su nombre lo sugiere, son pisos que indican un camino seguro para las personas con capacidad visual disminuida. Funcionan al igual que los de puntos; cuando uno los pisa o los toca con el bastón, pero también funcionan por contraste de color en su entorno.',
-                    imagen_url: 'img/products/barras_molde.jpg',
-                    imagen_mosaico_url: 'img/products/barras_mosaico.png',
-                    precio: 0,
-                    precio_usd: 0,
-                    pdf_url: '',
-                    activo: 1
-                  },
-                  {
-                    id: 202,
-                    nombre: 'Señal Discapacitados',
-                    categoria: 'Podotáctiles',
-                    subcategoria: 'Discapacidad',
-                    descripcion: 'Este se coloca en lugares reservados para accesibilidad. Está pensado para la comunicación hacia las personas videntes. Para dar prioridad o tener precaución para con personas con discapacidad visual.',
-                    imagen_url: 'img/products/discapacitado_molde.jpg',
-                    imagen_mosaico_url: 'img/products/discapacitado_mosaico.png',
-                    precio: 0,
-                    precio_usd: 0,
-                    pdf_url: '',
-                    activo: 1
-                  }
-                ];
-                
-                // Sincronizar productos predefinidos con la base de datos solo si no existen
-                await sincronizarPodotactilesConBD(productosPredefinidos);
-                
-                // Volver a cargar desde la BD para obtener los estados actuales
-                const responseRefresh = await fetch('/productos');
-                const productosRefresh = await responseRefresh.json();
-                productosPodotactiles = productosRefresh.filter(p => p.categoria === 'Podotáctiles');
-              }
-              
-              // Aplicar filtros adicionales a los productos podotáctiles
-              let productosFiltrados = productosPodotactiles;
-              
-              if (subcategoria) {
-                productosFiltrados = productosFiltrados.filter(p => p.subcategoria === subcategoria);
-              }
-              
-              if (busqueda) {
-                productosFiltrados = productosFiltrados.filter(p => 
-                  p.nombre.toLowerCase().includes(busqueda) || 
-                  (p.descripcion && p.descripcion.toLowerCase().includes(busqueda))
-                );
-              }
-              
-              // Actualizar el array global para que las funciones de edición funcionen
-              productos = productosPodotactiles;
-              mostrarProductos(productosFiltrados);
-              return;
-              
-            } catch (error) {
-              console.error('Error cargando productos podotáctiles desde BD:', error);
-              // En caso de error, usar comportamiento normal
-            }
-          }
-          
-          // Para otras categorías, usar el comportamiento normal
           let productosFiltrados = productos;
           
           if (categoria) {
@@ -709,144 +585,46 @@ function getClientesHTML() {
           
           mostrarVistaPrevia('', '');
           
-          // Configurar vista previa del modal
-          configurarVistasPrevia();
-          
           if (typeof $ !== 'undefined' && $('#modalProducto').length) {
             $('#modalProducto').modal('show');
-            // Configurar event listeners después de que el modal se muestre
-            $('#modalProducto').on('shown.bs.modal', function() {
-              configurarEventListenersModal();
-            });
           }
         }
         
-        // 6. Función para mostrar vista previa de imagen (molde y mosaico)
+        // 6. Función para mostrar vista previa de imagen
         function mostrarVistaPrevia(urlMolde, urlMosaico = '') {
-          const vistasIndividuales = document.getElementById('vistasIndividuales');
+          const imgPrevia = document.getElementById('imagenPrevia');
+          const imgMosaicoPrevia = document.getElementById('imagenMosaicoPrevia');
+          const contenedorImagenes = document.getElementById('contenedorImagenes');
           const sinImagen = document.getElementById('sinImagen');
           
-          // Elementos individuales
-          const soloMolde = document.getElementById('soloMolde');
-          const soloMosaico = document.getElementById('soloMosaico');
-          const sinMosaico = document.getElementById('sinMosaico');
+          if (!imgPrevia || !sinImagen || !contenedorImagenes) return;
           
-          if (!vistasIndividuales || !sinImagen) return;
-          
-          // Si no hay URL del molde, no mostrar nada
-          if (!urlMolde || urlMolde.trim() === '') {
-            vistasIndividuales.style.display = 'none';
-            sinImagen.style.display = 'block';
-            return;
-          }
-          
-          // Mostrar las vistas
-          vistasIndividuales.style.display = 'block';
-          sinImagen.style.display = 'none';
-          
-          // Configurar imagen del molde
-          if (soloMolde) {
-            soloMolde.src = urlMolde;
-            soloMolde.style.display = 'block';
-          }
-          
-          // Configurar imagen del mosaico
-          if (urlMosaico && urlMosaico.trim() !== '') {
-            // Hay mosaico
-            if (soloMosaico) {
-              soloMosaico.src = urlMosaico;
-              soloMosaico.style.display = 'block';
-            }
-            if (sinMosaico) {
-              sinMosaico.style.display = 'none';
-            }
-          } else {
-            // No hay mosaico
-            if (soloMosaico) {
-              soloMosaico.style.display = 'none';
-            }
-            if (sinMosaico) {
-              sinMosaico.style.display = 'block';
-            }
-          }
-          
-          // Manejar errores de carga
-          if (soloMolde) {
-            soloMolde.onerror = function() {
-              vistasIndividuales.style.display = 'none';
-              sinImagen.style.display = 'block';
-            };
-          }
-          
-          if (soloMosaico) {
-            soloMosaico.onerror = function() {
-              soloMosaico.style.display = 'none';
-              sinMosaico.style.display = 'block';
-            };
-          }
-        }
-        
-        // Función para configurar las vistas previas del modal
-        function configurarVistasPrevia() {
-          const productoImagen = document.getElementById('productoImagen');
-          const productoImagenMosaico = document.getElementById('productoImagenMosaico');
-          
-          if (productoImagen) {
-            productoImagen.addEventListener('input', function() {
-              actualizarVistaPreviaModal();
-            });
-          }
-          
-          if (productoImagenMosaico) {
-            productoImagenMosaico.addEventListener('input', function() {
-              actualizarVistaPreviaModal();
-            });
-          }
-          
-          // Actualizar vista previa inicial
-          actualizarVistaPreviaModal();
-        }
-        
-        // Función para actualizar la vista previa del modal
-        function actualizarVistaPreviaModal() {
-          const urlMolde = document.getElementById('productoImagen')?.value || '';
-          const urlMosaico = document.getElementById('productoImagenMosaico')?.value || '';
-          
-          const previewMolde = document.getElementById('previewMolde');
-          const previewMoldeEmpty = document.getElementById('previewMoldeEmpty');
-          const previewMosaico = document.getElementById('previewMosaico');
-          const previewMosaicoEmpty = document.getElementById('previewMosaicoEmpty');
-          
-          // Mostrar/ocultar imagen del molde
           if (urlMolde && urlMolde.trim() !== '') {
-            if (previewMolde) {
-              previewMolde.src = urlMolde;
-              previewMolde.style.display = 'block';
-              previewMolde.onerror = function() {
-                this.style.display = 'none';
-                if (previewMoldeEmpty) previewMoldeEmpty.style.display = 'flex';
+            imgPrevia.src = urlMolde;
+            contenedorImagenes.style.display = 'inline-block';
+            sinImagen.style.display = 'none';
+            
+            imgPrevia.onerror = function() {
+              contenedorImagenes.style.display = 'none';
+              sinImagen.style.display = 'block';
+              sinImagen.textContent = 'Error al cargar la imagen del molde';
+            };
+            
+            // Manejar imagen del mosaico si existe
+            if (imgMosaicoPrevia && urlMosaico && urlMosaico.trim() !== '') {
+              imgMosaicoPrevia.src = urlMosaico;
+              imgMosaicoPrevia.style.display = 'block';
+              
+              imgMosaicoPrevia.onerror = function() {
+                imgMosaicoPrevia.style.display = 'none';
               };
+            } else if (imgMosaicoPrevia) {
+              imgMosaicoPrevia.style.display = 'none';
             }
-            if (previewMoldeEmpty) previewMoldeEmpty.style.display = 'none';
           } else {
-            if (previewMolde) previewMolde.style.display = 'none';
-            if (previewMoldeEmpty) previewMoldeEmpty.style.display = 'flex';
-          }
-          
-          // Mostrar/ocultar imagen del mosaico
-          if (urlMosaico && urlMosaico.trim() !== '') {
-            if (previewMosaico) {
-              previewMosaico.src = urlMosaico;
-              previewMosaico.style.display = 'block';
-              previewMosaico.onerror = function() {
-                this.style.display = 'none';
-                if (previewMosaicoEmpty) previewMosaicoEmpty.style.display = 'flex';
-              };
-            }
-            if (previewMosaicoEmpty) previewMosaicoEmpty.style.display = 'none';
-          } else {
-            if (previewMosaico) previewMosaico.style.display = 'none';
-            if (previewMosaicoEmpty) previewMosaicoEmpty.style.display = 'flex';
+            contenedorImagenes.style.display = 'none';
+            sinImagen.style.display = 'block';
+            sinImagen.textContent = 'No hay imagen para mostrar';
           }
         }
         
@@ -992,7 +770,6 @@ function getClientesHTML() {
         }
         
         // 9. Función para editar producto
-        // 9. Función para editar producto
         function editarProducto(id) {
           const producto = productos.find(p => p.id === id);
           if (!producto) return;
@@ -1005,7 +782,6 @@ function getClientesHTML() {
           const productoDescripcion = document.getElementById('productoDescripcion');
           const productoCategoria = document.getElementById('productoCategoria');
           const productoPrecio = document.getElementById('productoPrecio');
-          const productoPrecioUsd = document.getElementById('productoPrecioUsd');
           const productoImagen = document.getElementById('productoImagen');
           const productoImagenMosaico = document.getElementById('productoImagenMosaico');
           const productoPdf = document.getElementById('productoPdf');
@@ -1016,7 +792,6 @@ function getClientesHTML() {
           if (productoDescripcion) productoDescripcion.value = producto.descripcion || '';
           if (productoCategoria) productoCategoria.value = producto.categoria;
           if (productoPrecio) productoPrecio.value = producto.precio || '';
-          if (productoPrecioUsd) productoPrecioUsd.value = producto.precio_usd || '';
           if (productoImagen) productoImagen.value = producto.imagen_url || '';
           if (productoImagenMosaico) productoImagenMosaico.value = producto.imagen_mosaico_url || '';
           if (productoPdf) productoPdf.value = producto.pdf_url || '';
@@ -1031,376 +806,38 @@ function getClientesHTML() {
           
           mostrarVistaPrevia(producto.imagen_url || '', producto.imagen_mosaico_url || '');
           
-          // Configurar listeners para vista previa en tiempo real
-          configurarVistasPrevia();
-          
           if (typeof $ !== 'undefined' && $('#modalProducto').length) {
             $('#modalProducto').modal('show');
-            // Configurar event listeners después de que el modal se muestre
-            $('#modalProducto').on('shown.bs.modal', function() {
-              configurarEventListenersModal();
-            });
           }
         }
         
         // 10. Función para eliminar producto
         async function eliminarProducto(id) {
-          const producto = productos.find(p => p.id === id);
-          const nombreProducto = producto ? producto.nombre : `el producto #${id}`;
-          
-          showDeleteConfirmation({
-            title: 'Confirmar eliminación',
-            itemName: nombreProducto,
-            description: 'Esta acción no se puede deshacer. El producto será eliminado permanentemente del sistema.',
-            onConfirm: async () => {
-              try {
-                const response = await fetch(`/productos/${id}`, {
-                  method: 'DELETE'
-                });
-                
-                if (response.ok) {
-                  console.log('✅ Eliminación exitosa en el servidor');
-                  
-                  // Verificar el estado del filtro actual
-                  const filtroCategoria = document.getElementById('filtroCategoria');
-                  const categoriaActual = filtroCategoria ? filtroCategoria.value : '';
-                  
-                  // Detectar si estamos usando el filtro rápido de Podotáctiles
-                  const currentFilter = window.currentFilter || '';
-                  const botonPodotactilesActivo = document.querySelector('#filtroPodotactiles.active');
-                  
-                  console.log(`🔍 Filtro actual: "${currentFilter}"`);
-                  console.log(`🔍 Categoría dropdown: "${categoriaActual}"`);
-                  console.log('🔍 Botón Podotáctiles activo:', !!botonPodotactilesActivo);
-                  
-                  const estamosEnPodotactiles = currentFilter === 'Podotáctiles' || 
-                                               categoriaActual === 'Podotáctiles' || 
-                                               !!botonPodotactilesActivo;
-                  
-                  console.log('🎯 ¿Estamos en podotáctiles?', estamosEnPodotactiles);
-                  
-                  if (estamosEnPodotactiles) {
-                    console.log('🔄 Recargando vista de podotáctiles...');
-                    
-                    // Forzar recarga desde servidor para podotáctiles
-                    const response2 = await fetch('/productos');
-                    const todosProductos = await response2.json();
-                    const productosPodotactiles = todosProductos.filter(p => p.categoria === 'Podotáctiles');
-                    
-                    console.log('📦 Productos podotáctiles desde servidor:', productosPodotactiles.length);
-                    console.log('📦 Productos después de eliminar:', productosPodotactiles.map(p => ({id: p.id, nombre: p.nombre, activo: p.activo})));
-                    
-                    // Actualizar array global
-                    productos = productosPodotactiles;
-                    
-                    // Mostrar todos los podotáctiles (activos e inactivos)
-                    mostrarProductos(productosPodotactiles);
-                  } else {
-                    // Para otras categorías o vista general, recargar normalmente
-                    console.log('🔄 Recargando productos para categoría:', categoriaActual || 'todas');
-                    const response2 = await fetch('/productos');
-                    productos = await response2.json();
-                    
-                    if (categoriaActual && categoriaActual !== '') {
-                      // Si hay un filtro activo, aplicarlo
-                      await filtrarProductos();
-                    } else {
-                      // Sin filtro, mostrar todos
-                      mostrarProductos(productos);
-                    }
-                  }
-                  
-                  showSuccessToast('🗑️ Producto eliminado exitosamente');
-                } else {
-                  showErrorToast('Error al eliminar el producto');
-                }
-              } catch (error) {
-                console.error('Error:', error);
-                showErrorToast('Error al eliminar el producto');
-              }
-            }
-          });
-        }
-        
-        // 11. Funciones para manejar productos podotáctiles
-        function editarPodotactil(id) {
-          // Buscar el producto podotáctil
-          const producto = productos.find(p => p.id === id);
-          if (!producto) {
-            showErrorToast('Producto no encontrado');
-            return;
-          }
-          
-          // Llenar el modal con los datos del producto
-          document.getElementById('podotactilId').value = producto.id;
-          document.getElementById('podotactilNombre').value = producto.nombre;
-          document.getElementById('podotactilDescripcion').value = producto.descripcion || '';
-          document.getElementById('podotactilImagenMolde').value = producto.imagen_url || '';
-          document.getElementById('podotactilImagenMosaico').value = producto.imagen_mosaico_url || '';
-          document.getElementById('podotactilActivo').value = producto.activo ? '1' : '0';
-          
-          // Configurar event listeners para vista previa en tiempo real
-          const inputMolde = document.getElementById('podotactilImagenMolde');
-          const inputMosaico = document.getElementById('podotactilImagenMosaico');
-          
-          if (inputMolde) {
-            inputMolde.removeEventListener('input', actualizarVistaPreviaPodotactil);
-            inputMolde.addEventListener('input', actualizarVistaPreviaPodotactil);
-          }
-          
-          if (inputMosaico) {
-            inputMosaico.removeEventListener('input', actualizarVistaPreviaPodotactil);
-            inputMosaico.addEventListener('input', actualizarVistaPreviaPodotactil);
-          }
-          
-          // Actualizar vista previa inicial
-          actualizarVistaPreviaPodotactil();
-          
-          // Mostrar el modal
-          $('#modalEditarPodotactil').modal('show');
-          
-          // Log para debugging
-          console.log('Editando producto podotáctil:', {
-            id: producto.id,
-            nombre: producto.nombre,
-            molde: producto.imagen_url,
-            mosaico: producto.imagen_mosaico_url,
-            activo: producto.activo
-          });
-        }
-        
-        function actualizarVistaPreviaPodotactil() {
-          const urlMolde = document.getElementById('podotactilImagenMolde')?.value || '';
-          const urlMosaico = document.getElementById('podotactilImagenMosaico')?.value || '';
-          
-          const vistasIndividuales = document.getElementById('vistasIndividualesPodotactil');
-          const sinImagen = document.getElementById('sinImagenPodotactil');
-          const moldeImg = document.getElementById('podotactilMoldeImg');
-          const mosaicoImg = document.getElementById('podotactilMosaicoImg');
-          const sinMosaico = document.getElementById('sinMosaicoPodotactil');
-          
-          // Si no hay URL del molde, no mostrar nada
-          if (!urlMolde || urlMolde.trim() === '') {
-            if (vistasIndividuales) vistasIndividuales.style.display = 'none';
-            if (sinImagen) sinImagen.style.display = 'block';
-            return;
-          }
-          
-          // Mostrar las vistas
-          if (vistasIndividuales) vistasIndividuales.style.display = 'block';
-          if (sinImagen) sinImagen.style.display = 'none';
-          
-          // Configurar imagen del molde
-          if (moldeImg) {
-            moldeImg.src = urlMolde;
-            moldeImg.style.display = 'block';
-            moldeImg.onerror = function() {
-              this.src = 'img/placeholder.png';
-              console.log('Error cargando imagen molde:', urlMolde);
-            };
-          }
-          
-          // Configurar imagen del mosaico
-          if (urlMosaico && urlMosaico.trim() !== '') {
-            // Hay mosaico
-            if (mosaicoImg) {
-              mosaicoImg.src = urlMosaico;
-              mosaicoImg.style.display = 'block';
-              mosaicoImg.onerror = function() {
-                this.src = 'img/placeholder.png';
-                console.log('Error cargando imagen mosaico:', urlMosaico);
-              };
-            }
-            if (sinMosaico) sinMosaico.style.display = 'none';
-          } else {
-            // No hay mosaico
-            if (mosaicoImg) mosaicoImg.style.display = 'none';
-            if (sinMosaico) sinMosaico.style.display = 'block';
-          }
-        }
-        
-        async function guardarPodotactil() {
-          const id = parseInt(document.getElementById('podotactilId').value);
-          const nombre = document.getElementById('podotactilNombre').value;
-          const descripcion = document.getElementById('podotactilDescripcion').value;
-          const imagenMolde = document.getElementById('podotactilImagenMolde').value;
-          const imagenMosaico = document.getElementById('podotactilImagenMosaico').value;
-          const activo = parseInt(document.getElementById('podotactilActivo').value);
-          
-          if (!nombre || !descripcion) {
-            showErrorToast('Por favor completa todos los campos requeridos');
+          if (!confirm('¿Estás seguro de que quieres eliminar este producto?')) {
             return;
           }
           
           try {
-            // Preparar datos para enviar al servidor
-            const productoData = {
-              id: id,
-              nombre: nombre,
-              descripcion: descripcion,
-              categoria: 'Podotáctiles',
-              subcategoria: 'Discapacidad',
-              imagen_url: imagenMolde,
-              imagen_mosaico_url: imagenMosaico,
-              precio: 0,
-              precio_usd: 0,
-              pdf_url: '',
-              activo: activo
-            };
-            
-            // Enviar al servidor
             const response = await fetch(`/productos/${id}`, {
-              method: 'PUT',
-              headers: {
-                'Content-Type': 'application/json'
-              },
-              body: JSON.stringify(productoData)
+              method: 'DELETE'
             });
             
             if (response.ok) {
-              // También actualizar localmente
-              const index = productos.findIndex(p => p.id === id);
-              if (index !== -1) {
-                productos[index] = productoData;
-              }
-              
-              // Actualizar la vista
-              mostrarProductos(productos);
-              
-              // Cerrar modal
-              $('#modalEditarPodotactil').modal('hide');
-              
-              showSuccessToast('Producto podotáctil actualizado exitosamente en base de datos');
-              
-              console.log('Producto podotáctil guardado en BD:', productoData);
-            } else {
-              throw new Error('Error del servidor al guardar');
-            }
-          } catch (error) {
-            console.error('Error:', error);
-            showErrorToast('Error al guardar los cambios');
-          }
-        }
-        
-        async function togglePodotactil(id) {
-          const producto = productos.find(p => p.id === id);
-          if (!producto) {
-            showErrorToast('Producto no encontrado');
-            return;
-          }
-          
-          const nuevoEstado = !producto.activo;
-          const accion = nuevoEstado ? 'activar' : 'desactivar';
-          
-          try {
-            // Enviar solo el campo activo que queremos cambiar (como en promociones)
-            const productoData = {
-              nombre: producto.nombre,
-              descripcion: producto.descripcion,
-              categoria: producto.categoria,
-              subcategoria: producto.subcategoria,
-              pdf_url: producto.pdf_url,
-              imagen_url: producto.imagen_url,
-              imagen_mosaico_url: producto.imagen_mosaico_url,
-              precio: producto.precio,
-              precio_usd: producto.precio_usd,
-              activo: nuevoEstado ? 1 : 0  // Solo cambiamos el estado activo
-            };
-            
-            const response = await fetch(`/productos/${id}`, {
-              method: 'PUT',
-              headers: {
-                'Content-Type': 'application/json'
-              },
-              body: JSON.stringify(productoData)
-            });
-            
-            if (response.ok) {
-              // Recargar productos desde la base de datos para reflejar el cambio
+              // Recargar productos
               const response2 = await fetch('/productos');
-              const todosProductos = await response2.json();
-              
-              // Actualizar el producto en el array local
-              const index = productos.findIndex(p => p.id === id);
-              if (index !== -1) {
-                // Buscar el producto actualizado en la respuesta
-                const productoActualizado = todosProductos.find(p => p.id === id);
-                if (productoActualizado) {
-                  productos[index] = productoActualizado;
-                }
-              }
-              
-              // Actualizar la vista con los productos actuales
+              productos = await response2.json();
               mostrarProductos(productos);
-              
-              showSuccessToast(`✅ Producto "${producto.nombre}" ${nuevoEstado ? 'activado' : 'desactivado'} exitosamente`);
-              
-              console.log(`Producto podotáctil ${accion}:`, productoData);
+              showSuccessToast('🗑️ Producto eliminado exitosamente');
             } else {
-              throw new Error(`Error del servidor al ${accion}`);
+              showErrorToast('Error al eliminar el producto');
             }
           } catch (error) {
             console.error('Error:', error);
-            showErrorToast(`Error al ${accion} el producto`);
+            showErrorToast('Error al eliminar el producto');
           }
         }
         
-        // Función para sincronizar productos podotáctiles con la base de datos
-        async function sincronizarPodotactilesConBD(productosPodotactiles) {
-          try {
-            for (const producto of productosPodotactiles) {
-              // Verificar si el producto existe en la base de datos
-              const response = await fetch(`/productos/${producto.id}`);
-              
-              if (response.status === 404) {
-                // El producto no existe, crearlo
-                const createResponse = await fetch('/productos', {
-                  method: 'POST',
-                  headers: {
-                    'Content-Type': 'application/json'
-                  },
-                  body: JSON.stringify(producto)
-                });
-                
-                if (createResponse.ok) {
-                  console.log(`Producto podotáctil ${producto.nombre} creado en BD`);
-                } else {
-                  console.error(`Error creando producto ${producto.nombre}`);
-                }
-              } else if (response.ok) {
-                // El producto existe, verificar si necesita actualización
-                const productoExistente = await response.json();
-                
-                // Solo actualizar si las descripciones o imágenes son diferentes
-                if (productoExistente.descripcion !== producto.descripcion ||
-                    productoExistente.imagen_url !== producto.imagen_url ||
-                    productoExistente.imagen_mosaico_url !== producto.imagen_mosaico_url) {
-                  
-                  const updateResponse = await fetch(`/productos/${producto.id}`, {
-                    method: 'PUT',
-                    headers: {
-                      'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                      ...productoExistente,
-                      descripcion: producto.descripcion,
-                      imagen_url: producto.imagen_url,
-                      imagen_mosaico_url: producto.imagen_mosaico_url
-                    })
-                  });
-                  
-                  if (updateResponse.ok) {
-                    console.log(`Producto podotáctil ${producto.nombre} actualizado en BD`);
-                  }
-                }
-              }
-            }
-          } catch (error) {
-            console.error('Error sincronizando productos podotáctiles:', error);
-          }
-        }
-        
-        // 12. Configurar event listeners
+        // 11. Configurar event listeners
         const btnNuevoProducto = document.getElementById('btnNuevoProducto');
         if (btnNuevoProducto) {
           btnNuevoProducto.addEventListener('click', function() {
@@ -1413,18 +850,18 @@ function getClientesHTML() {
         const buscarProducto = document.getElementById('buscarProducto');
         
         if (filtroCategoria) {
-          filtroCategoria.addEventListener('change', async function() {
-            await actualizarFiltroSubcategorias();
-            await filtrarProductos();
+          filtroCategoria.addEventListener('change', function() {
+            actualizarFiltroSubcategorias();
+            filtrarProductos();
           });
         }
         
         if (filtroSubcategoria) {
-          filtroSubcategoria.addEventListener('change', () => filtrarProductos());
+          filtroSubcategoria.addEventListener('change', filtrarProductos);
         }
         
         if (buscarProducto) {
-          buscarProducto.addEventListener('input', () => filtrarProductos());
+          buscarProducto.addEventListener('input', filtrarProductos);
         }
         
         // Configurar botones de filtro rápido
@@ -1432,7 +869,6 @@ function getClientesHTML() {
         const filtro20x20 = document.getElementById('filtro20x20');
         const filtro40x40 = document.getElementById('filtro40x40');
         const filtro50x50 = document.getElementById('filtro50x50');
-        const filtroPodotactiles = document.getElementById('filtroPodotactiles');
         
         if (filtroTodos) {
           filtroTodos.addEventListener('click', function() {
@@ -1440,9 +876,6 @@ function getClientesHTML() {
             if (filtroCategoria) filtroCategoria.value = '';
             if (filtroSubcategoria) filtroSubcategoria.value = '';
             if (buscarProducto) buscarProducto.value = '';
-            
-            // Limpiar estado de filtro
-            window.currentFilter = '';
             
             // Actualizar botones activos
             document.querySelectorAll('.btn-group .btn').forEach(btn => btn.classList.remove('active'));
@@ -1459,9 +892,6 @@ function getClientesHTML() {
               // Actualizar botones activos
               document.querySelectorAll('.btn-group .btn').forEach(btn => btn.classList.remove('active'));
               this.classList.add('active');
-              
-              // Establecer filtro actual
-              window.currentFilter = '20x20';
               
               // Cargar productos específicos de línea 20x20
               const response = await fetch('/productos/linea/20x20');
@@ -1486,9 +916,6 @@ function getClientesHTML() {
               document.querySelectorAll('.btn-group .btn').forEach(btn => btn.classList.remove('active'));
               this.classList.add('active');
               
-              // Establecer filtro actual
-              window.currentFilter = '40x40';
-              
               // Cargar productos específicos de zócalos 40x40
               const response = await fetch('/productos/linea/40x40');
               if (response.ok) {
@@ -1512,9 +939,6 @@ function getClientesHTML() {
               document.querySelectorAll('.btn-group .btn').forEach(btn => btn.classList.remove('active'));
               this.classList.add('active');
               
-              // Establecer filtro actual
-              window.currentFilter = '50x50';
-              
               // Cargar productos específicos de zócalos 50x50
               const response = await fetch('/productos/linea/50x50');
               if (response.ok) {
@@ -1531,44 +955,16 @@ function getClientesHTML() {
           });
         }
         
-        if (filtroPodotactiles) {
-          filtroPodotactiles.addEventListener('click', async function() {
-            try {
-              // Actualizar botones activos
-              document.querySelectorAll('.btn-group .btn').forEach(btn => btn.classList.remove('active'));
-              this.classList.add('active');
-              
-              // Cargar productos podotáctiles desde la base de datos
-              const response = await fetch('/productos');
-              if (response.ok) {
-                const todosLosProductos = await response.json();
-                const productosPodotactiles = todosLosProductos.filter(p => p.categoria === 'Podotáctiles');
-                
-                // Guardar estado de filtro actual
-                window.currentFilter = 'Podotáctiles';
-                
-                productos = productosPodotactiles;
-                mostrarProductos(productos);
-                
-                console.log('🏃‍♂️ Filtro Podotáctiles aplicado, productos cargados:', productosPodotactiles);
-              } else {
-                throw new Error('Error al cargar productos desde la base de datos');
-              }
-              
-            } catch (error) {
-              console.error('Error mostrando productos podotáctiles:', error);
-              showErrorToast('Error al mostrar productos podotáctiles');
-            }
-          });
-        }
-        
         // Configurar cambio de categoria en el modal
         const productoCategoria = document.getElementById('productoCategoria');
         if (productoCategoria) {
           productoCategoria.addEventListener('change', cargarSubcategorias);
         }
         
-        // Configurar vista previa de imágenes (molde y mosaico)
+        // Configurar vista previa de imagen
+        const productoImagen = document.getElementById('productoImagen');
+        const productoImagenMosaico = document.getElementById('productoImagenMosaico');
+        
         function actualizarVistaPrevia() {
           const productoImagen = document.getElementById('productoImagen');
           const productoImagenMosaico = document.getElementById('productoImagenMosaico');
@@ -1577,20 +973,15 @@ function getClientesHTML() {
           mostrarVistaPrevia(urlMolde, urlMosaico);
         }
         
-        // Configurar event listeners después de que el modal se cargue
-        function configurarEventListenersModal() {
-          const productoImagen = document.getElementById('productoImagen');
-          const productoImagenMosaico = document.getElementById('productoImagenMosaico');
-          
-          if (productoImagen) {
-            productoImagen.removeEventListener('input', actualizarVistaPrevia); // Remover listener anterior si existe
-            productoImagen.addEventListener('input', actualizarVistaPrevia);
-          }
-          
-          if (productoImagenMosaico) {
-            productoImagenMosaico.removeEventListener('input', actualizarVistaPrevia); // Remover listener anterior si existe
-            productoImagenMosaico.addEventListener('input', actualizarVistaPrevia);
-          }
+        const productoImagen = document.getElementById('productoImagen');
+        const productoImagenMosaico = document.getElementById('productoImagenMosaico');
+        
+        if (productoImagen) {
+          productoImagen.addEventListener('input', actualizarVistaPrevia);
+        }
+        
+        if (productoImagenMosaico) {
+          productoImagenMosaico.addEventListener('input', actualizarVistaPrevia);
         }
         
         // Configurar formulario
@@ -1599,15 +990,6 @@ function getClientesHTML() {
           formProducto.addEventListener('submit', function(e) {
             e.preventDefault();
             guardarProducto();
-          });
-        }
-        
-        // Configurar formulario de podotáctiles
-        const formEditarPodotactil = document.getElementById('formEditarPodotactil');
-        if (formEditarPodotactil) {
-          formEditarPodotactil.addEventListener('submit', function(e) {
-            e.preventDefault();
-            guardarPodotactil();
           });
         }
         
@@ -1630,25 +1012,16 @@ function getClientesHTML() {
                 <div class="card mb-4">
                   <div class="card-body">
                     <div class="row">
-                      <div class="col-md-3">
+                      <div class="col-md-4">
                         <label for="filtroCategoria">Categoría</label>
                         <select id="filtroCategoria" class="form-control" onchange="actualizarSubcategorias(); filtrarProductos()">
                           <option value="">Todas las categorías</option>
                         </select>
                       </div>
-                      <div class="col-md-3">
+                      <div class="col-md-4">
                         <label for="filtroSubcategoria">Subcategoría</label>
                         <select id="filtroSubcategoria" class="form-control" onchange="filtrarProductos()">
                           <option value="">Todas las subcategorías</option>
-                        </select>
-                      </div>
-                      <div class="col-md-2">
-                        <label for="filtroLinea">Línea con Mosaicos</label>
-                        <select id="filtroLinea" class="form-control" onchange="filtrarProductos()">
-                          <option value="">Todas</option>
-                          <option value="Línea 20x20">20x20</option>
-                          <option value="Línea 40x40">40x40</option>
-                          <option value="Línea 50x50">50x50</option>
                         </select>
                       </div>
                       <div class="col-md-4">
@@ -1675,11 +1048,10 @@ function getClientesHTML() {
                           <tr>
                             <th>ID</th>
                             <th>Imagen</th>
-                            <th>Producto</th>
+                            <th>Nombre</th>
                             <th>Categoría</th>
                             <th>Subcategoría</th>
-                            <th>Precio en Pesos</th>
-                            <th>Precio en Dólares</th>
+                            <th>Precio</th>
                             <th>Estado</th>
                             <th>Acciones</th>
                           </tr>
@@ -1719,15 +1091,6 @@ function getClientesHTML() {
                 option.textContent = categoria.nombre;
                 selectCategoria.appendChild(option);
               });
-              
-              // Agregar categoría especial "Podotáctiles" si no existe
-              const tienePodotactiles = categorias.some(cat => cat.nombre === 'Podotáctiles');
-              if (!tienePodotactiles) {
-                const optionPodotactiles = document.createElement('option');
-                optionPodotactiles.value = 'Podotáctiles';
-                optionPodotactiles.textContent = 'Podotáctiles';
-                selectCategoria.appendChild(optionPodotactiles);
-              }
             }
           })
           .catch(error => console.error('Error cargando categorías:', error));
@@ -1779,29 +1142,6 @@ function getClientesHTML() {
         }
       }
       
-      function actualizarSubcategorias() {
-        const selectCategoria = document.getElementById('filtroCategoria');
-        const selectSubcategoria = document.getElementById('filtroSubcategoria');
-        
-        if (!selectCategoria || !selectSubcategoria) return;
-        
-        const categoriaSeleccionada = selectCategoria.value;
-        
-        // Limpiar subcategorías
-        selectSubcategoria.innerHTML = '<option value="">Todas las subcategorías</option>';
-        
-        // Si es categoría Podotáctiles, agregar subcategoría específica
-        if (categoriaSeleccionada === 'Podotáctiles') {
-          const option = document.createElement('option');
-          option.value = 'Discapacidad';
-          option.textContent = 'Discapacidad';
-          selectSubcategoria.appendChild(option);
-        } else if (categoriaSeleccionada) {
-          // Para otras categorías, cargar desde la base de datos
-          cargarSubcategorias(categoriaSeleccionada);
-        }
-      }
-      
       // Variables para evitar cargas múltiples
       let cargandoProductos = false;
       let filtrandoProductos = false;
@@ -1821,7 +1161,7 @@ function getClientesHTML() {
             console.error('Error cargando productos:', error);
             const tabla = document.getElementById('tablaProductos');
             if (tabla) {
-              tabla.innerHTML = '<tr><td colspan="9" class="text-center text-danger">Error cargando productos</td></tr>';
+              tabla.innerHTML = '<tr><td colspan="8" class="text-center text-danger">Error cargando productos</td></tr>';
             }
           })
           .finally(() => {
@@ -1842,7 +1182,7 @@ function getClientesHTML() {
         }
         
         if (productos.length === 0) {
-          tabla.innerHTML = '<tr><td colspan="9" class="text-center">No hay productos disponibles</td></tr>';
+          tabla.innerHTML = '<tr><td colspan="8" class="text-center">No hay productos disponibles</td></tr>';
           return;
         }
         
@@ -1862,7 +1202,6 @@ function getClientesHTML() {
             <td><span class="badge badge-info">${producto.categoria || 'Sin categoría'}</span></td>
             <td><span class="badge badge-secondary">${producto.subcategoria || 'Sin subcategoría'}</span></td>
             <td><strong>$${parseFloat(producto.precio || 0).toFixed(2)}</strong></td>
-            <td><strong>U$D ${parseFloat(producto.precio_usd || 0).toFixed(2)}</strong></td>
             <td><span class="badge badge-success">Activo</span></td>
             <td>
               <button class="btn btn-sm btn-outline-primary" onclick="editarProducto(${producto.id})" title="Editar">
@@ -1885,10 +1224,9 @@ function getClientesHTML() {
         // Obtener valores de los filtros
         const categoria = document.getElementById('filtroCategoria').value;
         const subcategoria = document.getElementById('filtroSubcategoria').value;
-        const linea = document.getElementById('filtroLinea').value;
         const busqueda = document.getElementById('buscarProducto').value.toLowerCase();
         
-        console.log('🔍 Filtrando productos:', { categoria, subcategoria, linea, busqueda });
+        console.log('🔍 Filtrando productos:', { categoria, subcategoria, busqueda });
         
         // Cargar productos y aplicar filtros
         fetch('/productos')
@@ -1915,14 +1253,6 @@ function getClientesHTML() {
               console.log(`📊 Después de filtrar por subcategoría "${subcategoria}": ${productosFiltrados.length} productos`);
             }
             
-            // Filtrar por línea de mosaicos
-            if (linea && linea !== '') {
-              productosFiltrados = productosFiltrados.filter(p => 
-                p.subcategoria === linea
-              );
-              console.log(`📊 Después de filtrar por línea "${linea}": ${productosFiltrados.length} productos`);
-            }
-            
             // Filtrar por búsqueda de texto
             if (busqueda && busqueda !== '') {
               productosFiltrados = productosFiltrados.filter(p => 
@@ -1947,7 +1277,6 @@ function getClientesHTML() {
         console.log('🧹 Limpiando filtros...');
         document.getElementById('filtroCategoria').value = '';
         document.getElementById('filtroSubcategoria').value = '';
-        document.getElementById('filtroLinea').value = '';
         document.getElementById('buscarProducto').value = '';
         cargarSubcategorias(); // Recargar todas las subcategorías
         cargarProductos(); // Cargar todos los productos
@@ -1971,7 +1300,7 @@ function getClientesHTML() {
       async function loadPromocionesComponent() {
         try {
           console.log('Fetching promociones component...');
-          const response = await fetch('http://localhost:5000/admin/component/promociones');
+          const response = await fetch('/admin/component/promociones');
           
           if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
@@ -1981,43 +1310,22 @@ function getClientesHTML() {
           contentArea.innerHTML = html;
           console.log('Promociones component loaded successfully');
           
-          // Ejecutar scripts del componente manualmente
-          const scripts = contentArea.querySelectorAll('script');
-          scripts.forEach(script => {
-            try {
-              const newScript = document.createElement('script');
-              newScript.innerHTML = script.innerHTML;
-              document.head.appendChild(newScript);
-              document.head.removeChild(newScript);
-            } catch (e) {
-              console.log('Error ejecutando script:', e);
-            }
-          });
-          
           // Inicializar event listeners después de cargar el componente
           setTimeout(() => {
-            console.log('🔄 Intentando inicializar promociones...');
-            
-            // Verificar funciones disponibles
-            console.log('Funciones disponibles:', {
-              inicializarPromociones: typeof window.inicializarPromociones,
-              cargarPromociones: typeof window.cargarPromociones,
-              debugPromociones: typeof window.debugPromociones
-            });
-            
             if (typeof window.inicializarPromociones === 'function') {
-              console.log('✅ Inicializando promociones después de carga dinámica...');
+              console.log('🔄 Inicializando promociones después de carga dinámica...');
               window.inicializarPromociones();
-            } else if (typeof window.cargarPromociones === 'function') {
-              console.log('✅ Cargando promociones directamente...');
-              window.cargarPromociones();
             } else {
-              console.log('⚠️ Funciones no disponibles, intentando debug...');
-              if (typeof window.debugPromociones === 'function') {
-                window.debugPromociones();
+              console.log('⚠️ Función inicializarPromociones no disponible, intentando inicialización manual...');
+              // Fallback: intentar inicializar directamente
+              if (typeof inicializarPromocionesEventListeners === 'function') {
+                inicializarPromocionesEventListeners();
+                if (typeof cargarPromociones === 'function') {
+                  cargarPromociones();
+                }
               }
             }
-          }, 200);
+          }, 100);
           
         } catch (error) {
           console.error('Error loading promociones component:', error);
@@ -2242,7 +1550,7 @@ function getClientesHTML() {
             const activo = document.getElementById('testimonioActivo').checked ? 1 : 0;
             
             if (!nombre || !empresa || !testimonio) {
-              showToast('Por favor complete todos los campos requeridos', 'error');
+              alert('Por favor complete todos los campos requeridos');
               return;
             }
             
@@ -2275,25 +1583,14 @@ function getClientesHTML() {
             if (response.ok) {
               $('#modalTestimonio').modal('hide');
               await cargarTestimonios();
-              showToast(id ? 'Testimonio actualizado exitosamente' : 'Testimonio creado exitosamente', 'success');
-              
-              // Notificar a la página principal sobre el cambio
-              try {
-                // Intentar notificar a ventanas abiertas del sitio principal
-                window.postMessage({
-                  action: 'testimonio_actualizado',
-                  tipo: id ? 'actualizado' : 'creado'
-                }, '*');
-              } catch (e) {
-                console.log('No se pudo notificar a otras ventanas:', e);
-              }
+              alert(id ? 'Testimonio actualizado exitosamente' : 'Testimonio creado exitosamente');
             } else {
               const error = await response.json();
-              showToast('Error: ' + (error.error || 'Error desconocido'), 'error');
+              alert('Error: ' + (error.error || 'Error desconocido'));
             }
           } catch (error) {
             console.error('Error guardando testimonio:', error);
-            showToast('Error al guardar el testimonio', 'error');
+            alert('Error al guardar el testimonio');
           } finally {
             // Restaurar el botón
             btnGuardar.disabled = false;
@@ -2331,55 +1628,26 @@ function getClientesHTML() {
           const testimonio = testimonios.find(t => t.id === id);
           if (!testimonio) return;
           
-          // Configurar el modal de confirmación
-          const deleteMessage = document.getElementById('deleteTestimonioMessage');
-          if (deleteMessage) {
-            deleteMessage.textContent = `¿Está seguro de eliminar el testimonio de ${testimonio.nombre}?`;
+          if (!confirm(`¿Está seguro de eliminar el testimonio de ${testimonio.nombre}?`)) {
+            return;
           }
           
-          // Configurar el botón de confirmación
-          const confirmBtn = document.getElementById('confirmDeleteTestimonioBtn');
-          if (confirmBtn) {
-            // Limpiar eventos anteriores
-            const newConfirmBtn = confirmBtn.cloneNode(true);
-            confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
-            
-            // Agregar nuevo evento
-            newConfirmBtn.addEventListener('click', async function() {
-              // Cerrar el modal de confirmación
-              $('#deleteTestimonioConfirmModal').modal('hide');
-              
-              try {
-                const response = await fetch(`/testimonios/${id}`, {
-                  method: 'DELETE'
-                });
-                
-                if (response.ok) {
-                  await cargarTestimonios();
-                  showToast('Testimonio eliminado exitosamente', 'success');
-                  
-                  // Notificar a la página principal sobre el cambio
-                  try {
-                    window.postMessage({
-                      action: 'testimonio_actualizado',
-                      tipo: 'eliminado'
-                    }, '*');
-                  } catch (e) {
-                    console.log('No se pudo notificar a otras ventanas:', e);
-                  }
-                } else {
-                  const error = await response.json();
-                  showToast('Error: ' + (error.error || 'Error desconocido'), 'error');
-                }
-              } catch (error) {
-                console.error('Error eliminando testimonio:', error);
-                showToast('Error al eliminar el testimonio', 'error');
-              }
+          try {
+            const response = await fetch(`/testimonios/${id}`, {
+              method: 'DELETE'
             });
+            
+            if (response.ok) {
+              await cargarTestimonios();
+              alert('Testimonio eliminado exitosamente');
+            } else {
+              const error = await response.json();
+              alert('Error: ' + (error.error || 'Error desconocido'));
+            }
+          } catch (error) {
+            console.error('Error eliminando testimonio:', error);
+            alert('Error al eliminar el testimonio');
           }
-          
-          // Mostrar el modal de confirmación
-          $('#deleteTestimonioConfirmModal').modal('show');
         };
         
         function resetearFormulario() {
@@ -2408,25 +1676,17 @@ function getClientesHTML() {
 
       function loadSectionFromHash() {
         const hash = window.location.hash.substring(1); // Remover el #
-        console.log('Loading section from hash:', hash);
-        
         if (hash) {
           const sectionLink = document.querySelector(`#adminSidebar a[data-section="${hash}"]`);
           if (sectionLink) {
-            console.log('Found section link for:', hash);
             sectionLink.click();
             return;
           }
         }
-        
-        // Si no hay hash o no se encuentra la sección, cargar productos por defecto
-        console.log('No hash found, loading default productos section');
-        const productosLink = document.querySelector('#adminSidebar a[data-section="productos"]');
-        if (productosLink) {
-          productosLink.click();
-        } else {
-          // Fallback si no encuentra productos
-          loadProductosComponent();
+        // Si no hay hash o no se encuentra la sección, cargar dashboard por defecto
+        const dashboardLink = document.querySelector('#adminSidebar a[data-section="dashboard"]');
+        if (dashboardLink) {
+          dashboardLink.click();
         }
       }
 
@@ -2437,146 +1697,6 @@ function getClientesHTML() {
       loadSectionFromHash();
     });
   </script>
-
-  <!-- Modal para Productos -->
-  <div class="modal fade" id="modalProducto" tabindex="-1" role="dialog" aria-labelledby="modalProductoTitle" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="modalProductoTitle">Nuevo Producto</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body">
-          <form id="formProducto">
-            <input type="hidden" id="productoId" name="id">
-            
-            <div class="row">
-              <div class="col-md-6">
-                <div class="form-group">
-                  <label for="productoNombre">Nombre del Producto *</label>
-                  <input type="text" class="form-control" id="productoNombre" name="nombre" required>
-                </div>
-              </div>
-              <div class="col-md-6">
-                <div class="form-group">
-                  <label for="productoCategoria">Categoría *</label>
-                  <select class="form-control" id="productoCategoria" name="categoria" required onchange="cargarSubcategorias()">
-                    <option value="">Seleccionar categoría</option>
-                    <option value="Pisos y Zócalos">Pisos y Zócalos</option>
-                    <option value="Revestimientos">Revestimientos</option>
-                    <option value="Molduras">Molduras</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-
-            <div class="form-group">
-              <label for="productoSubcategoria">Subcategoría *</label>
-              <select class="form-control" id="productoSubcategoria" name="subcategoria" required>
-                <option value="">Seleccionar subcategoría</option>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label for="productoDescripcion">Descripción</label>
-              <textarea class="form-control" id="productoDescripcion" name="descripcion" rows="3"></textarea>
-            </div>
-
-            <div class="row">
-              <div class="col-md-6">
-                <div class="form-group">
-                  <label for="productoPrecio">Precio en $ *</label>
-                  <input type="number" class="form-control" id="productoPrecio" name="precio" step="0.01" min="0" required>
-                </div>
-              </div>
-              <div class="col-md-6">
-                <div class="form-group">
-                  <label for="productoPrecioUsd">Precio en U$D</label>
-                  <input type="number" class="form-control" id="productoPrecioUsd" name="precio_usd" step="0.01" min="0">
-                </div>
-              </div>
-            </div>
-
-            <div class="form-group">
-              <label for="productoImagen">URL de Imagen del Molde</label>
-              <input type="url" class="form-control" id="productoImagen" name="imagen_url" placeholder="https://ejemplo.com/imagen-molde.jpg">
-            </div>
-
-            <div class="form-group">
-              <label for="productoImagenMosaico">URL de Imagen del Mosaico</label>
-              <input type="url" class="form-control" id="productoImagenMosaico" name="imagen_mosaico_url" placeholder="https://ejemplo.com/imagen-mosaico.jpg">
-            </div>
-
-            <div class="form-group">
-              <label for="productoPdf">URL del Catálogo PDF</label>
-              <input type="url" class="form-control" id="productoPdf" name="pdf_url" placeholder="https://ejemplo.com/catalogo.pdf">
-            </div>
-
-            <!-- Vista Previa -->
-            <div class="form-group">
-              <label>Vista Previa</label>
-              <div id="vistaPrevia" class="d-flex justify-content-around align-items-center p-3 border rounded">
-                <div class="text-center">
-                  <h6>Molde</h6>
-                  <img id="previewMolde" src="" alt="Preview Molde" style="max-width: 150px; max-height: 150px; display: none;" class="img-thumbnail">
-                  <div id="previewMoldeEmpty" class="bg-light d-flex align-items-center justify-content-center" style="width: 150px; height: 150px;">
-                    <span class="text-muted">Sin imagen</span>
-                  </div>
-                </div>
-                <div class="text-center">
-                  <h6>Mosaico</h6>
-                  <img id="previewMosaico" src="" alt="Preview Mosaico" style="max-width: 150px; max-height: 150px; display: none;" class="img-thumbnail">
-                  <div id="previewMosaicoEmpty" class="bg-light d-flex align-items-center justify-content-center" style="width: 150px; height: 150px;">
-                    <span class="text-muted">Sin imagen</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </form>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-          <button type="button" class="btn btn-primary" onclick="guardarProducto()">Guardar Producto</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Modal de confirmación general para eliminaciones -->
-  <div class="modal fade" id="deleteConfirmModal" tabindex="-1" role="dialog" aria-labelledby="deleteConfirmModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" role="document">
-      <div class="modal-content">
-        <div class="modal-header bg-danger text-white">
-          <h5 class="modal-title" id="deleteConfirmModalLabel">
-            <i class="fa fa-exclamation-triangle mr-2"></i>
-            Confirmar eliminación
-          </h5>
-          <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body">
-          <div class="text-center">
-            <div class="mb-3">
-              <i class="fa fa-trash-o" style="font-size: 48px; color: #dc3545;"></i>
-            </div>
-            <h5 class="mb-3" id="deleteConfirmMessage">¿Estás seguro de eliminar este elemento?</h5>
-            <p class="text-muted mb-0" id="deleteConfirmDescription">Esta acción no se puede deshacer. El elemento será eliminado permanentemente del sistema.</p>
-          </div>
-        </div>
-        <div class="modal-footer justify-content-center">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">
-            <i class="fa fa-times mr-1"></i> Cancelar
-          </button>
-          <button type="button" class="btn btn-danger ml-2" id="confirmDeleteBtn">
-            <i class="fa fa-trash-o mr-1"></i> Sí, eliminar
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
 
   <!-- Contenedor para notificaciones toast -->
   <div class="toast-container" id="toastContainer"></div>

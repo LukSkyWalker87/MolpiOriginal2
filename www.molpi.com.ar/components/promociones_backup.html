@@ -1,0 +1,634 @@
+<div class="container-fluid">
+    <h1 class="h3 mb-4 text-gray-800">📢 Gestión de Promociones</h1>
+    
+    <!-- Botón para agregar nueva promoción -->
+    <div class="mb-4">
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#promocionModal">
+            <i class="fa fa-plus"></i> Agregar Nueva Promoción
+        </button>
+        <button type="button" class="btn btn-success ml-2" onclick="cargarPromociones()">
+            <i class="fa fa-refresh"></i> Recargar Promociones
+        </button>
+    </div>
+    
+    <!-- Tabla de promociones -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Lista de Promociones</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="promocionesTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>Imagen</th>
+                            <th>Título</th>
+                            <th>Estado</th>
+                            <th>Fecha Creación</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="promocionesTableBody">
+                        <!-- Las promociones se cargan dinámicamente aquí -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para agregar/editar promoción -->
+<div class="modal fade" id="promocionModal" tabindex="-1" role="dialog" aria-labelledby="promocionModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="promocionModalLabel">Agregar Nueva Promoción</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="promocionForm">
+                <div class="modal-body">
+                    <input type="hidden" id="promocionId" name="promocionId">
+                    
+                    <!-- Título -->
+                    <div class="form-group">
+                        <label for="promocionTitulo">Título (opcional)</label>
+                        <input type="text" class="form-control" id="promocionTitulo" name="titulo" 
+                               placeholder="Ej: Oferta Especial - 20% de descuento">
+                        <small class="form-text text-muted">Si no se especifica título, solo se mostrará la imagen</small>
+                    </div>
+                    
+                    <!-- Imagen -->
+                    <div class="form-group">
+                        <label for="promocionImagen">Imagen de la Promoción *</label>
+                        <input type="file" class="form-control-file" id="promocionImagenFile" accept="image/*">
+                        <input type="text" class="form-control mt-2" id="promocionImagen" name="imagen" 
+                               placeholder="O ingrese la URL de la imagen">
+                        <small class="form-text text-muted">Suba una imagen o ingrese la URL. Recomendado: 1200x400px</small>
+                        
+                        <!-- Estado del archivo -->
+                        <div id="archivoEstado" class="mt-2" style="display: none;">
+                            <span class="badge badge-success">
+                                <i class="fa fa-check"></i> Archivo seleccionado
+                            </span>
+                        </div>
+                        
+                        <!-- Vista previa de la imagen -->
+                        <div id="imagenPreview" class="mt-3" style="display: none;">
+                            <img id="imagenPreviewImg" src="" alt="Vista previa" class="img-fluid" style="max-height: 200px; border: 1px solid #ddd; border-radius: 4px;">
+                        </div>
+                    </div>
+                    
+                    <!-- Estado -->
+                    <div class="form-group">
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="promocionActivo" name="activo" checked>
+                            <label class="form-check-label" for="promocionActivo">
+                                Promoción activa (visible en el sitio web)
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary" id="guardarPromocionBtn">
+                        <i class="fa fa-save"></i> Guardar Promoción
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+// Hacer la función global para poder llamarla desde el botón
+window.cargarPromociones = cargarPromociones;
+
+// Función para cargar promociones en la tabla
+async function cargarPromociones() {
+    console.log('🔄 [cargarPromociones] Iniciando carga de promociones...');
+    
+    try {
+        // Verificar que el elemento de la tabla exista
+        const tbody = document.getElementById('promocionesTableBody');
+        if (!tbody) {
+            console.error('❌ [cargarPromociones] No se encontró el elemento promocionesTableBody');
+            return;
+        }
+        
+        console.log('📡 [cargarPromociones] Haciendo fetch a http://localhost:5000/promociones/admin...');
+        const response = await fetch('http://localhost:5000/promociones/admin');
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const promociones = await response.json();
+        console.log('📦 [cargarPromociones] Promociones recibidas:', promociones);
+        
+        // Asegurar que promociones sea un array
+        let listaPromociones = Array.isArray(promociones) ? promociones : [promociones];
+        
+        tbody.innerHTML = '';
+        
+        if (!listaPromociones || listaPromociones.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">No hay promociones registradas</td></tr>';
+            console.log('ℹ️ [cargarPromociones] No hay promociones para mostrar');
+            return;
+        }
+        
+        listaPromociones.forEach((promocion, index) => {
+            console.log(`📝 [cargarPromociones] Procesando promoción ${index + 1}:`, promocion);
+            
+            const row = document.createElement('tr');
+            
+            // Determinar el estado
+            const estadoBadge = promocion.activo ? 
+                '<span class="badge badge-success">Activa</span>' : 
+                '<span class="badge badge-secondary">Inactiva</span>';
+            
+            // Formatear fecha
+            const fecha = new Date(promocion.fecha_creacion).toLocaleDateString('es-AR');
+            
+            // Crear la URL completa de la imagen para debuggear
+            const imagenUrl = promocion.imagen;
+            console.log(`🖼️ [cargarPromociones] URL de imagen para promoción ${promocion.id}:`, imagenUrl);
+            
+            row.innerHTML = `
+                <td>
+                    <div style="position: relative;">
+                        <img src="${imagenUrl}" 
+                             alt="Promoción ${promocion.titulo || promocion.id}" 
+                             style="max-width: 100px; max-height: 60px; object-fit: cover; border-radius: 4px;" 
+                             onload="console.log('✅ Imagen cargada:', this.src)"
+                             onerror="console.error('❌ Error cargando imagen:', this.src); this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <div style="display: none; width: 100px; height: 60px; background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; align-items: center; justify-content: center; color: #6c757d; font-size: 10px; text-align: center;">
+                            <div>
+                                <i class="fa fa-image" style="font-size: 16px; margin-bottom: 2px;"></i><br>
+                                Sin imagen
+                            </div>
+                        </div>
+                    </div>
+                </td>
+                <td>${promocion.titulo || '<em>Sin título</em>'}</td>
+                <td>${estadoBadge}</td>
+                <td>${fecha}</td>
+                <td>
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-sm btn-outline-primary" onclick="editarPromocion(${promocion.id})" title="Editar">
+                            <i class="fa fa-edit"></i> Editar
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="eliminarPromocion(${promocion.id})" title="Eliminar">
+                            <i class="fa fa-trash"></i> Eliminar
+                        </button>
+                    </div>
+                </td>
+            `;
+            
+            tbody.appendChild(row);
+        });
+        
+        console.log(`✅ [cargarPromociones] ${listaPromociones.length} promociones cargadas exitosamente`);
+        
+    } catch (error) {
+        console.error('💥 [cargarPromociones] Error:', error);
+        const tbody = document.getElementById('promocionesTableBody');
+        if (tbody) {
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center text-danger">Error al cargar promociones: ' + error.message + '</td></tr>';
+        }
+        alert('Error al cargar las promociones: ' + error.message);
+    }
+}
+
+// Función para limpiar el formulario
+function limpiarFormularioPromocion() {
+    document.getElementById('promocionForm').reset();
+    document.getElementById('promocionId').value = '';
+    document.getElementById('promocionModalLabel').textContent = 'Agregar Nueva Promoción';
+    document.getElementById('imagenPreview').style.display = 'none';
+    document.getElementById('archivoEstado').style.display = 'none';
+    
+    // Limpiar el input de archivo y sus datos
+    const fileInput = document.getElementById('promocionImagenFile');
+    fileInput.value = '';
+    delete fileInput.dataset.fileName;
+    delete fileInput.dataset.fileData;
+    
+    // Restaurar placeholder
+    document.getElementById('promocionImagen').placeholder = 'O ingrese la URL de la imagen';
+}
+
+// Función para mostrar vista previa de imagen
+function mostrarVistaPrevia(src) {
+    const preview = document.getElementById('imagenPreview');
+    const img = document.getElementById('imagenPreviewImg');
+    
+    if (src) {
+        img.src = src;
+        preview.style.display = 'block';
+    } else {
+        preview.style.display = 'none';
+    }
+}
+
+// Función para inicializar event listeners (para carga dinámica)
+function inicializarPromocionesEventListeners() {
+    console.log('🔧 [inicializarEventListeners] Iniciando...');
+    
+    // Evitar múltiples inicializaciones
+    if (window.promocionesEventListenersInicializados) {
+        console.log('⏭️ [inicializarEventListeners] Ya inicializados, saltando...');
+        return;
+    }
+    
+    const promocionForm = document.getElementById('promocionForm');
+    const promocionImagenInput = document.getElementById('promocionImagen');
+    const promocionFileInput = document.getElementById('promocionImagenFile');
+    const guardarBtn = document.getElementById('guardarPromocionBtn');
+    
+    console.log('🔍 [inicializarEventListeners] Elementos encontrados:', {
+        form: !!promocionForm,
+        imageInput: !!promocionImagenInput,
+        fileInput: !!promocionFileInput,
+        saveBtn: !!guardarBtn
+    });
+    
+    // Asegurar que guardarPromocion esté disponible globalmente
+    if (typeof window.guardarPromocion === 'undefined') {
+        window.guardarPromocion = guardarPromocion;
+        console.log('✅ [inicializarEventListeners] Función guardarPromocion expuesta globalmente');
+    }
+    
+    // Event listener del formulario
+    if (promocionForm) {
+        promocionForm.addEventListener('submit', function(e) {
+            console.log('📝 [inicializarEventListeners] Formulario enviado');
+            e.preventDefault();
+            guardarPromocion(e);
+        });
+        console.log('✅ [inicializarEventListeners] Event listener del formulario registrado');
+    }
+    
+    // Event listener para imagen URL
+    if (promocionImagenInput) {
+        promocionImagenInput.addEventListener('input', function() {
+            mostrarVistaPrevia(this.value);
+        });
+        console.log('✅ [inicializarEventListeners] Event listener de imagen URL registrado');
+    }
+    
+    // Event listener para archivo
+    if (promocionFileInput) {
+        promocionFileInput.addEventListener('change', function() {
+            console.log('📁 [inicializarEventListeners] Archivo seleccionado:', this.files[0]?.name);
+            handleFileSelection(this);
+        });
+        console.log('✅ [inicializarEventListeners] Event listener de archivo registrado');
+    }
+    
+    // Setup modal events
+    $(document).off('hidden.bs.modal', '#promocionModal').on('hidden.bs.modal', '#promocionModal', function () {
+        limpiarFormularioPromocion();
+    });
+    
+    // Marcar como inicializado
+    window.promocionesEventListenersInicializados = true;
+    console.log('✅ [inicializarEventListeners] Completado');
+}
+
+// Función separada para manejar selección de archivo
+function handleFileSelection(fileInput) {
+    const file = fileInput.files[0];
+    if (!file) {
+        // Limpiar si no hay archivo
+        const imageUrlInput = document.getElementById('promocionImagen');
+        if (imageUrlInput) {
+            imageUrlInput.value = '';
+            imageUrlInput.placeholder = 'O ingrese la URL de la imagen';
+        }
+        document.getElementById('imagenPreview').style.display = 'none';
+        document.getElementById('archivoEstado').style.display = 'none';
+        return;
+    }
+    
+    // Validar tipo de archivo
+    if (!file.type.startsWith('image/')) {
+        alert('Por favor seleccione un archivo de imagen válido');
+        fileInput.value = '';
+        return;
+    }
+    
+    // Validar tamaño (máximo 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+        alert('El archivo es demasiado grande. Tamaño máximo: 5MB');
+        fileInput.value = '';
+        return;
+    }
+    
+    console.log('📁 [handleFileSelection] Procesando archivo válido:', file.name);
+    
+    // Generar nombre único
+    const timestamp = Date.now();
+    const fileName = `promo_${timestamp}_${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
+    const imagePath = `img/promociones/${fileName}`;
+    
+    // Actualizar campo URL
+    const imageUrlInput = document.getElementById('promocionImagen');
+    if (imageUrlInput) {
+        imageUrlInput.value = imagePath;
+        imageUrlInput.placeholder = 'Archivo seleccionado: ' + file.name;
+        console.log('✅ [handleFileSelection] Campo URL actualizado:', imagePath);
+    }
+    
+    // Mostrar indicadores
+    document.getElementById('archivoEstado').style.display = 'block';
+    
+    // Vista previa
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        mostrarVistaPrevia(e.target.result);
+        fileInput.dataset.fileName = fileName;
+        fileInput.dataset.fileData = e.target.result;
+    };
+    reader.readAsDataURL(file);
+}
+async function guardarPromocion(event) {
+    console.log('💾 guardarPromocion ejecutada - inicio');
+    
+    if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+    }
+    
+    const btn = document.getElementById('guardarPromocionBtn');
+    const originalText = btn ? btn.innerHTML : '';
+    
+    console.log('🔍 Estado inicial:', {
+        btnExists: !!btn,
+        originalText: originalText
+    });
+    
+    if (btn) {
+        btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Guardando...';
+        btn.disabled = true;
+    }
+    
+    try {
+        let imagenUrl = document.getElementById('promocionImagen').value;
+        console.log('📷 URL de imagen inicial:', imagenUrl);
+        
+        // Si hay un archivo seleccionado, subirlo primero
+        const fileInput = document.getElementById('promocionImagenFile');
+        if (fileInput && fileInput.files.length > 0) {
+            console.log('📁 Subiendo archivo:', fileInput.files[0].name);
+            
+            if (btn) btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Subiendo imagen...';
+            
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+            
+            console.log('🚀 Enviando archivo al servidor...');
+            const uploadResponse = await fetch('http://localhost:5000/upload/promocion', {
+                method: 'POST',
+                body: formData
+            });
+            
+            console.log('📡 Respuesta de upload:', uploadResponse.status);
+            const uploadResult = await uploadResponse.json();
+            console.log('📦 Resultado de upload:', uploadResult);
+            
+            if (uploadResponse.ok) {
+                imagenUrl = uploadResult.path;
+                console.log('✅ Imagen subida exitosamente:', imagenUrl);
+            } else {
+                console.error('❌ Error subiendo imagen:', uploadResult);
+                alert('Error subiendo imagen: ' + uploadResult.error);
+                return;
+            }
+        }
+        
+        // Validación: debe haber una imagen (archivo o URL)
+        if (!imagenUrl && (!fileInput || !fileInput.files || fileInput.files.length === 0)) {
+            console.warn('⚠️ No hay imagen seleccionada');
+            alert('Debe seleccionar una imagen o ingresar una URL de imagen');
+            return;
+        }
+        
+        if (btn) btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Guardando promoción...';
+        
+        const formData = new FormData(document.getElementById('promocionForm'));
+        const promocionId = document.getElementById('promocionId').value;
+        
+        const data = {
+            titulo: formData.get('titulo'),
+            imagen: imagenUrl, // Usar la URL subida o la URL manual
+            activo: document.getElementById('promocionActivo').checked ? 1 : 0
+        };
+        
+        console.log('📋 Datos a enviar:', data);
+        
+        const url = promocionId ? `http://localhost:5000/promociones/${promocionId}` : 'http://localhost:5000/promociones';
+        const method = promocionId ? 'PUT' : 'POST';
+        
+        console.log('🚀 Enviando petición:', { url, method });
+        
+        const response = await fetch(url, {
+            method: method,
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        });
+        
+        console.log('📡 Respuesta del servidor:', response.status);
+        const result = await response.json();
+        console.log('📦 Resultado:', result);
+        
+        if (response.ok) {
+            console.log('✅ Promoción guardada exitosamente:', result);
+            alert(promocionId ? 'Promoción actualizada exitosamente' : 'Promoción creada exitosamente');
+            $('#promocionModal').modal('hide');
+            
+            // Recargar promociones después de un pequeño delay
+            setTimeout(() => {
+                console.log('🔄 Recargando lista de promociones...');
+                cargarPromociones();
+            }, 500);
+        } else {
+            console.error('❌ Error del servidor:', result);
+            alert('Error: ' + result.error);
+        }
+        
+    } catch (error) {
+        console.error('💥 Error guardando promoción:', error);
+        alert('Error al guardar la promoción: ' + error.message);
+    } finally {
+        if (btn) {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }
+        console.log('🏁 guardarPromocion finalizada');
+    }
+}
+
+// Función para editar promoción
+async function editarPromocion(id) {
+    try {
+        const response = await fetch('http://localhost:5000/promociones/admin');
+        const promociones = await response.json();
+        const promocion = promociones.find(p => p.id === id);
+        
+        if (!promocion) {
+            alert('Promoción no encontrada');
+            return;
+        }
+        
+        // Llenar el formulario
+        document.getElementById('promocionId').value = promocion.id;
+        document.getElementById('promocionTitulo').value = promocion.titulo || '';
+        document.getElementById('promocionImagen').value = promocion.imagen;
+        document.getElementById('promocionActivo').checked = promocion.activo;
+        
+        // Cambiar título del modal
+        document.getElementById('promocionModalLabel').textContent = 'Editar Promoción';
+        
+        // Mostrar vista previa
+        mostrarVistaPrevia(promocion.imagen);
+        
+        // Mostrar modal
+        $('#promocionModal').modal('show');
+        
+    } catch (error) {
+        console.error('Error cargando promoción:', error);
+        alert('Error al cargar los datos de la promoción');
+    }
+}
+
+// Función para eliminar promoción
+async function eliminarPromocion(id) {
+    if (!confirm('¿Estás seguro de que quieres eliminar esta promoción?')) {
+        return;
+    }
+    
+    try {
+        const response = await fetch(`http://localhost:5000/promociones/${id}`, {
+            method: 'DELETE'
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok) {
+            alert('Promoción eliminada exitosamente');
+            cargarPromociones();
+        } else {
+            alert('Error: ' + result.error);
+        }
+        
+    } catch (error) {
+        console.error('Error eliminando promoción:', error);
+        alert('Error al eliminar la promoción');
+    }
+}
+
+// Inicializar componente cuando el DOM esté listo
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🚀 [DOMContentLoaded] Inicializando componente promociones...');
+    if (!window.promocionesComponenteInicializado) {
+        inicializarPromocionesEventListeners();
+        cargarPromociones();
+        window.promocionesComponenteInicializado = true;
+    }
+});
+
+// También llamar cuando se carga el componente dinámicamente
+if (typeof window.inicializarPromociones === 'undefined') {
+    window.inicializarPromociones = function() {
+        console.log('🔄 [inicializarPromociones] Inicialización dinámica...');
+        
+        // Evitar múltiples inicializaciones
+        if (window.promocionesComponenteInicializado) {
+            console.log('⏭️ [inicializarPromociones] Ya inicializado, solo recargando datos...');
+            cargarPromociones();
+            return;
+        }
+        
+        // Exponer funciones globalmente
+        window.guardarPromocion = guardarPromocion;
+        window.cargarPromociones = cargarPromociones;
+        window.editarPromocion = editarPromocion;
+        window.eliminarPromocion = eliminarPromocion;
+        window.inicializarPromocionesEventListeners = inicializarPromocionesEventListeners;
+        
+        console.log('✅ [inicializarPromociones] Funciones expuestas globalmente');
+        
+        // Dar tiempo al DOM a renderizarse antes de inicializar
+        setTimeout(() => {
+            console.log('⏰ [inicializarPromociones] Ejecutando inicialización después del timeout...');
+            inicializarPromocionesEventListeners();
+            cargarPromociones();
+            window.promocionesComponenteInicializado = true;
+        }, 100);
+    };
+    console.log('✅ [inicializarPromociones] Función window.inicializarPromociones definida');
+}
+
+// Exponer funciones inmediatamente también
+window.guardarPromocion = guardarPromocion;
+window.cargarPromociones = cargarPromociones;
+window.editarPromocion = editarPromocion;
+window.eliminarPromocion = eliminarPromocion;
+console.log('🌐 [setup] Funciones de promociones disponibles globalmente');
+
+// Forzar carga si ya estamos en un entorno cargado (solo una vez)
+if ((document.readyState === 'complete' || document.readyState === 'interactive') && !window.promocionesComponenteInicializado) {
+    console.log('📄 [setup] Documento ya listo, cargando promociones inmediatamente...');
+    setTimeout(() => {
+        const tbody = document.getElementById('promocionesTableBody');
+        if (tbody && !window.promocionesComponenteInicializado) {
+            console.log('🎯 [setup] Elemento encontrado, cargando promociones...');
+            inicializarPromocionesEventListeners();
+            cargarPromociones();
+            window.promocionesComponenteInicializado = true;
+        }
+    }, 50);
+}
+        }
+    }, 50);
+}
+
+// Test de conectividad
+async function testConectividad() {
+    try {
+        console.log('🔌 Probando conectividad con el servidor...');
+        const response = await fetch('http://localhost:5000/promociones/admin');
+        console.log('📡 Estado de respuesta:', response.status);
+        console.log('📡 Headers:', response.headers);
+        const data = await response.json();
+        console.log('📦 Datos recibidos en test:', data);
+        return true;
+    } catch (error) {
+        console.error('❌ Error de conectividad:', error);
+        return false;
+    }
+}
+
+// Función de debug simple
+window.debugPromociones = function() {
+    console.log('🔍 === DEBUG PROMOCIONES ===');
+    console.log('Elementos DOM:');
+    console.log('- promocionesTableBody:', !!document.getElementById('promocionesTableBody'));
+    console.log('- promocionesTable:', !!document.getElementById('promocionesTable'));
+    console.log('Estado del documento:', document.readyState);
+    
+    testConectividad().then(conectado => {
+        console.log('Conectividad:', conectado ? '✅ OK' : '❌ FALLO');
+        if (conectado) {
+            console.log('🔄 Intentando cargar promociones...');
+            cargarPromociones();
+        }
+    });
+};
+
+console.log('🌐 Debug function disponible: window.debugPromociones()');
+</script>

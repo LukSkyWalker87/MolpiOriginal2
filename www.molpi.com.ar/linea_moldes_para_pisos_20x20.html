@@ -48,6 +48,42 @@
 
 		<!-- Theme Custom CSS -->
 		<link rel="stylesheet" href="css/custom.css">
+		
+		<!-- Animaciones personalizadas -->
+		<style>
+		.producto-animate {
+			opacity: 0;
+			transform: translateX(-50px);
+			transition: all 0.6s ease-out;
+		}
+		
+		.producto-animate.show {
+			opacity: 1;
+			transform: translateX(0);
+		}
+		
+		.producto-titulo {
+			opacity: 0;
+			transform: translateY(20px);
+			transition: all 0.4s ease-out;
+		}
+		
+		.producto-titulo.show {
+			opacity: 1;
+			transform: translateY(0);
+		}
+		
+		.producto-imagen {
+			opacity: 0;
+			transform: scale(0.8);
+			transition: all 0.5s ease-out;
+		}
+		
+		.producto-imagen.show {
+			opacity: 1;
+			transform: scale(1);
+		}
+		</style>
 
 		<!-- Head Libs -->
 		<script src="vendor/modernizr/modernizr.min.js"></script>
@@ -198,137 +234,9 @@ Medidas del molde = 45cm x 45cm x 3cm.<br>
 						        <img src="img/products/plano_20x20.png" alt class="custom-product-image-pos-3 _relative img-responsive" />
                         </div>
                         
-                        <div class="col-md-12">
-						<hr>
-						</div>
-						
-						
-						
-						<div class="col-md-6">
-                                <div class="col-md-12">
-                                     <h4 class="mb-xl mt-xlg">Vainilla de 3.</h4>
-                                     <div class="divider divider-primary divider-small mb-xl"> 
-						                 <hr>
-						             </div>
-                                </div>
-                                <img src="img/products/vainilla_de_3_molde.jpg" data-appear-animation="fadeInLeft" data-appear-animation-delay="0" data-plugin-options="{'accY': 10}" alt class="custom-product-image-pos-1 _relative img-responsive" />
-
-								<img src="img/products/vainilla_de_3_mosaico.png" data-appear-animation="fadeInLeft" data-appear-animation-delay="200" data-plugin-options="{'accY': 10}" alt class="custom-product-image-pos-5 _absolute img-responsive" />
-
-
-						 </div> 
-
-						
-						
-						<div class="col-md-6">
-                                <div class="col-md-12">
-                                     <h4 class="mb-xl mt-xlg">Vainilla de 4.</h4>
-                                     <div class="divider divider-primary divider-small mb-xl"> 
-						                 <hr>
-						             </div>
-                                </div>
-                                <img src="img/products/vainilla_de_4_molde.jpg" data-appear-animation="fadeInLeft" data-appear-animation-delay="0" data-plugin-options="{'accY': 10}" alt class="custom-product-image-pos-1 _relative img-responsive" />
-
-								<img src="img/products/vainilla_de_4_mosaico.html" data-appear-animation="fadeInLeft" data-appear-animation-delay="200" data-plugin-options="{'accY': 10}" alt class="custom-product-image-pos-5 _absolute img-responsive" />
-
-
-						 </div>
-
-						  <div class="col-md-12">
-						<hr>
-						</div>
-						
-						<div class="col-md-6">
-                                <div class="col-md-12">
-                                     <h4 class="mb-xl mt-xlg">Vainilla de 5.</h4>
-                                     <div class="divider divider-primary divider-small mb-xl"> 
-						                 <hr>
-						             </div>
-                                </div>
-                                <img src="img/products/vainilla_de_5_molde.jpg" data-appear-animation="fadeInLeft" data-appear-animation-delay="0" data-plugin-options="{'accY': 10}" alt class="custom-product-image-pos-1 _relative img-responsive" />
-
-								<img src="img/products/vainilla_de_5_mosaico.html" data-appear-animation="fadeInLeft" data-appear-animation-delay="200" data-plugin-options="{'accY': 10}" alt class="custom-product-image-pos-5 _absolute img-responsive" />
-
-
-						 </div>    
-
-						  
-						
-						<div class="col-md-6">
-                                <div class="col-md-12">
-                                     <h4 class="mb-xl mt-xlg">Vainilla de 6.</h4>
-                                     <div class="divider divider-primary divider-small mb-xl"> 
-						                 <hr>
-						             </div>
-                                </div>
-                                <img src="img/products/vainilla_de_6_molde.jpg" data-appear-animation="fadeInLeft" data-appear-animation-delay="0" data-plugin-options="{'accY': 10}" alt class="custom-product-image-pos-1 _relative img-responsive" />
-
-								<img src="img/products/vainilla_de_6_mosaico.png" data-appear-animation="fadeInLeft" data-appear-animation-delay="200" data-plugin-options="{'accY': 10}" alt class="custom-product-image-pos-5 _absolute img-responsive" />
-
-
-						 </div>
-
-						 <div class="col-md-12">
-						<hr>
-						</div>
-						
-						<div class="col-md-6">
-                                <div class="col-md-12">
-                                     <h4 class="mb-xl mt-xlg">9 Panes.</h4>
-                                     <div class="divider divider-primary divider-small mb-xl"> 
-						                 <hr>
-						             </div>
-                                </div>
-                                <img src="img/products/9_panes_molde.jpg" data-appear-animation="fadeInLeft" data-appear-animation-delay="0" data-plugin-options="{'accY': 10}" alt class="custom-product-image-pos-1 _relative img-responsive" />
-
-								<img src="img/products/9_panes_mosaico.png" data-appear-animation="fadeInLeft" data-appear-animation-delay="200" data-plugin-options="{'accY': 10}" alt class="custom-product-image-pos-5 _absolute img-responsive" />
-
-
-						 </div> 
-
-						 <div class="col-md-6">
-                                <div class="col-md-12">
-                                     <h4 class="mb-xl mt-xlg">Laja 20x20.</h4>
-                                     <div class="divider divider-primary divider-small mb-xl"> 
-						                 <hr>
-						             </div>
-                                </div>
-                                <img src="img/products/laja_20_molde.jpg" data-appear-animation="fadeInLeft" data-appear-animation-delay="0" data-plugin-options="{'accY': 10}" alt class="custom-product-image-pos-1 _relative img-responsive" />
-
-								<img src="img/products/lisa_20_mosaico_b.png" data-appear-animation="fadeInLeft" data-appear-animation-delay="200" data-plugin-options="{'accY': 10}" alt class="custom-product-image-pos-5 _absolute img-responsive" />
-
-						 </div> 
-
-						 
-						  <div class="col-md-12">
-						<hr>
-						</div>
-						
-						<div class="col-md-6">
-                                <div class="col-md-12">
-                                     <h4 class="mb-xl mt-xlg">Liso 20x20.</h4>
-                                     <div class="divider divider-primary divider-small mb-xl"> 
-						                 <hr>
-						             </div>
-                                </div>
-                                <img src="img/products/lisa_20_molde.jpg" data-appear-animation="fadeInLeft" data-appear-animation-delay="0" data-plugin-options="{'accY': 10}" alt class="custom-product-image-pos-1 _relative img-responsive" />
-
-								<img src="img/products/lisa_20_mosaico.png" data-appear-animation="fadeInLeft" data-appear-animation-delay="200" data-plugin-options="{'accY': 10}" alt class="custom-product-image-pos-5 _absolute img-responsive" />
-
-
-						 </div> 
-
-						<div class="col-md-6">
-
-                                <div class="col-md-12">
-                                     <h4 class="mb-xl mt-xlg">Laja 20x40.</h4>
-                                     <div class="divider divider-primary divider-small mb-xl"> 
-						                 <hr>
-						             </div>
-                                </div>
-                                <img src="img/products/laja_n2_40x20_molde.jpg" data-appear-animation="fadeInLeft" data-appear-animation-delay="200" data-plugin-options="{'accY': 10}" alt class="custom-product-image-pos-1 _relative img-responsive" />
-
-								<img src="img/products/laja_20x40_yeso_mosaico.html" data-appear-animation="fadeInLeft" data-appear-animation-delay="400" data-plugin-options="{'accY': 10}" alt class="custom-product-image-pos-5 _absolute img-responsive" />
+                        <!-- Contenedor para productos dinámicos de línea 20x20 -->
+                        <div id="productos-container">
+                            <!-- Los productos se cargarán dinámicamente aquí -->
                         </div>
 
 
@@ -504,6 +412,172 @@ Medidas del molde = 45cm x 45cm x 3cm.<br>
    title="Chatear por WhatsApp con Molpi">
   <img src="https://icongr.am/fontawesome/whatsapp.svg?size=40&color=ffffff" alt="WhatsApp">
 </a>
+
+<script>
+$(document).ready(function() {
+    cargarProductosLinea20x20();
+});
+
+function cargarProductosLinea20x20() {
+    // Datos de productos en el orden correcto según las imágenes
+    const productosLinea20x20 = [
+        { id: 69, nombre: "Vainilla de 3", descripcion: "Molde para baldosas con diseño vainilla de 3 cm..." },
+        { id: 70, nombre: "Vainilla de 4", descripcion: "Molde para baldosas con diseño vainilla de 4 cm..." },
+        { id: 5, nombre: "Vainilla de 5", descripcion: "Molde para baldosas con diseño vainilla de 5 cm..." },
+        { id: 6, nombre: "Vainilla de 6", descripcion: "Molde para baldosas con diseño vainilla de 6 cm..." },
+        { id: 71, nombre: "9 Panes", descripcion: "Molde para baldosas con diseño de 9 panes..." },
+        { id: 72, nombre: "Laja 20x20", descripcion: "Molde para baldosas con diseño laja 20x20..." },
+        { id: 73, nombre: "Liso 20x20", descripcion: "Molde para baldosas lisas 20x20..." },
+        { id: 23, nombre: "Laja 20x40", descripcion: "Molde para revestimiento tipo laja 20x40cm..." }
+    ];
+    
+    // Intentar cargar desde el servidor, si falla usar datos locales
+    fetch('http://127.0.0.1:5000/productos/linea/20x20')
+        .then(response => response.json())
+        .then(productos => {
+            // Ordenar productos según el orden deseado
+            const ordenDeseado = ["Vainilla de 3", "Vainilla de 4", "Vainilla de 5", "Vainilla de 6", "9 Panes", "Laja 20x20", "Liso 20x20", "Laja 20x40"];
+            const productosOrdenados = [];
+            
+            ordenDeseado.forEach(nombre => {
+                const producto = productos.find(p => p.nombre === nombre);
+                if (producto) {
+                    productosOrdenados.push(producto);
+                }
+            });
+            
+            mostrarProductos(productosOrdenados);
+        })
+        .catch(error => {
+            console.error('Error cargando productos del servidor, usando datos locales:', error);
+            // Si falla, usar datos locales como fallback
+            mostrarProductos(productosLinea20x20);
+        });
+}
+
+function mostrarProductos(productos) {
+    const container = document.getElementById('productos-container');
+    if (!container) return;
+    
+    let html = '';
+    let isFirstRow = true;
+    
+    for (let i = 0; i < productos.length; i += 2) {
+        if (!isFirstRow) {
+            html += '<div class="col-md-12"><hr></div>';
+        }
+        
+        const producto1 = productos[i];
+        const producto2 = productos[i + 1];
+        
+        // Calcular el delay base para la fila (cada fila aparece 400ms después de la anterior)
+        const filaIndex = Math.floor(i / 2);
+        const baseDelay = filaIndex * 400;
+        
+        // Primer producto de la fila (aparece primero)
+        html += crearProductoHTML(producto1, baseDelay);
+        
+        // Segundo producto de la fila (aparece 200ms después del primero)
+        if (producto2) {
+            html += crearProductoHTML(producto2, baseDelay + 200);
+        }
+        
+        isFirstRow = false;
+    }
+    
+    container.innerHTML = html;
+    
+    // Activar animaciones personalizadas
+    setTimeout(() => {
+        activarAnimaciones();
+    }, 100);
+}
+
+function activarAnimaciones() {
+    // Obtener todos los elementos que necesitan animación
+    const productosAnimate = document.querySelectorAll('.producto-animate');
+    const titulosAnimate = document.querySelectorAll('.producto-titulo');
+    const imagenesAnimate = document.querySelectorAll('.producto-imagen');
+    
+    // Animar productos
+    productosAnimate.forEach(elemento => {
+        const delay = parseInt(elemento.dataset.delay) || 0;
+        setTimeout(() => {
+            elemento.classList.add('show');
+        }, delay);
+    });
+    
+    // Animar títulos
+    titulosAnimate.forEach(elemento => {
+        const delay = parseInt(elemento.dataset.delay) || 0;
+        setTimeout(() => {
+            elemento.classList.add('show');
+        }, delay);
+    });
+    
+    // Animar imágenes
+    imagenesAnimate.forEach(elemento => {
+        const delay = parseInt(elemento.dataset.delay) || 0;
+        setTimeout(() => {
+            elemento.classList.add('show');
+        }, delay);
+    });
+}
+
+function crearProductoHTML(producto, delay) {
+    // Determinar las imágenes basándose en el nombre del producto
+    let imagenMolde = '';
+    let imagenMosaico = '';
+    
+    const nombreLower = producto.nombre.toLowerCase();
+    
+    if (nombreLower.includes('vainilla de 3') || nombreLower === 'vainilla de 3') {
+        imagenMolde = 'img/products/vainilla_de_3_molde.jpg';
+        imagenMosaico = 'img/products/vainilla_de_3_mosaico.png';
+    } else if (nombreLower.includes('vainilla de 4') || nombreLower === 'vainilla de 4') {
+        imagenMolde = 'img/products/vainilla_de_4_molde.jpg';
+        imagenMosaico = 'img/products/vainilla_de_4_mosaico.html'; // Mantener extensión original
+    } else if (nombreLower.includes('vainilla de 5') || nombreLower === 'vainilla de 5') {
+        imagenMolde = 'img/products/vainilla_de_5_molde.jpg';
+        imagenMosaico = 'img/products/vainilla_de_5_mosaico.html'; // Mantener extensión original
+    } else if (nombreLower.includes('vainilla de 6') || nombreLower === 'vainilla de 6') {
+        imagenMolde = 'img/products/vainilla_de_6_molde.jpg';
+        imagenMosaico = 'img/products/vainilla_de_6_mosaico.png';
+    } else if (nombreLower.includes('9 panes') || nombreLower === '9 panes') {
+        imagenMolde = 'img/products/9_panes_molde.jpg';
+        imagenMosaico = 'img/products/9_panes_mosaico.png';
+    } else if (nombreLower.includes('laja 20x20') || nombreLower === 'laja 20x20') {
+        imagenMolde = 'img/products/laja_20_molde.jpg';
+        imagenMosaico = 'img/products/lisa_20_mosaico_b.png';
+    } else if (nombreLower.includes('liso 20x20') || nombreLower === 'liso 20x20') {
+        imagenMolde = 'img/products/lisa_20_molde.jpg';
+        imagenMosaico = 'img/products/lisa_20_mosaico.png';
+    } else if (nombreLower.includes('laja 20x40') || nombreLower === 'laja 20x40') {
+        imagenMolde = 'img/products/laja_n2_40x20_molde.jpg';
+        imagenMosaico = 'img/products/laja_20x40_yeso_mosaico.html';
+    } else if (nombreLower.includes('piedra laja')) {
+        imagenMolde = 'img/products/laja_20_molde.jpg';
+        imagenMosaico = 'img/products/lisa_20_mosaico_b.png';
+    } else {
+        // Usar imagen por defecto o la imagen de la base de datos si existe
+        imagenMolde = producto.imagen_url || 'img/products/default_molde.jpg';
+        imagenMosaico = producto.imagen_url || 'img/products/default_mosaico.png';
+    }
+    
+    return `
+        <div class="col-md-6 producto-animate" data-delay="${delay}">
+            <div class="col-md-12">
+                <h4 class="mb-xl mt-xlg producto-titulo" data-delay="${delay + 100}">${producto.nombre}</h4>
+                <div class="divider divider-primary divider-small mb-xl producto-titulo" data-delay="${delay + 150}"> 
+                    <hr>
+                </div>
+            </div>
+            <img src="${imagenMolde}" class="custom-product-image-pos-1 _relative img-responsive producto-imagen" data-delay="${delay + 200}" alt />
+            <img src="${imagenMosaico}" class="custom-product-image-pos-5 _absolute img-responsive producto-imagen" data-delay="${delay + 300}" alt />
+        </div>
+    `;
+}
+</script>
 
 
 	</body>

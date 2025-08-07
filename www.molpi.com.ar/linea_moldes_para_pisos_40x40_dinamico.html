@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html>
 	
-<!-- Mirrored from www.molpi.com.ar/linea_moldes_para_pisos_50x50.html by HTTrack Website Copier/3.x [XR&CO'2014], Sat, 12 Apr 2025 18:25:21 GMT -->
+<!-- Mirrored from www.molpi.com.ar/linea_moldes_para_pisos_40x40.html by HTTrack Website Copier/3.x [XR&CO'2014], Sat, 12 Apr 2025 18:25:02 GMT -->
 <head>
 
 		<!-- Basic -->
 		<meta charset="utf-8">
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">	
 
-		<title>Molpi | Moldes para pisos 50 x 50 cm </title>	
+		<title>Molpi | Moldes para pisos 40 x 40 cm </title>	
 
 		<meta name="keywords" content="Moldes inyectados para mosaicos, Moldes de plastico para mosaicos, Moldes para baldozas, revestimientos, molduras, mosaicos rusticos, mosaico de adoquines, simil piedra, inyeccion de moldes, moldes, molde, mosaicos, mosaico, moldes autoapilables, moldes autoestibables, mosaicos podotactiles, mosaicos para jardin" />
 		<meta name="description" content="Moldes Autoestibables para la fabricación de mosaicos. Moldes inyectados en plástico de alta Resistencia y Durabilidad">
@@ -112,7 +112,7 @@
 															    <ul class="dropdown-menu">
 															         <li class""><a href="linea_moldes_para_pisos_20x20.html">Línea 20x20</a>
 															         </li>
-															         <li class""><a href="linea_moldes_para_pisos_40x40.html">Línea 40x40</a>
+															         <li class""><a href="linea_moldes_para_pisos_50x50.html">Línea 50x50</a>
 															         </li>
 															        
                                                                 </ul>
@@ -176,7 +176,7 @@
 
 					<div class="row">
 						<div class="col-md-12">
-							<h2 class="mb-xl mt-xlg"><strong>Pisos y Zócalos</strong> Línea 50/50</h2>
+							<h2 class="mb-xl mt-xlg"><strong>Pisos y Zócalos</strong> Línea 40/40</h2>
 						</div>
 						
 						<div class="col-md-7">
@@ -185,14 +185,14 @@
 						     <h4 class="heading-primary">Especificaciones:</h4>
 						     <p><strong>MOLPI</strong> Produce moldes con ABS virgen de primera calidad. <br>
 						     El ABS es un plástico muy resistente al impacto, muy utilizado en la industria. Su rasgo más importante es su gran resistencia, incluso a muy baja temperatura. Tiene una buena resistencia química y a la abrasión además de muy buena estabilidad dimensional. Con él se consigue un gran acabado en la pieza final.
-						     <strong>Autoapilables</strong>, Nuestros moldes tienen estructura propia y nervaduras para mayor resistencia que le otorgan la posibilidad de estibar hasta 20 moldes por pila.<br> En su formato de 50x50cm son ideales para crear grandes superficies con menos juntas.<br> Medidas del Producto final= 50cm x 50cm x 2,5cm.<br>
-Medidas del molde = 55cm x 55cm x 3,5cm.<br>
+						     <strong>Autoapilables</strong>, Nuestros moldes tienen estructura propia y nervaduras para mayor resistencia que le otorgan la posibilidad de estibar hasta 20 moldes por pila.<br> En su formato de 40x40cm son los moldes más usados para pisos tanto exteriores como interiores.<br> Medidas del Producto final= 40cm x 40cm x 2,2cm.<br>
+Medidas del molde = 45cm x 45cm x 3cm.<br>
 
-						<a href="pdf/catalogo_general.pdf" target="blank" class="btn btn-primary custom-btn-style-1 text-uppercase font-weight-semibold pull-right mt-sm">catálogo general</a>
+						<a href="pdf/catalogo_general.pdf" target="blank" class="btn btn-primary custom-btn-style-1 text-uppercase font-weight-semibold pull-right mt-sm">catálogo general</a> <!--<a class="btn pull-right"/a><a href="pdf/linea_40x40.pdf" target="blank" class="btn btn-primary custom-btn-style-1 text-uppercase font-weight-semibold pull-right mt-sm">pdf linea 40x40</a>-->
 						 
 						</div>
 						<div class="col-md-5">
-						        <img src="img/products/plano_50x50.png" alt class="custom-product-image-pos-3 _relative img-responsive" />
+						        <img src="img/products/plano_40x40.png" alt class="custom-product-image-pos-3 _relative img-responsive" />
                         </div>
                         
                         <!-- Contenedor dinámico para productos -->
@@ -370,17 +370,17 @@ Medidas del molde = 55cm x 55cm x 3,5cm.<br>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    cargarProductos50x50();
+    cargarProductos40x40();
 });
 
-function cargarProductos50x50() {
+function cargarProductos40x40() {
     // Intentar cargar desde el servidor
-    fetch('http://127.0.0.1:5000/productos/linea/50x50')
+    fetch('http://127.0.0.1:5000/productos/linea/40x40')
         .then(response => response.json())
         .then(productos => {
             // Ordenar productos según el orden de la base de datos (por ID)
             const productosOrdenados = productos.sort((a, b) => a.id - b.id);
-            mostrarProductos50x50(productosOrdenados);
+            mostrarProductos40x40(productosOrdenados);
         })
         .catch(error => {
             console.error('Error cargando productos del servidor:', error);
@@ -392,7 +392,7 @@ function cargarProductos50x50() {
         });
 }
 
-function mostrarProductos50x50(productos) {
+function mostrarProductos40x40(productos) {
     const container = document.getElementById('productos-container');
     if (!container) return;
     
@@ -412,11 +412,11 @@ function mostrarProductos50x50(productos) {
         const baseDelay = filaIndex * 400;
         
         // Primer producto de la fila (aparece primero)
-        html += crearProducto50x50HTML(producto1, baseDelay);
+        html += crearProducto40x40HTML(producto1, baseDelay);
         
         // Segundo producto de la fila (aparece 200ms después del primero)
         if (producto2) {
-            html += crearProducto50x50HTML(producto2, baseDelay + 200);
+            html += crearProducto40x40HTML(producto2, baseDelay + 200);
         }
         
         isFirstRow = false;
@@ -426,11 +426,11 @@ function mostrarProductos50x50(productos) {
     
     // Activar animaciones personalizadas
     setTimeout(() => {
-        activarAnimaciones50x50();
+        activarAnimaciones40x40();
     }, 100);
 }
 
-function activarAnimaciones50x50() {
+function activarAnimaciones40x40() {
     // Obtener todos los elementos que necesitan animación
     const productosAnimate = document.querySelectorAll('.producto-animate');
     const titulosAnimate = document.querySelectorAll('.producto-titulo');
@@ -461,7 +461,7 @@ function activarAnimaciones50x50() {
     });
 }
 
-function crearProducto50x50HTML(producto, delay) {
+function crearProducto40x40HTML(producto, delay) {
     // Obtener las imágenes del molde y mosaico basándose en la URL de la base de datos
     let imagenMolde = producto.imagen_url || 'img/products/default_molde.jpg';
     let imagenMosaico = '';
@@ -483,6 +483,243 @@ function crearProducto50x50HTML(producto, delay) {
             </div>
             <img src="${imagenMolde}" class="custom-product-image-pos-1 _relative img-responsive producto-imagen" data-delay="${delay + 200}" alt />
             <img src="${imagenMosaico}" class="custom-product-image-pos-5 _absolute img-responsive producto-imagen" data-delay="${delay + 300}" alt />
+        </div>
+    `;
+}
+</script>
+
+<style>
+/* Estilos para productos dinámicos con soporte de mosaicos 40x40 */
+.producto-animate {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.6s ease;
+}
+
+.producto-animate.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.producto-titulo {
+    opacity: 0;
+    transform: translateX(-20px);
+    transition: all 0.4s ease;
+}
+
+.producto-titulo.show {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.producto-imagen-container {
+    position: relative;
+    display: inline-block;
+}
+
+.producto-imagen {
+    opacity: 0;
+    transform: scale(0.8);
+    transition: all 0.5s ease;
+}
+
+.producto-imagen.show {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.mosaico-overlay {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    max-width: 80px;
+    max-height: 80px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    z-index: 2;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: all 0.6s ease;
+}
+
+.mosaico-overlay.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.producto-40x40 {
+    margin-bottom: 40px;
+}
+
+/* Animación para hover en productos con mosaico */
+.producto-imagen-container:hover .mosaico-overlay {
+    transform: translateY(-5px) scale(1.1);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+}
+
+/* Indicador de mosaico disponible */
+.mosaico-indicator {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    background: rgba(40, 167, 69, 0.9);
+    color: white;
+    padding: 2px 6px;
+    border-radius: 12px;
+    font-size: 10px;
+    font-weight: bold;
+    z-index: 3;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.mosaico-indicator.show {
+    opacity: 1;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    cargarProductos40x40();
+});
+
+function cargarProductos40x40() {
+    // Intentar cargar desde el servidor
+    fetch('http://127.0.0.1:5000/productos/linea/40x40')
+        .then(response => response.json())
+        .then(productos => {
+            console.log('Productos 40x40 cargados:', productos);
+            // Ordenar productos según el orden de la base de datos (por ID)
+            const productosOrdenados = productos.sort((a, b) => a.id - b.id);
+            mostrarProductos40x40(productosOrdenados);
+        })
+        .catch(error => {
+            console.error('Error cargando productos del servidor:', error);
+            // Si falla, mostrar un mensaje de error
+            const container = document.getElementById('productos-container');
+            if (container) {
+                container.innerHTML = '<div class="col-md-12"><p>Error cargando productos. Por favor, recargue la página.</p></div>';
+            }
+        });
+}
+
+function mostrarProductos40x40(productos) {
+    const container = document.getElementById('productos-container');
+    if (!container) return;
+    
+    let html = '';
+    let isFirstRow = true;
+    
+    for (let i = 0; i < productos.length; i += 2) {
+        if (!isFirstRow) {
+            html += '<div class="col-md-12"><hr></div>';
+        }
+        
+        const producto1 = productos[i];
+        const producto2 = productos[i + 1];
+        
+        // Calcular el delay base para la fila (cada fila aparece 400ms después de la anterior)
+        const filaIndex = Math.floor(i / 2);
+        const baseDelay = filaIndex * 400;
+        
+        // Primer producto de la fila (aparece primero)
+        html += crearProducto40x40HTML(producto1, baseDelay);
+        
+        // Segundo producto de la fila (aparece 200ms después del primero)
+        if (producto2) {
+            html += crearProducto40x40HTML(producto2, baseDelay + 200);
+        }
+        
+        isFirstRow = false;
+    }
+    
+    container.innerHTML = html;
+    
+    // Activar animaciones personalizadas
+    setTimeout(() => {
+        activarAnimaciones40x40();
+    }, 100);
+}
+
+function activarAnimaciones40x40() {
+    // Obtener todos los elementos que necesitan animación
+    const productosAnimate = document.querySelectorAll('.producto-animate');
+    const titulosAnimate = document.querySelectorAll('.producto-titulo');
+    const imagenesAnimate = document.querySelectorAll('.producto-imagen');
+    const mosaicosAnimate = document.querySelectorAll('.mosaico-overlay');
+    const indicadoresAnimate = document.querySelectorAll('.mosaico-indicator');
+    
+    // Animar productos
+    productosAnimate.forEach(elemento => {
+        const delay = parseInt(elemento.dataset.delay) || 0;
+        setTimeout(() => {
+            elemento.classList.add('show');
+        }, delay);
+    });
+    
+    // Animar títulos
+    titulosAnimate.forEach(elemento => {
+        const delay = parseInt(elemento.dataset.delay) || 0;
+        setTimeout(() => {
+            elemento.classList.add('show');
+        }, delay);
+    });
+    
+    // Animar imágenes
+    imagenesAnimate.forEach(elemento => {
+        const delay = parseInt(elemento.dataset.delay) || 0;
+        setTimeout(() => {
+            elemento.classList.add('show');
+        }, delay);
+    });
+    
+    // Animar mosaicos
+    mosaicosAnimate.forEach(elemento => {
+        const delay = parseInt(elemento.dataset.delay) || 0;
+        setTimeout(() => {
+            elemento.classList.add('show');
+        }, delay + 200); // Mosaicos aparecen después de las imágenes principales
+    });
+    
+    // Animar indicadores
+    indicadoresAnimate.forEach(elemento => {
+        const delay = parseInt(elemento.dataset.delay) || 0;
+        setTimeout(() => {
+            elemento.classList.add('show');
+        }, delay + 400); // Indicadores aparecen al final
+    });
+}
+
+function crearProducto40x40HTML(producto, delay) {
+    // Obtener la imagen del molde
+    let imagenMolde = producto.imagen_url || 'img/products/default_molde.jpg';
+    let imagenMosaico = producto.imagen_mosaico_url || '';
+    
+    // Determinar si tiene mosaico
+    const tieneMosaico = imagenMosaico && imagenMosaico.trim() !== '';
+    
+    // HTML para el mosaico overlay (solo si existe)
+    let mosaicoHTML = '';
+    let indicadorHTML = '';
+    
+    if (tieneMosaico) {
+        mosaicoHTML = `<img src="${imagenMosaico}" class="mosaico-overlay" data-delay="${delay + 300}" alt="Mosaico ${producto.nombre}" />`;
+        indicadorHTML = `<span class="mosaico-indicator" data-delay="${delay + 400}">MOSAICO</span>`;
+    }
+    
+    return `
+        <div class="col-md-6 producto-animate producto-40x40" data-delay="${delay}">
+            <div class="col-md-12">
+                <h4 class="mb-xl mt-xlg producto-titulo" data-delay="${delay + 100}">${producto.nombre}</h4>
+                <div class="divider divider-primary divider-small mb-xl producto-titulo" data-delay="${delay + 150}"> 
+                    <hr>
+                </div>
+            </div>
+            <div class="producto-imagen-container">
+                ${indicadorHTML}
+                <img src="${imagenMolde}" class="custom-product-image-pos-1 _relative img-responsive producto-imagen" data-delay="${delay + 200}" alt="${producto.nombre}" />
+                ${mosaicoHTML}
+            </div>
         </div>
     `;
 }
@@ -530,5 +767,5 @@ function crearProducto50x50HTML(producto, delay) {
 
 	</body>
 
-<!-- Mirrored from www.molpi.com.ar/linea_moldes_para_pisos_50x50.html by HTTrack Website Copier/3.x [XR&CO'2014], Sat, 12 Apr 2025 18:25:21 GMT -->
+<!-- Mirrored from www.molpi.com.ar/linea_moldes_para_pisos_40x40.html by HTTrack Website Copier/3.x [XR&CO'2014], Sat, 12 Apr 2025 18:25:20 GMT -->
 </html>

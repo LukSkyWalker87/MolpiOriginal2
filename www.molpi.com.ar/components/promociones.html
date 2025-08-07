@@ -1,0 +1,694 @@
+<div class="container-fluid">
+    <h1 class="h3 mb-4 text-gray-800">📢 Gestión de Promociones</h1>
+    
+    <!-- Botón para agregar nueva promoción -->
+    <div class="mb-4">
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#promocionModal">
+            <i class="fa fa-plus"></i> Agregar Nueva Promoción
+        </button>
+        <button type="button" class="btn btn-success ml-2" onclick="cargarPromociones()">
+            <i class="fa fa-refresh"></i> Recargar Promociones
+        </button>
+    </div>
+    
+    <!-- Tabla de promociones -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Lista de Promociones</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="promocionesTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>Imagen</th>
+                            <th>Título</th>
+                            <th>Archivos</th>
+                            <th>Estado</th>
+                            <th>Fecha Creación</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="promocionesTableBody">
+                        <!-- Las promociones se cargan dinámicamente aquí -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para agregar/editar promoción -->
+<div class="modal fade" id="promocionModal" tabindex="-1" role="dialog" aria-labelledby="promocionModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="promocionModalLabel">Agregar Nueva Promoción</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="promocionForm">
+                <div class="modal-body">
+                    <input type="hidden" id="promocionId" name="promocionId">
+                    
+                    <!-- Título -->
+                    <div class="form-group">
+                        <label for="promocionTitulo">Título (opcional)</label>
+                        <input type="text" class="form-control" id="promocionTitulo" name="titulo" 
+                               placeholder="Ej: Oferta Especial - 20% de descuento">
+                        <small class="form-text text-muted">Si no se especifica título, solo se mostrará la imagen</small>
+                    </div>
+                    
+                    <!-- Archivos -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <!-- Imagen -->
+                            <div class="form-group">
+                                <label for="promocionImagen">Imagen de la Promoción *</label>
+                                <input type="file" class="form-control-file" id="promocionImagenFile" accept="image/*">
+                                <input type="text" class="form-control mt-2" id="promocionImagen" name="imagen" 
+                                       placeholder="O ingrese la URL de la imagen">
+                                <small class="form-text text-muted">Suba una imagen o ingrese la URL. Recomendado: 1200x400px</small>
+                                
+                                <!-- Estado del archivo de imagen -->
+                                <div id="archivoEstadoImagen" class="mt-2" style="display: none;">
+                                    <span class="badge badge-success">
+                                        <i class="fa fa-check"></i> Imagen seleccionada
+                                    </span>
+                                </div>
+                                
+                                <!-- Vista previa de la imagen -->
+                                <div id="imagenPreview" class="mt-3" style="display: none;">
+                                    <img id="imagenPreviewImg" src="" alt="Vista previa" class="img-fluid" style="max-height: 200px; border: 1px solid #ddd; border-radius: 4px;">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <!-- PDF Cartilla -->
+                            <div class="form-group">
+                                <label for="promocionPdf">Cartilla PDF (opcional)</label>
+                                <input type="file" class="form-control-file" id="promocionPdfFile" accept=".pdf">
+                                <input type="text" class="form-control mt-2" id="promocionPdf" name="cartilla_pdf" 
+                                       placeholder="O ingrese la URL del PDF">
+                                <small class="form-text text-muted">Archivo PDF con información detallada de la promoción (máx. 10MB)</small>
+                                
+                                <!-- Estado del archivo PDF -->
+                                <div id="archivoEstadoPdf" class="mt-2" style="display: none;">
+                                    <span class="badge badge-info">
+                                        <i class="fa fa-file-pdf-o"></i> PDF seleccionado
+                                    </span>
+                                </div>
+                                
+                                <!-- Vista previa del PDF -->
+                                <div id="pdfPreview" class="mt-3" style="display: none;">
+                                    <div class="alert alert-info p-2">
+                                        <i class="fa fa-file-pdf-o"></i> 
+                                        <span id="pdfFileName"></span>
+                                        <a id="pdfPreviewLink" href="#" target="_blank" class="btn btn-sm btn-outline-info ml-2">
+                                            <i class="fa fa-eye"></i> Ver
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Estado -->
+                    <div class="form-group">
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="promocionActivo" name="activo" checked>
+                            <label class="form-check-label" for="promocionActivo">
+                                Promoción activa (visible en el sitio web)
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary" id="guardarPromocionBtn">
+                        <i class="fa fa-save"></i> Guardar Promoción
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de confirmación para eliminar promoción -->
+<div class="modal fade" id="deleteConfirmModal" tabindex="-1" role="dialog" aria-labelledby="deleteConfirmModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="deleteConfirmModalLabel">
+                    <i class="fa fa-exclamation-triangle mr-2"></i>
+                    Confirmar eliminación
+                </h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="text-center">
+                    <div class="mb-3">
+                        <i class="fa fa-trash-o" style="font-size: 48px; color: #dc3545;"></i>
+                    </div>
+                    <h5 class="mb-3">¿Estás seguro de eliminar esta promoción?</h5>
+                    <p class="text-muted mb-0">Esta acción no se puede deshacer. La promoción será eliminada permanentemente del sistema.</p>
+                </div>
+            </div>
+            <div class="modal-footer justify-content-center">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                    <i class="fa fa-times mr-1"></i> Cancelar
+                </button>
+                <button type="button" class="btn btn-danger ml-2" id="confirmDeleteBtn">
+                    <i class="fa fa-trash-o mr-1"></i> Sí, eliminar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Contenedor para notificaciones toast -->
+<div id="toastContainer" class="toast-container" style="position: fixed; top: 20px; right: 20px; z-index: 9999;"></div>
+
+<style>
+/* Estilos para notificaciones toast */
+.toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+}
+
+.custom-toast {
+    min-width: 300px;
+    margin-bottom: 10px;
+    border-left: 4px solid;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.custom-toast.success {
+    border-left-color: #28a745;
+    background-color: #d4edda;
+}
+
+.custom-toast.error {
+    border-left-color: #dc3545;
+    background-color: #f8d7da;
+}
+
+.custom-toast.info {
+    border-left-color: #17a2b8;
+    background-color: #d1ecf1;
+}
+
+.custom-toast .toast-header {
+    background-color: transparent;
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+}
+
+.custom-toast .toast-body {
+    color: #495057;
+    line-height: 1.4;
+}
+
+.custom-toast .close {
+    color: inherit;
+    opacity: 0.8;
+}
+
+.custom-toast .close:hover {
+    opacity: 1;
+}
+</style>
+
+<script>
+// === VARIABLES GLOBALES ===
+window.promocionesInicializado = false;
+
+// === FUNCIÓN PARA NOTIFICACIONES TOAST ===
+function showToast(message, type = 'success', duration = 4000) {
+    const toastContainer = document.getElementById('toastContainer');
+    const toastId = 'toast-' + Date.now();
+    
+    const toastHTML = `
+        <div class="toast custom-toast ${type}" id="${toastId}" role="alert">
+            <div class="toast-header">
+                <strong class="mr-auto">
+                    ${type === 'success' ? '✅ Éxito' : type === 'error' ? '❌ Error' : '💡 Info'}
+                </strong>
+                <button type="button" class="close" data-dismiss="toast">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="toast-body">
+                ${message}
+            </div>
+        </div>
+    `;
+    
+    toastContainer.insertAdjacentHTML('beforeend', toastHTML);
+    const toastElement = document.getElementById(toastId);
+    
+    // Mostrar el toast
+    $(toastElement).toast({
+        autohide: true,
+        delay: duration
+    });
+    $(toastElement).toast('show');
+    
+    // Eliminar el elemento del DOM después de que se oculte
+    $(toastElement).on('hidden.bs.toast', function() {
+        toastElement.remove();
+    });
+}
+
+// === FUNCIÓN CARGAR PROMOCIONES ===
+async function cargarPromociones() {
+    console.log('🔄 Cargando promociones...');
+    
+    try {
+        const tbody = document.getElementById('promocionesTableBody');
+        if (!tbody) {
+            console.error('❌ No se encontró tbody');
+            return;
+        }
+        
+        const response = await fetch('http://localhost:5000/promociones/admin');
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+        
+        const promociones = await response.json();
+        console.log('📦 Promociones recibidas:', promociones);
+        
+        tbody.innerHTML = '';
+        
+        if (!promociones || promociones.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">No hay promociones registradas</td></tr>';
+            return;
+        }
+        
+        promociones.forEach(promocion => {
+            const row = document.createElement('tr');
+            const estadoBadge = promocion.activo ? 
+                '<span class="badge badge-success">Activa</span>' : 
+                '<span class="badge badge-secondary">Inactiva</span>';
+            
+            const fecha = new Date(promocion.fecha_creacion).toLocaleDateString('es-AR');
+            
+            // Distintivos para archivos
+            const tieneImagen = promocion.imagen ? 
+                '<span class="badge badge-success mr-1" title="Tiene imagen"><i class="fa fa-image"></i> IMG</span>' : 
+                '<span class="badge badge-light mr-1" title="Sin imagen"><i class="fa fa-image"></i> IMG</span>';
+            
+            const tienePdf = promocion.cartilla_pdf ? 
+                '<span class="badge badge-info" title="Tiene PDF"><i class="fa fa-file-pdf-o"></i> PDF</span>' : 
+                '<span class="badge badge-light" title="Sin PDF"><i class="fa fa-file-pdf-o"></i> PDF</span>';
+            
+            const archivos = `<div>${tieneImagen} ${tienePdf}</div>`;
+            
+            row.innerHTML = `
+                <td>
+                    <img src="${promocion.imagen}" 
+                         alt="Promoción" 
+                         style="max-width: 100px; max-height: 60px; object-fit: cover; border-radius: 4px;" 
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div style="display: none; width: 100px; height: 60px; background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; align-items: center; justify-content: center; color: #6c757d; font-size: 10px; text-align: center;">
+                        <div><i class="fa fa-image"></i><br>Sin imagen</div>
+                    </div>
+                </td>
+                <td>${promocion.titulo || '<em>Sin título</em>'}</td>
+                <td>${archivos}</td>
+                <td>${estadoBadge}</td>
+                <td>${fecha}</td>
+                <td>
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-sm btn-outline-primary" onclick="editarPromocion(${promocion.id})" title="Editar">
+                            <i class="fa fa-edit"></i> Editar
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="eliminarPromocion(${promocion.id})" title="Eliminar">
+                            <i class="fa fa-trash"></i> Eliminar
+                        </button>
+                    </div>
+                </td>
+            `;
+            
+            tbody.appendChild(row);
+        });
+        
+        console.log(`✅ ${promociones.length} promociones cargadas`);
+        
+    } catch (error) {
+        console.error('❌ Error cargando promociones:', error);
+        const tbody = document.getElementById('promocionesTableBody');
+        if (tbody) {
+            tbody.innerHTML = '<tr><td colspan="6" class="text-center text-danger">Error: ' + error.message + '</td></tr>';
+        }
+    }
+}
+
+// === FUNCIÓN GUARDAR PROMOCIÓN ===
+async function guardarPromocion(event) {
+    if (event) event.preventDefault();
+    
+    const btn = document.getElementById('guardarPromocionBtn');
+    const originalText = btn.innerHTML;
+    
+    try {
+        btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Guardando...';
+        btn.disabled = true;
+        
+        let imagenUrl = document.getElementById('promocionImagen').value;
+        let pdfUrl = document.getElementById('promocionPdf').value;
+        
+        // Subir archivo de imagen si existe
+        const fileInput = document.getElementById('promocionImagenFile');
+        if (fileInput && fileInput.files.length > 0) {
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+            
+            const uploadResponse = await fetch('http://localhost:5000/upload/promocion', {
+                method: 'POST',
+                body: formData
+            });
+            
+            const uploadResult = await uploadResponse.json();
+            if (uploadResponse.ok) {
+                imagenUrl = uploadResult.path;
+            } else {
+                throw new Error('Error subiendo imagen: ' + uploadResult.error);
+            }
+        }
+        
+        // Subir archivo PDF si existe
+        const pdfFileInput = document.getElementById('promocionPdfFile');
+        if (pdfFileInput && pdfFileInput.files.length > 0) {
+            const formData = new FormData();
+            formData.append('file', pdfFileInput.files[0]);
+            
+            const uploadResponse = await fetch('http://localhost:5000/upload/promocion', {
+                method: 'POST',
+                body: formData
+            });
+            
+            const uploadResult = await uploadResponse.json();
+            if (uploadResponse.ok) {
+                pdfUrl = uploadResult.path;
+            } else {
+                throw new Error('Error subiendo PDF: ' + uploadResult.error);
+            }
+        }
+        
+        if (!imagenUrl) {
+            throw new Error('Debe seleccionar una imagen');
+        }
+        
+        const promocionId = document.getElementById('promocionId').value;
+        const data = {
+            titulo: document.getElementById('promocionTitulo').value,
+            imagen: imagenUrl,
+            cartilla_pdf: pdfUrl || null,
+            activo: document.getElementById('promocionActivo').checked ? 1 : 0
+        };
+        
+        const url = promocionId ? 
+            `http://localhost:5000/promociones/${promocionId}` : 
+            'http://localhost:5000/promociones';
+        const method = promocionId ? 'PUT' : 'POST';
+        
+        const response = await fetch(url, {
+            method: method,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok) {
+            const mensaje = promocionId ? 'Promoción actualizada correctamente' : 'Promoción creada correctamente';
+            const detalles = [];
+            
+            if (imagenUrl) detalles.push('✓ Imagen guardada');
+            if (pdfUrl) detalles.push('✓ PDF guardado');
+            
+            const mensajeCompleto = detalles.length > 0 ? 
+                `${mensaje}<br><br>${detalles.join('<br>')}` : 
+                mensaje;
+                
+            showToast(mensajeCompleto, 'success');
+            $('#promocionModal').modal('hide');
+            setTimeout(cargarPromociones, 300);
+        } else {
+            throw new Error(result.error);
+        }
+        
+    } catch (error) {
+        console.error('Error:', error);
+        showToast('Error: ' + error.message, 'error');
+    } finally {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    }
+}
+
+// === FUNCIÓN EDITAR PROMOCIÓN ===
+async function editarPromocion(id) {
+    try {
+        const response = await fetch('http://localhost:5000/promociones/admin');
+        const promociones = await response.json();
+        const promocion = promociones.find(p => p.id === id);
+        
+        if (!promocion) {
+            showToast('Promoción no encontrada', 'error');
+            return;
+        }
+        
+        document.getElementById('promocionId').value = promocion.id;
+        document.getElementById('promocionTitulo').value = promocion.titulo || '';
+        document.getElementById('promocionImagen').value = promocion.imagen;
+        document.getElementById('promocionPdf').value = promocion.cartilla_pdf || '';
+        document.getElementById('promocionActivo').checked = promocion.activo;
+        document.getElementById('promocionModalLabel').textContent = 'Editar Promoción';
+        
+        // Vista previa de imagen
+        const preview = document.getElementById('imagenPreview');
+        const img = document.getElementById('imagenPreviewImg');
+        img.src = promocion.imagen;
+        preview.style.display = 'block';
+        
+        // Vista previa de PDF
+        if (promocion.cartilla_pdf) {
+            const pdfPreview = document.getElementById('pdfPreview');
+            const pdfLink = document.getElementById('pdfPreviewLink');
+            const pdfFileName = document.getElementById('pdfFileName');
+            
+            pdfFileName.textContent = promocion.cartilla_pdf.split('/').pop();
+            pdfLink.href = promocion.cartilla_pdf;
+            pdfPreview.style.display = 'block';
+        }
+        
+        $('#promocionModal').modal('show');
+        
+    } catch (error) {
+        console.error('Error:', error);
+        showToast('Error al cargar la promoción', 'error');
+    }
+}
+
+// === FUNCIÓN ELIMINAR PROMOCIÓN ===
+function eliminarPromocion(id) {
+    // Mostrar modal de confirmación personalizado
+    $('#deleteConfirmModal').modal('show');
+    
+    // Configurar el botón de confirmación
+    $('#confirmDeleteBtn').off('click').on('click', async function() {
+        // Ocultar el modal
+        $('#deleteConfirmModal').modal('hide');
+        
+        try {
+            const response = await fetch(`http://localhost:5000/promociones/${id}`, {
+                method: 'DELETE'
+            });
+            
+            const result = await response.json();
+            
+            if (response.ok) {
+                showToast('Promoción eliminada correctamente', 'success');
+                cargarPromociones();
+            } else {
+                throw new Error(result.error);
+            }
+            
+        } catch (error) {
+            console.error('Error:', error);
+            showToast('Error al eliminar la promoción', 'error');
+        }
+    });
+}
+
+// === FUNCIÓN LIMPIAR FORMULARIO ===
+function limpiarFormulario() {
+    document.getElementById('promocionForm').reset();
+    document.getElementById('promocionId').value = '';
+    document.getElementById('promocionModalLabel').textContent = 'Agregar Nueva Promoción';
+    document.getElementById('imagenPreview').style.display = 'none';
+    document.getElementById('pdfPreview').style.display = 'none';
+    document.getElementById('archivoEstadoImagen').style.display = 'none';
+    document.getElementById('archivoEstadoPdf').style.display = 'none';
+    document.getElementById('promocionImagen').placeholder = 'O ingrese la URL de la imagen';
+    document.getElementById('promocionPdf').placeholder = 'O ingrese la URL del PDF';
+}
+
+// === INICIALIZACIÓN ===
+function inicializar() {
+    console.log('🚀 Inicializando promociones...');
+    
+    if (window.promocionesInicializado) {
+        console.log('⏭️ Ya inicializado, recargando...');
+        cargarPromociones();
+        return;
+    }
+    
+    // Event listeners
+    const form = document.getElementById('promocionForm');
+    if (form) {
+        form.addEventListener('submit', guardarPromocion);
+    }
+    
+    const fileInput = document.getElementById('promocionImagenFile');
+    if (fileInput) {
+        fileInput.addEventListener('change', function() {
+            const file = this.files[0];
+            if (file) {
+                if (!file.type.startsWith('image/')) {
+                    showToast('Seleccione un archivo de imagen válido', 'error');
+                    this.value = '';
+                    return;
+                }
+                if (file.size > 5 * 1024 * 1024) {
+                    showToast('El archivo es muy grande (máx. 5MB)', 'error');
+                    this.value = '';
+                    return;
+                }
+                
+                document.getElementById('archivoEstadoImagen').style.display = 'block';
+                document.getElementById('promocionImagen').placeholder = 'Archivo: ' + file.name;
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const preview = document.getElementById('imagenPreview');
+                    const img = document.getElementById('imagenPreviewImg');
+                    img.src = e.target.result;
+                    preview.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+    
+    // Event listener para archivo PDF
+    const pdfFileInput = document.getElementById('promocionPdfFile');
+    if (pdfFileInput) {
+        pdfFileInput.addEventListener('change', function() {
+            const file = this.files[0];
+            if (file) {
+                if (file.type !== 'application/pdf') {
+                    showToast('Seleccione un archivo PDF válido', 'error');
+                    this.value = '';
+                    return;
+                }
+                if (file.size > 10 * 1024 * 1024) {
+                    showToast('El archivo PDF es muy grande (máx. 10MB)', 'error');
+                    this.value = '';
+                    return;
+                }
+                
+                document.getElementById('archivoEstadoPdf').style.display = 'block';
+                document.getElementById('promocionPdf').placeholder = 'Archivo: ' + file.name;
+                
+                // Mostrar vista previa del PDF
+                const pdfPreview = document.getElementById('pdfPreview');
+                const pdfFileName = document.getElementById('pdfFileName');
+                const pdfLink = document.getElementById('pdfPreviewLink');
+                
+                pdfFileName.textContent = file.name;
+                pdfLink.href = URL.createObjectURL(file);
+                pdfPreview.style.display = 'block';
+            }
+        });
+    }
+    
+    const urlInput = document.getElementById('promocionImagen');
+    if (urlInput) {
+        urlInput.addEventListener('input', function() {
+            if (this.value) {
+                const preview = document.getElementById('imagenPreview');
+                const img = document.getElementById('imagenPreviewImg');
+                img.src = this.value;
+                preview.style.display = 'block';
+            }
+        });
+    }
+    
+    // Event listener para URL del PDF
+    const pdfUrlInput = document.getElementById('promocionPdf');
+    if (pdfUrlInput) {
+        pdfUrlInput.addEventListener('input', function() {
+            if (this.value) {
+                const pdfPreview = document.getElementById('pdfPreview');
+                const pdfFileName = document.getElementById('pdfFileName');
+                const pdfLink = document.getElementById('pdfPreviewLink');
+                
+                pdfFileName.textContent = this.value.split('/').pop();
+                pdfLink.href = this.value;
+                pdfPreview.style.display = 'block';
+            }
+        });
+    }
+    
+    // Modal events
+    $('#promocionModal').on('hidden.bs.modal', limpiarFormulario);
+    
+    // Cargar datos
+    cargarPromociones();
+    
+    window.promocionesInicializado = true;
+    console.log('✅ Promociones inicializadas');
+}
+
+// === EXPOSICIÓN GLOBAL ===
+window.cargarPromociones = cargarPromociones;
+window.guardarPromocion = guardarPromocion;
+window.editarPromocion = editarPromocion;
+window.eliminarPromocion = eliminarPromocion;
+window.inicializarPromociones = inicializar;
+
+// === INICIALIZACIÓN AUTOMÁTICA ===
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('📄 DOM listo');
+    setTimeout(inicializar, 100);
+});
+
+// === DEBUG ===
+window.debugPromociones = function() {
+    console.log('🔍 === DEBUG ===');
+    console.log('- DOM tbody:', !!document.getElementById('promocionesTableBody'));
+    console.log('- Inicializado:', window.promocionesInicializado);
+    
+    fetch('http://localhost:5000/promociones/admin')
+        .then(r => r.json())
+        .then(data => {
+            console.log('- Conectividad: ✅');
+            console.log('- Datos:', data);
+            cargarPromociones();
+        })
+        .catch(err => {
+            console.log('- Conectividad: ❌');
+            console.error(err);
+        });
+};
+
+console.log('🌐 Script cargado - Debug: window.debugPromociones()');
+</script>
