@@ -201,80 +201,128 @@ Medidas del molde = 45cm x 45cm x 3cm.<br><br> </p><br><br><br>
                     </div>
                 </div>
                 <div class="container">
-
-
+					<div class="row">
 						<div class="col-md-12">
 							<h2><strong> </strong></h2>
 						</div>
 
-                        <div class="col-md-4">
-
-                                <img src="img/products/circulos_ciegos_molde.jpg" alt class="custom-product-image-pos-1 _relative img-responsive" />
-
-								<img src="img/products/circulos_ciegos_mosaico.png" alt class="custom-product-image-pos-1 _absolute img-responsive" />
-                        </div>
-						<div class="col-md-1">
-						</div>
-						<div class="col-md-5">
-
-                             <h4 class="mb-xl mt-xlg">Con Círculos.</h4>
-						     <div class="divider divider-primary divider-small mb-xl"> 
-						     <hr></div>
-						     <h4 class="heading-primary">Especificaciones:</h4>
-						     <p><strong>Los pisos podotáctiles de advertencia</strong> funcionan para todos, nos advierten a todos de que hay un peligro inminente en nuestro camino, y sobre todo les ayuda a personas ciegas a saber que no deben avanzar, son conocidos también como señal de Stop.<br><br></p>
-						     
-                        </div>
-						<div class="col-md-12">
-						<hr>
-						</div>
-                        
-                        <div class="col-md-4">
-
-                                <img src="img/products/barras_molde.jpg" data-appear-animation="fadeInLeft" data-appear-animation-delay="0" data-plugin-options="{'accY': 10}" alt class="custom-product-image-pos-1 _relative img-responsive" />
-
-								<img src="img/products/barras_mosaico.png" data-appear-animation="fadeInLeft" data-appear-animation-delay="200" data-plugin-options="{'accY': 10}" alt class="custom-product-image-pos-1 _absolute img-responsive" />
-                        </div>
-						<div class="col-md-1">
-						</div>
-						<div class="col-md-5">
-
-                             <h4 class="mb-xl mt-xlg">Con Barras.</h4>
-						     <div class="divider divider-primary divider-small mb-xl"> 
-						     <hr></div>
-						     <h4 class="heading-primary">Especificaciones:</h4>
-						     <p><strong>Los pisos podotáctiles de guia o baldozas de barras</strong> como su nombre lo sugiere, son pisos que indican un camino seguro para las personas con capacidad visual disminuída. Funcionan al igual que los de puntos, cuando uno los pisa o los toca con el bastón, pero también funcionan por contraste de color en su entorno. </p>
-						     
-                        </div>
-						<div class="col-md-12">
-						<hr>
+						<!-- Contenedor dinámico para productos podotáctiles -->
+						<div id="productos-podotactiles-container">
+							<!-- Loading indicator -->
+							<div class="col-md-12 text-center" id="loading-productos">
+								<i class="fa fa-spinner fa-spin fa-3x"></i>
+								<p>Cargando productos podotáctiles...</p>
+							</div>
 						</div>
 
-                        <div class="col-md-4">
-
-                                <img src="img/products/discapacitado_molde.jpg" data-appear-animation="fadeInLeft" data-appear-animation-delay="0" data-plugin-options="{'accY': 10}" alt class="custom-product-image-pos-1 _relative img-responsive" />
-
-								<img src="img/products/discapacitado_mosaico.png" data-appear-animation="fadeInLeft" data-appear-animation-delay="200" data-plugin-options="{'accY': 10}" alt class="custom-product-image-pos-1 _absolute img-responsive" />
-                        </div>
-						<div class="col-md-1">
+						<!-- Mensaje si no hay productos disponibles -->
+						<div class="col-md-12 text-center" id="no-productos" style="display: none;">
+							<h4>No hay productos podotáctiles disponibles en este momento.</h4>
+							<p>Por favor, inténtelo más tarde.</p>
 						</div>
-						<div class="col-md-5">
-
-                             <h4 class="mb-xl mt-xlg">Señal Discapacitados.</h4>
-						     <div class="divider divider-primary divider-small mb-xl"> 
-						     <hr></div>
-						     <h4 class="heading-primary">Especificaciones:</h4>
-						     <p> Este se coloca en lugares reservados para accesibilidad. Está pensado para la comunicación hacia las personas videntes. Para dar prioridad o tener precaución para con personas con discapacidad visual.</p>
-						     
-                        </div>
-						
-                        
-
-                        
-						
-
-						
 					</div>
                 </div>
+
+                <!-- Script para cargar productos dinámicamente -->
+                <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    cargarProductosPodotactiles();
+                });
+
+                async function cargarProductosPodotactiles() {
+                    try {
+                        console.log('🚀 Cargando productos podotáctiles desde la API...');
+                        
+                        // Llamar a la API para obtener solo productos activos
+                        const response = await fetch('/productos');
+                        
+                        if (!response.ok) {
+                            throw new Error(`Error HTTP: ${response.status}`);
+                        }
+                        
+                        const productos = await response.json();
+                        console.log('📦 Productos recibidos:', productos.length);
+                        
+                        // Filtrar solo productos podotáctiles activos
+                        const productosPodotactiles = productos.filter(p => 
+                            p.categoria === 'Podotáctiles' && p.activo === 1
+                        );
+                        
+                        console.log('🎯 Productos podotáctiles activos:', productosPodotactiles.length);
+                        
+                        // Ocultar loading
+                        document.getElementById('loading-productos').style.display = 'none';
+                        
+                        if (productosPodotactiles.length === 0) {
+                            // Mostrar mensaje de no productos
+                            document.getElementById('no-productos').style.display = 'block';
+                        } else {
+                            // Mostrar productos
+                            mostrarProductosPodotactiles(productosPodotactiles);
+                        }
+                        
+                    } catch (error) {
+                        console.error('❌ Error cargando productos podotáctiles:', error);
+                        
+                        // Ocultar loading y mostrar error
+                        document.getElementById('loading-productos').style.display = 'none';
+                        document.getElementById('no-productos').style.display = 'block';
+                        document.getElementById('no-productos').innerHTML = `
+                            <h4>Error al cargar productos</h4>
+                            <p>No se pudieron cargar los productos podotáctiles. Por favor, inténtelo más tarde.</p>
+                        `;
+                    }
+                }
+
+                function mostrarProductosPodotactiles(productos) {
+                    const container = document.getElementById('productos-podotactiles-container');
+                    let html = '';
+                    
+                    productos.forEach((producto, index) => {
+                        // Extraer nombre limpio (quitar "Pisos Podotáctiles con " del nombre)
+                        let nombreLimpio = producto.nombre;
+                        if (nombreLimpio.includes('Pisos Podotáctiles con ')) {
+                            nombreLimpio = nombreLimpio.replace('Pisos Podotáctiles con ', '');
+                        }
+                        
+                        // Determinar si usar animaciones (para el segundo producto en adelante)
+                        const animacionDelay = index > 0 ? `data-appear-animation="fadeInLeft" data-appear-animation-delay="${index * 200}" data-plugin-options="{'accY': 10}"` : '';
+                        
+                        html += `
+                            <div class="col-md-4">
+                                <img src="${producto.imagen_url || 'img/placeholder.png'}" 
+                                     alt="${producto.nombre}" 
+                                     class="custom-product-image-pos-1 _relative img-responsive" 
+                                     ${animacionDelay} 
+                                     onerror="this.src='img/placeholder.png'; this.onerror=null;" />
+                                
+                                ${producto.imagen_mosaico_url ? `
+                                    <img src="${producto.imagen_mosaico_url}" 
+                                         alt="${producto.nombre} - Mosaico" 
+                                         class="custom-product-image-pos-1 _absolute img-responsive" 
+                                         ${animacionDelay ? animacionDelay.replace('delay="0"', `delay="${(index * 200) + 200}"`) : ''} 
+                                         onerror="this.style.display='none'; this.onerror=null;" />
+                                ` : ''}
+                            </div>
+                            <div class="col-md-1"></div>
+                            <div class="col-md-5">
+                                <h4 class="mb-xl mt-xlg">${nombreLimpio}.</h4>
+                                <div class="divider divider-primary divider-small mb-xl"> 
+                                    <hr>
+                                </div>
+                                <h4 class="heading-primary">Especificaciones:</h4>
+                                <p>${producto.descripcion || 'Descripción no disponible.'}</p>
+                            </div>
+                            <div class="col-md-12">
+                                <hr>
+                            </div>
+                        `;
+                    });
+                    
+                    container.innerHTML = html;
+                    console.log('✅ Productos podotáctiles mostrados correctamente');
+                }
+                </script>
 				
 				
 			

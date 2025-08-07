@@ -242,6 +242,7 @@ init_db()
 def get_productos():
     categoria = request.args.get('categoria')
     subcategoria = request.args.get('subcategoria')
+    incluir_inactivos = request.args.get('incluir_inactivos', 'false').lower() == 'true'
     
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
@@ -251,9 +252,14 @@ def get_productos():
         SELECT id, nombre, descripcion, pdf_url, imagen_url, imagen_mosaico_url, categoria, subcategoria, 
                precio, precio_usd, activo, fecha_creacion, fecha_modificacion
         FROM productos 
-        WHERE activo = 1
     """
     params = []
+    
+    # Si no se especifica incluir_inactivos, filtrar solo activos (comportamiento por defecto)
+    if not incluir_inactivos:
+        query += "WHERE activo = 1"
+    else:
+        query += "WHERE 1=1"  # Incluir todos los productos
     
     if categoria:
         query += " AND categoria = ?"
@@ -467,16 +473,37 @@ def get_productos_linea_50x50():
 
 @app.route('/productos/<int:producto_id>', methods=['DELETE'])
 def delete_producto(producto_id):
+    print(f"[DEBUG DELETE] Iniciando eliminación lógica del producto ID: {producto_id}")
+    
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     
-    # Eliminación lógica
-    c.execute("UPDATE productos SET activo = 0 WHERE id = ?", (producto_id,))
+    # Verificar que el producto existe antes de eliminarlo
+    c.execute("SELECT id, nombre, activo FROM productos WHERE id = ?", (producto_id,))
+    producto_antes = c.fetchone()
     
-    conn.commit()
-    conn.close()
-    
-    return jsonify({'message': 'Producto eliminado correctamente'})
+    if producto_antes:
+        print(f"[DEBUG DELETE] Producto encontrado antes de eliminar: {producto_antes}")
+        
+        # Eliminación lógica
+        c.execute("UPDATE productos SET activo = 0 WHERE id = ?", (producto_id,))
+        rows_affected = c.rowcount
+        print(f"[DEBUG DELETE] Filas afectadas por UPDATE: {rows_affected}")
+        
+        # Verificar después de la actualización
+        c.execute("SELECT id, nombre, activo FROM productos WHERE id = ?", (producto_id,))
+        producto_despues = c.fetchone()
+        print(f"[DEBUG DELETE] Producto después de eliminar: {producto_despues}")
+        
+        conn.commit()
+        conn.close()
+        
+        print(f"[DEBUG DELETE] Eliminación lógica completada exitosamente para producto ID: {producto_id}")
+        return jsonify({'message': 'Producto eliminado correctamente'})
+    else:
+        print(f"[DEBUG DELETE] Producto ID {producto_id} no encontrado")
+        conn.close()
+        return jsonify({'error': 'Producto no encontrado'}), 404
 
 @app.route('/categorias', methods=['GET'])
 def get_categorias():

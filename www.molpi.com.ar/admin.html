@@ -474,7 +474,7 @@ function getClientesHTML() {
         // 2. Cargar productos
         try {
           console.log('Cargando productos...');
-          const response = await fetch('/productos');
+          const response = await fetch('/productos?incluir_inactivos=true');
           productos = await response.json();
           mostrarProductos(productos);
           console.log('Productos cargados:', productos.length);
@@ -590,8 +590,8 @@ function getClientesHTML() {
           // Si se está filtrando por categoría "Podotáctiles", cargar desde BD
           if (categoria === 'Podotáctiles') {
             try {
-              // Cargar productos podotáctiles desde la base de datos
-              const response = await fetch('/productos');
+              // Cargar productos podotáctiles desde la base de datos (incluyendo inactivos)
+              const response = await fetch('/productos?incluir_inactivos=true');
               const todosProductos = await response.json();
               
               // Filtrar solo productos podotáctiles
@@ -645,7 +645,7 @@ function getClientesHTML() {
                 await sincronizarPodotactilesConBD(productosPredefinidos);
                 
                 // Volver a cargar desde la BD para obtener los estados actuales
-                const responseRefresh = await fetch('/productos');
+                const responseRefresh = await fetch('/productos?incluir_inactivos=true');
                 const productosRefresh = await responseRefresh.json();
                 productosPodotactiles = productosRefresh.filter(p => p.categoria === 'Podotáctiles');
               }
@@ -1006,6 +1006,7 @@ function getClientesHTML() {
           const productoCategoria = document.getElementById('productoCategoria');
           const productoPrecio = document.getElementById('productoPrecio');
           const productoPrecioUsd = document.getElementById('productoPrecioUsd');
+          const productoEstado = document.getElementById('productoEstado');
           const productoImagen = document.getElementById('productoImagen');
           const productoImagenMosaico = document.getElementById('productoImagenMosaico');
           const productoPdf = document.getElementById('productoPdf');
@@ -1017,6 +1018,7 @@ function getClientesHTML() {
           if (productoCategoria) productoCategoria.value = producto.categoria;
           if (productoPrecio) productoPrecio.value = producto.precio || '';
           if (productoPrecioUsd) productoPrecioUsd.value = producto.precio_usd || '';
+          if (productoEstado) productoEstado.value = producto.activo !== undefined ? producto.activo : 1;
           if (productoImagen) productoImagen.value = producto.imagen_url || '';
           if (productoImagenMosaico) productoImagenMosaico.value = producto.imagen_mosaico_url || '';
           if (productoPdf) productoPdf.value = producto.pdf_url || '';
@@ -1082,8 +1084,8 @@ function getClientesHTML() {
                   if (estamosEnPodotactiles) {
                     console.log('🔄 Recargando vista de podotáctiles...');
                     
-                    // Forzar recarga desde servidor para podotáctiles
-                    const response2 = await fetch('/productos');
+                    // Forzar recarga desde servidor para podotáctiles (incluyendo inactivos)
+                    const response2 = await fetch('/productos?incluir_inactivos=true');
                     const todosProductos = await response2.json();
                     const productosPodotactiles = todosProductos.filter(p => p.categoria === 'Podotáctiles');
                     
@@ -1098,7 +1100,7 @@ function getClientesHTML() {
                   } else {
                     // Para otras categorías o vista general, recargar normalmente
                     console.log('🔄 Recargando productos para categoría:', categoriaActual || 'todas');
-                    const response2 = await fetch('/productos');
+                    const response2 = await fetch('/productos?incluir_inactivos=true');
                     productos = await response2.json();
                     
                     if (categoriaActual && categoriaActual !== '') {
@@ -1317,7 +1319,7 @@ function getClientesHTML() {
             
             if (response.ok) {
               // Recargar productos desde la base de datos para reflejar el cambio
-              const response2 = await fetch('/productos');
+              const response2 = await fetch('/productos?incluir_inactivos=true');
               const todosProductos = await response2.json();
               
               // Actualizar el producto en el array local
@@ -1539,10 +1541,67 @@ function getClientesHTML() {
               this.classList.add('active');
               
               // Cargar productos podotáctiles desde la base de datos
-              const response = await fetch('/productos');
+              const response = await fetch('/productos?incluir_inactivos=true');
               if (response.ok) {
                 const todosLosProductos = await response.json();
-                const productosPodotactiles = todosLosProductos.filter(p => p.categoria === 'Podotáctiles');
+                let productosPodotactiles = todosLosProductos.filter(p => p.categoria === 'Podotáctiles');
+                
+                // Si no hay productos podotáctiles en la BD, crear los predefinidos
+                if (productosPodotactiles.length === 0) {
+                  console.log('📝 No se encontraron productos podotáctiles, creando predefinidos...');
+                  
+                  const productosPredefinidos = [
+                    {
+                      id: 200,
+                      nombre: 'Pisos Podotáctiles con Círculos',
+                      categoria: 'Podotáctiles',
+                      subcategoria: 'Discapacidad',
+                      descripcion: 'Los pisos podotáctiles de advertencia funcionan para todos, nos advierten a todos de que hay peligro inminente en nuestro camino, y sobre todo les ayuda a personas ciegas a saber que no deben avanzar; son conocidos también como señal de Stop.',
+                      imagen_url: 'img/products/circulos_ciegos_molde.jpg',
+                      imagen_mosaico_url: 'img/products/circulos_ciegos_mosaico.png',
+                      precio: 0,
+                      precio_usd: 0,
+                      pdf_url: '',
+                      activo: 1
+                    },
+                    {
+                      id: 201,
+                      nombre: 'Pisos Podotáctiles con Barras',
+                      categoria: 'Podotáctiles',
+                      subcategoria: 'Discapacidad',
+                      descripcion: 'Los pisos podotáctiles de guía o baldosas de barras como su nombre lo sugiere, son pisos que indican un camino seguro para las personas con capacidad visual disminuida. Funcionan al igual que los de puntos; cuando uno los pisa o los toca con el bastón, pero también funcionan por contraste de color en su entorno.',
+                      imagen_url: 'img/products/barras_molde.jpg',
+                      imagen_mosaico_url: 'img/products/barras_mosaico.png',
+                      precio: 0,
+                      precio_usd: 0,
+                      pdf_url: '',
+                      activo: 1
+                    },
+                    {
+                      id: 202,
+                      nombre: 'Señal Discapacitados',
+                      categoria: 'Podotáctiles',
+                      subcategoria: 'Discapacidad',
+                      descripcion: 'Este se coloca en lugares reservados para accesibilidad. Está pensado para la comunicación hacia las personas videntes. Para dar prioridad o tener precaución para con personas con discapacidad visual.',
+                      imagen_url: 'img/products/discapacitado_molde.jpg',
+                      imagen_mosaico_url: 'img/products/discapacitado_mosaico.png',
+                      precio: 0,
+                      precio_usd: 0,
+                      pdf_url: '',
+                      activo: 1
+                    }
+                  ];
+                  
+                  // Sincronizar productos predefinidos con la base de datos
+                  await sincronizarPodotactilesConBD(productosPredefinidos);
+                  
+                  // Volver a cargar desde la BD para obtener los productos creados
+                  const responseRefresh = await fetch('/productos?incluir_inactivos=true');
+                  const productosRefresh = await responseRefresh.json();
+                  productosPodotactiles = productosRefresh.filter(p => p.categoria === 'Podotáctiles');
+                  
+                  console.log('✅ Productos podotáctiles creados y cargados:', productosPodotactiles.length);
+                }
                 
                 // Guardar estado de filtro actual
                 window.currentFilter = 'Podotáctiles';
@@ -2467,6 +2526,8 @@ function getClientesHTML() {
                     <option value="Pisos y Zócalos">Pisos y Zócalos</option>
                     <option value="Revestimientos">Revestimientos</option>
                     <option value="Molduras">Molduras</option>
+                    <option value="Green">Green</option>
+                    <option value="Podotáctiles">Podotáctiles</option>
                   </select>
                 </div>
               </div>
@@ -2485,16 +2546,26 @@ function getClientesHTML() {
             </div>
 
             <div class="row">
-              <div class="col-md-6">
+              <div class="col-md-4">
                 <div class="form-group">
                   <label for="productoPrecio">Precio en $ *</label>
                   <input type="number" class="form-control" id="productoPrecio" name="precio" step="0.01" min="0" required>
                 </div>
               </div>
-              <div class="col-md-6">
+              <div class="col-md-4">
                 <div class="form-group">
                   <label for="productoPrecioUsd">Precio en U$D</label>
                   <input type="number" class="form-control" id="productoPrecioUsd" name="precio_usd" step="0.01" min="0">
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label for="productoEstado">Estado</label>
+                  <!-- CAMPO ESTADO AGREGADO - SI NO LO VES HAY PROBLEMA DE CACHE -->
+                  <select class="form-control" id="productoEstado" name="activo">
+                    <option value="1" selected>Activo</option>
+                    <option value="0">Inactivo</option>
+                  </select>
                 </div>
               </div>
             </div>
