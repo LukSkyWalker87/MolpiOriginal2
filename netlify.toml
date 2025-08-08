@@ -1,0 +1,31 @@
+[build]
+  # Directorio donde están los archivos del frontend
+  publish = "frontend"
+  
+  # No hay comando de build porque es HTML estático
+  command = "echo 'No build required for static site'"
+
+[build.environment]
+  # Variables de entorno para Netlify
+  NODE_VERSION = "18"
+
+[[headers]]
+  # Para todos los archivos
+  for = "/*"
+  [headers.values]
+    # Permitir CORS desde el dominio de PythonAnywhere
+    Access-Control-Allow-Origin = "https://sgit.pythonanywhere.com"
+    # Cachear archivos estáticos
+    Cache-Control = "public, max-age=31536000"
+
+[[headers]]
+  # Para archivos HTML no cachear tanto
+  for = "/*.html"
+  [headers.values]
+    Cache-Control = "public, max-age=3600"
+
+# Redirecciones en caso de que accedan a la raíz
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
