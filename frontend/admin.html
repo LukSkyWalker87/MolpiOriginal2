@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <title>Panel de Administración | Molpi</title>
-  <!-- Cache buster: ACTUALIZADO 8 Agosto 2025 15:15 - Fix env.js incluido y modales ocultos -->
+  <!-- Cache buster: ACTUALIZADO 8 Agosto 2025 15:25 - Debugging extensivo para diagnosticar problema de carga -->
   <link rel="icon" href="img/favicon.ico" type="image/x-icon">
 
 
@@ -319,11 +319,22 @@
   
   
   <script>
+    console.log('=== ADMIN PANEL DEBUG START ===');
+    console.log('env.js loaded:', typeof window.env !== 'undefined');
+    console.log('jQuery loaded:', typeof $ !== 'undefined');
+    console.log('Bootstrap loaded:', typeof $.fn.modal !== 'undefined');
+    
     document.addEventListener("DOMContentLoaded", function () {
+      console.log('=== DOMContentLoaded START ===');
       console.log('Admin panel JavaScript loaded');
       
       const sidebarLinks = document.querySelectorAll("#adminSidebar a[data-section]");
       const contentArea = document.getElementById("adminContent");
+      
+      console.log('Sidebar links found:', sidebarLinks.length);
+      console.log('Content area found:', contentArea ? 'YES' : 'NO');
+      console.log('window.env available:', typeof window.env !== 'undefined');
+      console.log('API URL:', window.env ? window.env.API_URL : 'UNDEFINED');
       
       // ========== FUNCIONES PARA NOTIFICACIONES TOAST ==========
       
@@ -3043,27 +3054,33 @@ function getClientesHTML() {
       }
 
       function loadSectionFromHash() {
+        console.log('=== loadSectionFromHash START ===');
         const hash = window.location.hash.substring(1); // Remover el #
-        console.log('Loading section from hash:', hash);
+        console.log('Current hash:', hash);
         
         if (hash) {
           const sectionLink = document.querySelector(`#adminSidebar a[data-section="${hash}"]`);
+          console.log('Section link found for hash:', sectionLink ? 'YES' : 'NO');
           if (sectionLink) {
-            console.log('Found section link for:', hash);
+            console.log('Clicking section link for:', hash);
             sectionLink.click();
             return;
           }
         }
         
         // Si no hay hash o no se encuentra la sección, cargar productos por defecto
-        console.log('No hash found, loading default productos section');
+        console.log('Loading default productos section');
         const productosLink = document.querySelector('#adminSidebar a[data-section="productos"]');
+        console.log('Productos link found:', productosLink ? 'YES' : 'NO');
         if (productosLink) {
+          console.log('Clicking productos link');
           productosLink.click();
         } else {
           // Fallback si no encuentra productos
+          console.log('Fallback: calling loadProductosComponent directly');
           loadProductosComponent();
         }
+        console.log('=== loadSectionFromHash END ===');
       }
 
       // Escuchar cambios en el hash
