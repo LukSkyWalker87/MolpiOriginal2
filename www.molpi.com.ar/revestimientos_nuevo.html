@@ -1,16 +1,16 @@
 <!DOCTYPE html>
 <html>
 	
-<!-- Piscinas Dinámico - Molpi -->
+<!-- Revestimientos Dinámico - Molpi -->
 <head>
 
 		<!-- Basic -->
 		<meta charset="utf-8">
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">	
 
-		<title> Molpi | Moldes inyectados autoestibables para mosaicos de piscina</title>	
+		<title>Molpi | Moldes para Revestimientos </title>	
 
-		<meta name="keywords" content="Moldes inyectados para mosaicos, Moldes de plastico para mosaicos, Moldes para baldozas, revestimientos, molduras, mosaicos rusticos, mosaico de adoquines, simil piedra, inyeccion de moldes, moldes, molde, mosaicos, mosaico, moldes autoapilables, moldes autoestibables, mosaicos podotactiles, mosaicos para jardin" />
+		<meta name="keywords" content="Moldes inyectados para mosaicos, Moldes de plastico para revestimientos, Moldes para baldozas, moldes para mosaicos, molduras, mosaicos rusticos, mosaico de adoquines, simil piedra, inyeccion de moldes, moldes, molde, mosaicos, mosaico, moldes autoapilables, moldes autoestibables, mosaicos podotactiles, mosaicos para jardin" />
 		<meta name="description" content="Moldes Autoestibables para la fabricación de mosaicos. Moldes inyectados en plástico de alta Resistencia y Durabilidad">
 		<meta name="author" content="molpi.com.ar">
 
@@ -77,7 +77,7 @@
 		<div class="body">
 			<header id="header" class="header-mobile-nav-only" data-plugin-options="{'stickyEnabled': true, 'stickyEnableOnBoxed': true, 'stickyEnableOnMobile': true, 'stickyStartAt': 90, 'stickySetTop': '-90px', 'stickyChangeLogo': true}">
 				<div class="header-body">
-					<div class="header-top header-top-colored header-top-primary">
+				    <div class="header-top header-top-colored header-top-primary">
 						<div class="container">
 							<p>
 								<span class="ml-xs"><i class="fa fa-phone"></i> 11-3556-8417</span><span class="hidden-xs"> | <a href="mailto:info@molpi.com.ar">info@molpi.com.ar</a></span>
@@ -175,23 +175,22 @@
 
 			<div role="main" class="main">
 
-				<div class="portada-piscinas-full">
-					<img src="img/products/portada-piscinas.png" alt="portada-piscinas" />
+				<div class="portada-Revestimientos-full">
+					<img src="img/products/portada-revestimientos.png" alt="portada-Revestimientos" />
 				</div>
 				
 				<div class="container">
-
 					<div class="row">
 						<div class="col-md-12">
-							<h2 class="mb-xl mt-xlg"><strong>Piscinas</strong> - Bordes, esquineros, escalones, deck y rejillas.</h2>
+							<h2 class="mb-xl mt-xlg"><strong>Revestimientos</strong> - Símil Piedras, Maderas o Tridimensionales.</h2>
 						</div>
 						    
 						<div class="col-md-12">
-							<p>Una gran variedad para que puedas elegir el diseño que mejor combine con el deck y revestimiento de tu pileta.<br>
-							Desde el borde ballena que se caracteriza por evitar el reingreso de agua y otros cuerpos hacia la pileta, hasta las rejillas para que pueda desagotarse el agua del solarium, sin olvidar los escalones antideslizantes que aseguran un acceso seguro a la piscina.    <br><br> 
-                                     
-
-                         <a href="pdf/catalogo_general.pdf" target="blank" class="btn btn-primary custom-btn-style-1 text-uppercase font-weight-semibold pull-right mt-sm">catálogo general</a>
+							<p>Gran variedad de diseños para lograr terminaciones de acuerdo a los gustos de cada persona.<br>
+							Revestimientos símil madera y piedra, donde la textura y calidez de los elementos naturales, permiten que se pueda utilizar en todo tipo de ambientes, tanto en interiores como en exteriores.<br>
+							Revestimientos tridimensionales que juegan con la iluminación del ambiente, entregándole movimiento y versatilidad al mismo, transformándolo en único. <br>Revestimientos con ondas para crear paredes suaves y elegantes.<br>
+							
+							<a href="pdf/catalogo_general.pdf" target="blank" class="btn btn-primary custom-btn-style-1 text-uppercase font-weight-semibold pull-right mt-sm">catálogo general</a>
 							</p>
                         </div>
                     </div>
@@ -202,7 +201,7 @@
 					<div id="loading-message" class="text-center">
 						<div class="row">
 							<div class="col-md-12">
-								<h3><i class="fa fa-spinner fa-spin"></i> Cargando productos de piscinas...</h3>
+								<h3><i class="fa fa-spinner fa-spin"></i> Cargando revestimientos...</h3>
 							</div>
 						</div>
 					</div>
@@ -212,8 +211,8 @@
 						<div class="row">
 							<div class="col-md-12">
 								<h3 class="text-danger"><i class="fa fa-exclamation-triangle"></i> Error al cargar los productos</h3>
-								<p>No se pudieron cargar los productos de piscinas. Por favor, intente nuevamente.</p>
-								<button class="btn btn-primary" onclick="cargarProductosPiscinas()">
+								<p>No se pudieron cargar los revestimientos. Por favor, intente nuevamente.</p>
+								<button class="btn btn-primary" onclick="cargarProductosRevestimientos()">
 									<i class="fa fa-refresh"></i> Reintentar
 								</button>
 							</div>
@@ -326,15 +325,15 @@
 		<script src="js/theme.init.js"></script>
 
 		<script>
-			async function cargarProductosPiscinas() {
+			async function cargarProductosRevestimientos() {
 				try {
-					console.log('Iniciando carga de productos de piscinas...');
+					console.log('Iniciando carga de productos de revestimientos...');
 					
 					// Mostrar loading y ocultar error
 					document.getElementById('loading-message').style.display = 'block';
 					document.getElementById('error-message').style.display = 'none';
 					
-					const response = await fetch('/productos/piscinas');
+					const response = await fetch('/productos/revestimientos');
 					
 					if (!response.ok) {
 						throw new Error('Error en la respuesta del servidor');
@@ -364,151 +363,85 @@
 
 			function mostrarProductosOriginal(productosPorSubcategoria) {
 				const container = document.getElementById('productos-container');
-				
-				// Crear un mapa de productos por nombre para facilitar el acceso
-				const productosPorNombre = {};
-				Object.keys(productosPorSubcategoria).forEach(subcategoria => {
-					productosPorSubcategoria[subcategoria].forEach(producto => {
-						productosPorNombre[producto.nombre] = producto;
-					});
-				});
+				let html = '<div class="row">';
+				let columnaActual = 1; // Para alternar entre columnas
 
-				// Función auxiliar para buscar producto
-				function buscarProducto(nombre) {
-					return productosPorNombre[nombre] || null;
-				}
-
-				// Función auxiliar para crear estructura de producto exacta como en el estático
-				function crearProducto(producto, esColumnaIzquierda, delayImagen1, delayImagen2, botonPlano = null) {
-					const tieneMosaico = producto.imagen_mosaico_url && 
-						producto.imagen_mosaico_url.trim() !== '' && 
-						!producto.imagen_mosaico_url.includes('.html'); // Excluir URLs incorrectas con .html
+				// Función auxiliar para crear estructura de producto con diseño original
+				function crearProducto(producto, esColumnaIzquierda, indexEnFila) {
+					const tieneMosaico = producto.imagen_mosaico_url && producto.imagen_mosaico_url.trim() !== '';
 					
-					// Formatear descripción como en el estático
-					let descripcionFormateada = '';
-					if (producto.descripcion) {
-						if (producto.descripcion.includes('piezas por molde') || producto.descripcion.includes('piezas de') || 
-							producto.descripcion.includes('Modelo disponible') || producto.descripcion.includes('metros de diámetro')) {
-							descripcionFormateada = `<small> / ${producto.descripcion}.</small>`;
-						}
-					}
-					
-					// Botón de plano si existe
-					let botonHTML = '';
-					if (botonPlano) {
-						botonHTML = `<a href="${botonPlano.url}" target="blank" class="btn btn-primary custom-btn-style-1 text-uppercase font-weight-semibold pull mt1-sm">${botonPlano.texto}</a>`;
-					}
+					// Usar delays simples como en revestimientos
+					const delayImagen1 = esColumnaIzquierda ? 0 : 200;
+					const delayImagen2 = esColumnaIzquierda ? 200 : 400;
 					
 					return `
 						<div class="col-md-6">
 							<div class="col-md-12">
-								<h4 class="mb-xl mt-xlg">${producto.nombre}.${descripcionFormateada}</h4>
+								<h4 class="mb-xl mt-xlg">
+									${producto.nombre}${producto.descripcion ? `<br><small>${producto.descripcion}</small>` : ''}
+								</h4>
 								<div class="divider divider-primary divider-small mb-xl"> 
 									<hr>
 								</div>
 							</div>
-							<img src="${producto.imagen_url}" data-appear-animation="fadeInLeft" data-appear-animation-delay="${delayImagen1}" data-plugin-options="{'accY': 10}" alt class="custom-product-image-pos-1 _relative img-responsive" />
+							<img src="${producto.imagen_url}" 
+								 data-appear-animation="fadeInLeft" 
+								 data-appear-animation-delay="${delayImagen1}" 
+								 data-plugin-options="{'accY': 10}" 
+								 alt="${producto.nombre}" 
+								 class="custom-product-image-pos-1 _relative img-responsive" />
 							
 							${tieneMosaico ? `
-							<img src="${producto.imagen_mosaico_url}" data-appear-animation="fadeInLeft" data-appear-animation-delay="${delayImagen2}" data-plugin-options="{'accY': 10}" alt class="custom-product-image-pos-5 _absolute img-responsive" />
+							<img src="${producto.imagen_mosaico_url}" 
+								 data-appear-animation="fadeInLeft" 
+								 data-appear-animation-delay="${delayImagen2}" 
+								 data-plugin-options="{'accY': 10}" 
+								 alt="${producto.nombre} mosaico" 
+								 class="custom-product-image-pos-5 _absolute img-responsive" />
 							` : ''}
-							
-							${botonHTML}
 						</div>
 					`;
 				}
 
-				// Estructura exacta como en el estático - orden específico de productos
-				let html = '<div class="col-md-12"><h2><strong> </strong></h2></div>';
+				// Ordenar subcategorías para mostrar en orden específico
+				const ordenSubcategorias = ['Simil Piedra', 'Maderas', 'Encastrables', 'Geometricos', 'Rectangulares', '3D'];
 				
-				// Fila 1: Travertino 50x50x3cm y Borde Recto con Diente
-				const travertino50x50 = buscarProducto('Travertino 50x50x3cm');
-				const bordeRectoDiente = buscarProducto('Borde Recto con Diente');
-				
-				if (travertino50x50) {
-					html += crearProducto(travertino50x50, true, "0", "200");
-				}
-				if (bordeRectoDiente) {
-					html += crearProducto(bordeRectoDiente, false, "0", "200", {
-						url: "pdf/travertino_con_diente.png",
-						texto: "descargar plano"
-					});
-				}
-				html += '<div class="col-md-12"><hr></div>';
-				
-				// Fila 2: Borde Recto 40x50 y Escalón 50x32cm
-				const bordeRecto40x50 = buscarProducto('Borde Recto 40x50');
-				const escalon50x32 = buscarProducto('Escalón 50x32cm');
-				
-				if (bordeRecto40x50) {
-					html += crearProducto(bordeRecto40x50, true, "0", "200");
-				}
-				if (escalon50x32) {
-					html += crearProducto(escalon50x32, false, "0", "200");
-				}
-				html += '<div class="col-md-12"><hr></div>';
-				
-				// Fila 3: Arco Romano y Borde Ballena 40x50x3cm
-				const arcoRomano = buscarProducto('Arco Romano');
-				const bordeBallena = buscarProducto('Borde Ballena 40x50x3cm');
-				
-				if (arcoRomano) {
-					html += crearProducto(arcoRomano, true, "0", "200", {
-						url: "pdf/arco-romano.jpg",
-						texto: "descargar plano"
-					});
-				}
-				if (bordeBallena) {
-					html += crearProducto(bordeBallena, false, "0", "200");
-				}
-				html += '<div class="col-md-12"><hr></div>';
-				
-				// Fila 4: Esquinero 50x50cm y Esquinero Invertido 40x40cm
-				const esquinero50x50 = buscarProducto('Esquinero 50x50cm');
-				const esquineroInvertido = buscarProducto('Esquinero Invertido 40x40cm');
-				
-				if (esquinero50x50) {
-					html += crearProducto(esquinero50x50, true, "0", "200");
-				}
-				if (esquineroInvertido) {
-					html += crearProducto(esquineroInvertido, false, "0", "200");
-				}
-				html += '<div class="col-md-12"><hr></div>';
-				
-				// Fila 5: Rejilla 50x25x4cm y Esquina Rejilla 25x25x4cm
-				const rejilla50x25 = buscarProducto('Rejilla 50x25x4cm');
-				const esquinaRejilla = buscarProducto('Esquina Rejilla 25x25x4cm');
-				
-				if (rejilla50x25) {
-					html += crearProducto(rejilla50x25, true, "0", "200");
-				}
-				if (esquinaRejilla) {
-					html += crearProducto(esquinaRejilla, false, "0", "200");
-				}
-				html += '<div class="col-md-12"><hr></div>';
-				
-				// Fila 6: Deck Antideslizante con Diente y Deck Travertino
-				const deckAntideslizante = buscarProducto('Deck Antideslizante con Diente');
-				const deckTravertino = buscarProducto('Deck Travertino');
-				
-				if (deckAntideslizante) {
-					html += crearProducto(deckAntideslizante, true, "0", "200", {
-						url: "pdf/deck_madera_con_diente.png",
-						texto: "descargar plano"
-					});
-				}
-				if (deckTravertino) {
-					html += crearProducto(deckTravertino, false, "0", "200");
-				}
-				html += '<div class="col-md-12"><hr></div>';
-				
-				// Fila 7: Travertino Piscina 40x40x2,2cm (solo un producto)
-				const travertino40x40 = buscarProducto('Travertino Piscina 40x40x2,2cm');
-				
-				if (travertino40x40) {
-					html += crearProducto(travertino40x40, true, "200", "400");
-				}
+				ordenSubcategorias.forEach(subcategoria => {
+					if (productosPorSubcategoria[subcategoria] && productosPorSubcategoria[subcategoria].length > 0) {
+						const productos = productosPorSubcategoria[subcategoria];
+						
+						// Título de subcategoría si hay más de una subcategoría
+						if (ordenSubcategorias.filter(sub => productosPorSubcategoria[sub] && productosPorSubcategoria[sub].length > 0).length > 1) {
+							html += `
+								<div class="col-md-12">
+									<h3 class="text-center mb-4">${subcategoria}</h3>
+									<div class="divider divider-primary divider-small mb-xl text-center"> 
+										<hr>
+									</div>
+								</div>
+							`;
+						}
+						
+						productos.forEach((producto, index) => {
+							// Crear el producto 
+							html += crearProducto(producto, columnaActual === 1, index);
+							
+							// Alternar columnas y añadir separadores según el diseño original
+							if (columnaActual === 2 || index === productos.length - 1) {
+								html += `
+									<div class="col-md-12">
+										<hr>
+									</div>
+								`;
+								columnaActual = 1;
+							} else {
+								columnaActual = 2;
+							}
+						});
+					}
+				});
 
+				html += '</div>';
 				container.innerHTML = html;
 				
 				// Reinicializar animaciones usando el método exacto del tema
@@ -555,7 +488,7 @@
 				
 				// Esperar un poco más para que todos los scripts se carguen
 				setTimeout(function() {
-					cargarProductosPiscinas();
+					cargarProductosRevestimientos();
 				}, 500);
 			});
 		</script>
@@ -592,7 +525,7 @@
 		<!-- END LOGIN MODAL -->  
 
 		<!-- Botón flotante de WhatsApp -->
-		<a href="https://wa.me/541135568417?text=¡Hola!%20¿Todo%20bien%3F%20Te%20quería%20hacer%20una%20consulta%20sobre%20piscinas" 
+		<a href="https://wa.me/541135568417?text=¡Hola!%20¿Todo%20bien%3F%20Te%20quería%20hacer%20una%20consulta%20sobre%20revestimientos" 
 		   class="whatsapp-float" 
 		   target="_blank" 
 		   title="Chatear por WhatsApp con Molpi">

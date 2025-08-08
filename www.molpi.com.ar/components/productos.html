@@ -28,6 +28,282 @@
 .productos-component .table-responsive {
   border-radius: 8px;
 }
+
+/* Estilos para que la tabla coincida exactamente con la de Insumos */
+.productos-component .table {
+  margin-bottom: 0;
+  font-size: 0.875rem;
+}
+
+.productos-component .table th,
+.productos-component .table td {
+  padding: 0.3rem 0.5rem;
+  vertical-align: middle;
+  border-top: 1px solid #dee2e6;
+  white-space: nowrap;
+  font-size: 0.8rem;
+}
+
+.productos-component .table th {
+  background-color: #f8f9fa;
+  border-bottom: 2px solid #dee2e6;
+  font-weight: 500;
+  font-size: 0.75rem;
+  color: #495057;
+  text-transform: none;
+  letter-spacing: normal;
+  padding: 0.25rem 0.5rem;
+}
+
+.productos-component .table-striped tbody tr:nth-of-type(odd) {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* Eliminar efectos hover para coincidir con Insumos */
+.productos-component .table tbody tr:hover {
+  background-color: inherit;
+}
+
+.productos-component .table-striped tbody tr:nth-of-type(odd):hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.productos-component .table-striped tbody tr:nth-of-type(even):hover {
+  background-color: transparent;
+}
+
+/* Estilos para modal minimalista y moderno */
+.productos-component .modal-content {
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+}
+
+.productos-component .modal-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 12px 12px 0 0;
+  padding: 1.5rem 2rem;
+}
+
+.productos-component .modal-title {
+  font-weight: 600;
+  font-size: 1.25rem;
+  display: flex;
+  align-items: center;
+}
+
+.productos-component .modal-title i {
+  margin-right: 0.75rem;
+  font-size: 1.5rem;
+  opacity: 0.9;
+}
+
+.productos-component .modal-header .close {
+  color: white;
+  opacity: 0.8;
+  font-size: 1.5rem;
+  text-shadow: none;
+  padding: 0;
+  background: none;
+  border: none;
+}
+
+.productos-component .modal-header .close:hover {
+  opacity: 1;
+  color: white;
+}
+
+.productos-component .modal-body {
+  padding: 2rem;
+  background-color: #fafafa;
+}
+
+.productos-component .form-group {
+  margin-bottom: 1.5rem;
+}
+
+.productos-component .form-group label {
+  font-weight: 600;
+  color: #4a5568;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  font-size: 0.9rem;
+}
+
+.productos-component .form-group label i {
+  margin-right: 0.5rem;
+  color: #667eea;
+  width: 16px;
+  text-align: center;
+}
+
+.productos-component .form-control {
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  transition: all 0.2s ease;
+  background-color: white;
+  font-size: 0.9rem;
+}
+
+.productos-component .form-control:focus {
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  outline: none;
+}
+
+/* Estilos específicos para los filtros del admin */
+.productos-component .card-body .form-control {
+  font-size: 0.85rem !important;
+  color: #2d3748 !important;
+  background-color: white !important;
+  border: 1px solid #d1d5db !important;
+  height: auto !important;
+  line-height: 1.4 !important;
+}
+
+.productos-component .card-body .form-control option {
+  color: #2d3748 !important;
+  background-color: white !important;
+  font-size: 0.85rem !important;
+}
+
+.productos-component .card-body .form-control-sm {
+  padding: 0.4rem 0.75rem !important;
+  font-size: 0.875rem !important;
+  line-height: 1.4 !important;
+  height: 32px !important;
+  color: #374151 !important;
+  background-color: #ffffff !important;
+  border: 1px solid #d1d5db !important;
+  border-radius: 6px !important;
+}
+
+.productos-component .card-body .form-control-sm:focus {
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1) !important;
+}
+
+.productos-component .form-control-file {
+  padding: 0.5rem 0;
+}
+
+.productos-component .form-text {
+  font-size: 0.8rem;
+  color: #718096;
+  margin-top: 0.25rem;
+}
+
+.productos-component .badge {
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+.productos-component .modal-footer {
+  padding: 1.5rem 2rem;
+  border: none;
+  background-color: #f7fafc;
+  border-radius: 0 0 12px 12px;
+}
+
+.productos-component .btn {
+  border-radius: 8px;
+  padding: 0.75rem 1.5rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.productos-component .btn-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+}
+
+.productos-component .btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.productos-component .btn-secondary {
+  background-color: #e2e8f0;
+  border: none;
+  color: #4a5568;
+}
+
+.productos-component .btn-secondary:hover {
+  background-color: #cbd5e0;
+  color: #2d3748;
+}
+
+/* Sección de vista previa mejorada */
+.productos-component #vistaPrevia {
+  background: white;
+  border: 2px dashed #e2e8f0;
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+
+.productos-component .preview-section {
+  background: white;
+  border-radius: 8px;
+  padding: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.productos-component .preview-title {
+  font-weight: 600;
+  color: #4a5568;
+  font-size: 0.9rem;
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+}
+
+.productos-component .preview-title i {
+  margin-right: 0.5rem;
+  color: #667eea;
+}
+
+/* Estados de archivo mejorados */
+.productos-component .archivo-estado {
+  background: #f0fff4;
+  border: 1px solid #9ae6b4;
+  border-radius: 6px;
+  padding: 0.5rem 0.75rem;
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.8rem;
+  color: #2f855a;
+  margin-top: 0.5rem;
+}
+
+.productos-component .archivo-estado i {
+  margin-right: 0.5rem;
+}
+
+/* Mejoras en los campos de grupo */
+.productos-component .input-group {
+  display: flex;
+  align-items: center;
+  background: white;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  transition: all 0.2s ease;
+}
+
+.productos-component .input-group:focus-within {
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.productos-component .input-group i {
+  color: #a0aec0;
+  margin-right: 0.75rem;
+}
 </style>
 
 <!-- Contenido principal del componente -->
@@ -41,11 +317,11 @@
             <i class="fa fa-plus mr-1"></i>Nuevo Producto
           </button>
         </div>
-        <div class="card-body">
-          <!-- Filtros rápidos por línea -->
-          <div class="row mb-3">
+        <div class="card-body" style="padding: 0.5rem;">
+          <!-- Filtros rápidos por línea (OCULTOS) -->
+          <div class="row mb-1" style="display: none;">
             <div class="col-12">
-              <h6 class="text-muted mb-2">Filtros rápidos por línea:</h6>
+              <h6 class="text-muted mb-1" style="font-size: 0.8rem;">Filtros rápidos por línea:</h6>
               <div class="btn-group mr-2" role="group">
                 <button type="button" class="btn btn-outline-primary btn-sm" id="filtroTodos">
                   <i class="fa fa-list mr-1"></i>Todos los productos
@@ -67,26 +343,26 @@
           </div>
           
           <!-- Filtros tradicionales -->
-          <div class="row mb-3">
+          <div class="row mb-1">
             <div class="col-md-3">
-              <select class="form-control" id="filtroCategoria">
+              <select class="form-control form-control-sm" id="filtroCategoria">
                 <option value="">Todas las categorías</option>
               </select>
             </div>
             <div class="col-md-3">
-              <select class="form-control" id="filtroSubcategoria">
+              <select class="form-control form-control-sm" id="filtroSubcategoria">
                 <option value="">Todas las subcategorías</option>
               </select>
             </div>
             <div class="col-md-6">
-              <input type="text" class="form-control" id="buscarProducto" placeholder="Buscar productos...">
+              <input type="text" class="form-control form-control-sm" id="buscarProducto" placeholder="Buscar productos...">
             </div>
           </div>
           
           <!-- Tabla de productos -->
           <div class="table-responsive">
-            <table class="table table-striped table-hover">
-              <thead class="thead-dark">
+            <table class="table table-striped">
+              <thead>
                 <tr>
                   <th>ID</th>
                   <th>Imagen</th>
@@ -122,7 +398,9 @@
   <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="modalProductoTitle">Nuevo Producto</h5>
+        <h5 class="modal-title" id="modalProductoTitle">
+          <i class="fa fa-cube"></i>Nuevo Producto
+        </h5>
         <button type="button" class="close" data-dismiss="modal">
           <span>&times;</span>
         </button>
@@ -134,13 +412,18 @@
           <div class="row">
             <div class="col-md-6">
               <div class="form-group">
-                <label for="productoNombre">Nombre del Producto *</label>
-                <input type="text" class="form-control" id="productoNombre" name="nombre" required>
+                <label for="productoNombre">
+                  <i class="fa fa-tag"></i>Nombre del Producto *
+                </label>
+                <input type="text" class="form-control" id="productoNombre" name="nombre" required 
+                       placeholder="Ej: Adoquín Hexagonal 20x20">
               </div>
             </div>
             <div class="col-md-6">
               <div class="form-group">
-                <label for="productoCategoria">Categoría *</label>
+                <label for="productoCategoria">
+                  <i class="fa fa-folder"></i>Categoría *
+                </label>
                 <select class="form-control" id="productoCategoria" name="categoria" required>
                   <option value="">Selecciona una categoría</option>
                 </select>
@@ -151,14 +434,20 @@
           <div class="row">
             <div class="col-md-6">
               <div class="form-group">
-                <label for="productoPrecio">Precio en Pesos</label>
-                <input type="number" class="form-control" id="productoPrecio" name="precio" step="0.01" min="0" placeholder="0.00">
+                <label for="productoPrecio">
+                  <i class="fa fa-dollar"></i>Precio en Pesos
+                </label>
+                <input type="number" class="form-control" id="productoPrecio" name="precio" 
+                       step="0.01" min="0" placeholder="3500.00">
               </div>
             </div>
             <div class="col-md-6">
               <div class="form-group">
-                <label for="productoPrecioUsd">Precio en Dólares</label>
-                <input type="number" class="form-control" id="productoPrecioUsd" name="precio_usd" step="0.01" min="0" placeholder="0.00">
+                <label for="productoPrecioUsd">
+                  <i class="fa fa-usd"></i>Precio en Dólares
+                </label>
+                <input type="number" class="form-control" id="productoPrecioUsd" name="precio_usd" 
+                       step="0.01" min="0" placeholder="35.00">
               </div>
             </div>
           </div>
@@ -166,31 +455,70 @@
           <div class="row">
             <div class="col-md-6">
               <div class="form-group">
-                <label for="productoSubcategoria">Subcategoría *</label>
+                <label for="productoSubcategoria">
+                  <i class="fa fa-tags"></i>Subcategoría *
+                </label>
                 <select class="form-control" id="productoSubcategoria" name="subcategoria" required>
                   <option value="">Selecciona una subcategoría</option>
+                </select>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="productoEstado">
+                  <i class="fa fa-toggle-on"></i>Estado
+                </label>
+                <select class="form-control" id="productoEstado" name="activo">
+                  <option value="1">✅ Activo</option>
+                  <option value="0">❌ Inactivo</option>
                 </select>
               </div>
             </div>
           </div>
           
           <div class="form-group">
-            <label for="productoDescripcion">Descripción</label>
-            <textarea class="form-control" id="productoDescripcion" name="descripcion" rows="3"></textarea>
+            <label for="productoDescripcion">
+              <i class="fa fa-align-left"></i>Descripción
+            </label>
+            <textarea class="form-control" id="productoDescripcion" name="descripcion" rows="3" 
+                      placeholder="Describe las características principales del producto..."></textarea>
           </div>
           
           <div class="row">
             <div class="col-md-6">
               <div class="form-group">
-                <label for="productoImagen">URL de Imagen del Molde</label>
-                <input type="text" class="form-control" id="productoImagen" name="imagen_url" placeholder="img/products/nombre_molde.jpg">
+                <label for="productoImagen">
+                  <i class="fa fa-image"></i>Imagen del Molde *
+                </label>
+                <input type="file" class="form-control-file" id="productoImagenFile" accept="image/*">
+                <input type="text" class="form-control mt-2" id="productoImagen" name="imagen_url" 
+                       placeholder="O ingrese la URL: img/products/molde.jpg">
+                <small class="form-text">
+                  <i class="fa fa-info-circle"></i> Suba una imagen o ingrese la URL. Formato: JPG/PNG
+                </small>
+                
+                <!-- Estado del archivo de imagen del molde -->
+                <div id="archivoEstadoMolde" class="archivo-estado" style="display: none;">
+                  <i class="fa fa-check"></i> Imagen del molde seleccionada
+                </div>
               </div>
             </div>
             <div class="col-md-6">
               <div class="form-group">
-                <label for="productoImagenMosaico">URL de Imagen del Mosaico (Opcional)</label>
-                <input type="text" class="form-control" id="productoImagenMosaico" name="imagen_mosaico_url" placeholder="img/products/nombre_mosaico.png">
-                <small class="form-text text-muted">Para mostrar el resultado final del cerámico sobre el molde</small>
+                <label for="productoImagenMosaico">
+                  <i class="fa fa-picture-o"></i>Imagen del Mosaico (Opcional)
+                </label>
+                <input type="file" class="form-control-file" id="productoImagenMosaicoFile" accept="image/*">
+                <input type="text" class="form-control mt-2" id="productoImagenMosaico" name="imagen_mosaico_url" 
+                       placeholder="O ingrese la URL: img/products/mosaico.png">
+                <small class="form-text">
+                  <i class="fa fa-lightbulb-o"></i> Para mostrar el resultado final del cerámico
+                </small>
+                
+                <!-- Estado del archivo de imagen del mosaico -->
+                <div id="archivoEstadoMosaico" class="archivo-estado" style="display: none;">
+                  <i class="fa fa-check"></i> Imagen del mosaico seleccionada
+                </div>
               </div>
             </div>
           </div>
@@ -198,31 +526,46 @@
           <div class="row">
             <div class="col-md-12">
               <div class="form-group">
-                <label for="productoPdf">URL del PDF</label>
-                <input type="text" class="form-control" id="productoPdf" name="pdf_url" placeholder="https://ejemplo.com/catalogo.pdf">
+                <label for="productoPdf">
+                  <i class="fa fa-file-pdf-o"></i>URL del PDF
+                </label>
+                <input type="text" class="form-control" id="productoPdf" name="pdf_url" 
+                       placeholder="https://ejemplo.com/catalogo.pdf">
               </div>
             </div>
           </div>
           
           <!-- Vista previa de imagen -->
           <div class="form-group">
-            <label>Vista Previa de Imágenes</label>
-            <div id="vistaPrevia" class="border p-3" style="min-height: 350px; background-color: #f8f9fa;">
+            <label class="preview-title">
+              <i class="fa fa-eye"></i>Vista Previa de Imágenes
+            </label>
+            <div id="vistaPrevia" style="min-height: 350px;">
               
               <!-- Vista individual de cada imagen -->
               <div id="vistasIndividuales" style="display: none;">
                 <div class="row">
-                  <div class="col-md-6 text-center">
-                    <h6 class="text-muted mb-2">Molde</h6>
-                    <div style="min-height: 200px; display: flex; align-items: center; justify-content: center; border: 1px dashed #ddd; border-radius: 8px;">
-                      <img id="soloMolde" src="" alt="Solo molde" style="max-width: 150px; max-height: 150px; border-radius: 8px;">
+                  <div class="col-md-6">
+                    <div class="preview-section text-center">
+                      <h6 class="preview-title">
+                        <i class="fa fa-cube"></i>Molde
+                      </h6>
+                      <div style="min-height: 200px; display: flex; align-items: center; justify-content: center; border: 2px dashed #e2e8f0; border-radius: 8px;">
+                        <img id="soloMolde" src="" alt="Solo molde" style="max-width: 150px; max-height: 150px; border-radius: 8px;">
+                      </div>
                     </div>
                   </div>
-                  <div class="col-md-6 text-center">
-                    <h6 class="text-muted mb-2">Mosaico</h6>
-                    <div style="min-height: 200px; display: flex; align-items: center; justify-content: center; border: 1px dashed #ddd; border-radius: 8px;">
-                      <img id="soloMosaico" src="" alt="Solo mosaico" style="max-width: 150px; max-height: 150px; border-radius: 8px; display: none;">
-                      <span id="sinMosaico" class="text-muted" style="font-size: 12px;">Sin mosaico</span>
+                  <div class="col-md-6">
+                    <div class="preview-section text-center">
+                      <h6 class="preview-title">
+                        <i class="fa fa-picture-o"></i>Mosaico
+                      </h6>
+                      <div style="min-height: 200px; display: flex; align-items: center; justify-content: center; border: 2px dashed #e2e8f0; border-radius: 8px;">
+                        <img id="soloMosaico" src="" alt="Solo mosaico" style="max-width: 150px; max-height: 150px; border-radius: 8px; display: none;">
+                        <span id="sinMosaico" class="text-muted" style="font-size: 12px;">
+                          <i class="fa fa-image text-muted"></i><br>Sin mosaico
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -230,11 +573,12 @@
               
               <!-- Mensaje cuando no hay imágenes -->
               <div id="sinImagen" class="text-center" style="padding: 100px 0;">
-                <i class="fa fa-image text-muted" style="font-size: 48px; margin-bottom: 10px;"></i>
-                <p class="text-muted">No hay imagen para mostrar</p>
+                <i class="fa fa-image text-muted" style="font-size: 48px; margin-bottom: 10px; opacity: 0.3;"></i>
+                <p class="text-muted">Selecciona una imagen para ver la vista previa</p>
               </div>
             </div>
-            <small class="form-text text-muted">
+            <small class="form-text">
+              <i class="fa fa-info-circle"></i>
               <strong>Molde:</strong> Imagen del molde de concreto | 
               <strong>Mosaico:</strong> Patrón cerámico que se superpone | 
               <strong>Resultado:</strong> Vista final del producto terminado
@@ -243,8 +587,12 @@
         </form>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-        <button type="submit" class="btn btn-primary" form="formProducto">Guardar Producto</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">
+          <i class="fa fa-times mr-1"></i>Cancelar
+        </button>
+        <button type="submit" class="btn btn-primary" form="formProducto">
+          <i class="fa fa-save mr-1"></i>Guardar Producto
+        </button>
       </div>
     </div>
   </div>
@@ -269,14 +617,19 @@
           <div class="row">
             <div class="col-md-6">
               <div class="form-group">
-                <label for="podotactilNombre">Nombre del Producto *</label>
-                <input type="text" class="form-control" id="podotactilNombre" name="nombre" required>
+                <label for="podotactilNombre">
+                  <i class="fa fa-tag"></i>Nombre del Producto *
+                </label>
+                <input type="text" class="form-control" id="podotactilNombre" name="nombre" required
+                       placeholder="Ej: Guía Podotáctil Recta">
               </div>
             </div>
             <div class="col-md-6">
               <div class="form-group">
-                <label for="podotactilCategoria">Categoría</label>
-                <input type="text" class="form-control" id="podotactilCategoria" value="Podotáctiles" readonly style="background-color: #e9ecef;">
+                <label for="podotactilCategoria">
+                  <i class="fa fa-folder"></i>Categoría
+                </label>
+                <input type="text" class="form-control" id="podotactilCategoria" value="Podotáctiles" readonly style="background-color: #f8f9fa; border: 1px solid #e2e8f0;">
               </div>
             </div>
           </div>
@@ -284,64 +637,104 @@
           <div class="row">
             <div class="col-md-6">
               <div class="form-group">
-                <label for="podotactilSubcategoria">Subcategoría</label>
-                <input type="text" class="form-control" id="podotactilSubcategoria" value="Discapacidad" readonly style="background-color: #e9ecef;">
+                <label for="podotactilSubcategoria">
+                  <i class="fa fa-tags"></i>Subcategoría
+                </label>
+                <input type="text" class="form-control" id="podotactilSubcategoria" value="Discapacidad" readonly style="background-color: #f8f9fa; border: 1px solid #e2e8f0;">
               </div>
             </div>
             <div class="col-md-6">
               <div class="form-group">
-                <label for="podotactilActivo">Estado</label>
+                <label for="podotactilActivo">
+                  <i class="fa fa-toggle-on"></i>Estado
+                </label>
                 <select class="form-control" id="podotactilActivo" name="activo">
-                  <option value="1">Activo</option>
-                  <option value="0">Inactivo</option>
+                  <option value="1">✅ Activo</option>
+                  <option value="0">❌ Inactivo</option>
                 </select>
               </div>
             </div>
           </div>
           
           <div class="form-group">
-            <label for="podotactilDescripcion">Descripción / Especificaciones</label>
-            <textarea class="form-control" id="podotactilDescripcion" name="descripcion" rows="4" required placeholder="Escribe aquí las especificaciones y descripción del producto podotáctil..."></textarea>
-            <small class="form-text text-muted">
-              Esta descripción se mostrará como información técnica del producto. Incluye características, usos y beneficios.
+            <label for="podotactilDescripcion">
+              <i class="fa fa-align-left"></i>Descripción / Especificaciones
+            </label>
+            <textarea class="form-control" id="podotactilDescripcion" name="descripcion" rows="4" required 
+                      placeholder="Escribe aquí las especificaciones y descripción del producto podotáctil..."></textarea>
+            <small class="form-text">
+              <i class="fa fa-info-circle"></i> Esta descripción se mostrará como información técnica del producto. Incluye características, usos y beneficios.
             </small>
           </div>
           
           <div class="row">
             <div class="col-md-6">
               <div class="form-group">
-                <label for="podotactilImagenMolde">URL de Imagen del Molde</label>
-                <input type="text" class="form-control" id="podotactilImagenMolde" name="imagen_url" placeholder="img/products/nombre_molde.jpg">
+                <label for="podotactilImagenMolde">
+                  <i class="fa fa-image"></i>Imagen del Molde
+                </label>
+                <input type="file" class="form-control-file" id="podotactilImagenMoldeFile" accept="image/*">
+                <input type="text" class="form-control mt-2" id="podotactilImagenMolde" name="imagen_url" 
+                       placeholder="O ingrese la URL de la imagen del molde">
+                <small class="form-text text-muted">Suba una imagen o ingrese la URL del molde</small>
+                
+                <!-- Estado del archivo de imagen del molde -->
+                <div id="archivoEstadoMoldePodotactil" class="mt-2" style="display: none;">
+                  <span class="badge badge-success">
+                    <i class="fa fa-check"></i> Imagen del molde seleccionada
+                  </span>
+                </div>
               </div>
             </div>
             <div class="col-md-6">
               <div class="form-group">
-                <label for="podotactilImagenMosaico">URL de Imagen del Mosaico</label>
-                <input type="text" class="form-control" id="podotactilImagenMosaico" name="imagen_mosaico_url" placeholder="img/products/nombre_mosaico.png">
+                <label for="podotactilImagenMosaico">Imagen del Mosaico</label>
+                <input type="file" class="form-control-file" id="podotactilImagenMosaicoFile" accept="image/*">
+                <input type="text" class="form-control mt-2" id="podotactilImagenMosaico" name="imagen_mosaico_url" 
+                       placeholder="O ingrese la URL de la imagen del mosaico">
                 <small class="form-text text-muted">Para mostrar el resultado final del cerámico sobre el molde</small>
+                
+                <!-- Estado del archivo de imagen del mosaico -->
+                <div id="archivoEstadoMosaicoPodotactil" class="mt-2" style="display: none;">
+                  <span class="badge badge-info">
+                    <i class="fa fa-check"></i> Imagen del mosaico seleccionada
+                  </span>
+                </div>
               </div>
             </div>
           </div>
           
           <!-- Vista previa de imagen -->
           <div class="form-group">
-            <label>Vista Previa de Imágenes</label>
-            <div id="vistaPreviaPodotactil" class="border p-3" style="min-height: 300px; background-color: #f8f9fa;">
+            <label class="preview-title">
+              <i class="fa fa-eye"></i>Vista Previa de Imágenes
+            </label>
+            <div id="vistaPreviaPodotactil" style="min-height: 300px;">
               
               <!-- Vista individual de cada imagen -->
               <div id="vistasIndividualesPodotactil" style="display: none;">
                 <div class="row">
-                  <div class="col-md-6 text-center">
-                    <h6 class="text-muted mb-2">Molde</h6>
-                    <div style="min-height: 150px; display: flex; align-items: center; justify-content: center; border: 1px dashed #ddd; border-radius: 8px;">
-                      <img id="podotactilMoldeImg" src="" alt="Molde" style="max-width: 120px; max-height: 120px; border-radius: 8px;">
+                  <div class="col-md-6">
+                    <div class="preview-section text-center">
+                      <h6 class="preview-title">
+                        <i class="fa fa-cube"></i>Molde
+                      </h6>
+                      <div style="min-height: 150px; display: flex; align-items: center; justify-content: center; border: 2px dashed #e2e8f0; border-radius: 8px;">
+                        <img id="podotactilMoldeImg" src="" alt="Molde" style="max-width: 120px; max-height: 120px; border-radius: 8px;">
+                      </div>
                     </div>
                   </div>
-                  <div class="col-md-6 text-center">
-                    <h6 class="text-muted mb-2">Mosaico</h6>
-                    <div style="min-height: 150px; display: flex; align-items: center; justify-content: center; border: 1px dashed #ddd; border-radius: 8px;">
-                      <img id="podotactilMosaicoImg" src="" alt="Mosaico" style="max-width: 120px; max-height: 120px; border-radius: 8px; display: none;">
-                      <span id="sinMosaicoPodotactil" class="text-muted" style="font-size: 12px;">Sin mosaico</span>
+                  <div class="col-md-6">
+                    <div class="preview-section text-center">
+                      <h6 class="preview-title">
+                        <i class="fa fa-picture-o"></i>Mosaico
+                      </h6>
+                      <div style="min-height: 150px; display: flex; align-items: center; justify-content: center; border: 2px dashed #e2e8f0; border-radius: 8px;">
+                        <img id="podotactilMosaicoImg" src="" alt="Mosaico" style="max-width: 120px; max-height: 120px; border-radius: 8px; display: none;">
+                        <span id="sinMosaicoPodotactil" class="text-muted" style="font-size: 12px;">
+                          <i class="fa fa-image text-muted"></i><br>Sin mosaico
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -349,11 +742,12 @@
               
               <!-- Mensaje cuando no hay imágenes -->
               <div id="sinImagenPodotactil" class="text-center" style="padding: 80px 0;">
-                <i class="fa fa-image text-muted" style="font-size: 48px; margin-bottom: 10px;"></i>
-                <p class="text-muted">No hay imagen para mostrar</p>
+                <i class="fa fa-image text-muted" style="font-size: 48px; margin-bottom: 10px; opacity: 0.3;"></i>
+                <p class="text-muted">Selecciona una imagen para ver la vista previa</p>
               </div>
             </div>
-            <small class="form-text text-muted">
+            <small class="form-text">
+              <i class="fa fa-info-circle"></i>
               <strong>Molde:</strong> Imagen del molde de concreto | 
               <strong>Mosaico:</strong> Patrón cerámico que se superpone
             </small>

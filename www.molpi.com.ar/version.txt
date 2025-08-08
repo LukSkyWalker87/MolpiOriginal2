@@ -1,0 +1,9 @@
+Última actualización: 7 de Agosto de 2025 - 12:45
+CAMPO ESTADO MOVIDO AL LADO DE SUBCATEGORÍA - DEBE SER VISIBLE AHORA
+
+✅ El campo Estado ahora está ubicado al lado de la subcategoría en el modal de editar producto
+✅ Se removió el campo duplicado de la sección de precios
+✅ Tiene un estilo visual destacado con borde rojo y emojis
+
+Si estás viendo este archivo, significa que estás accediendo a la versión más reciente del servidor.
+Para forzar la actualización de la caché en tu navegador, presiona CTRL+F5 o Shift+F5.

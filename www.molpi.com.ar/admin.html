@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <title>Panel de Administración | Molpi</title>
-  <!-- Cache buster: Actualizado 5 Agosto 2025 - Precios USD -->
+  <!-- Cache buster: ACTUALIZADO 7 Agosto 2025 12:45 - Campo Estado VISIBLE al lado de subcategoría -->
   <link rel="icon" href="img/favicon.ico" type="image/x-icon">
 
 
@@ -530,16 +530,16 @@ function getClientesHTML() {
                 <div class="btn-group" role="group">
                   ${esPodotactil ? 
                     `<button class="btn btn-outline-primary btn-sm btn-editar-podotactil" data-id="${producto.id}" title="Editar producto podotáctil">
-                      <i class="fa fa-pencil mr-1"></i>Editar
+                      <i class="fa fa-edit mr-1"></i>Editar
                     </button>
                     <button class="btn btn-outline-danger btn-sm btn-eliminar" data-id="${producto.id}" title="Eliminar producto podotáctil">
                       <i class="fa fa-trash mr-1"></i>Eliminar
                     </button>` :
                     `<button class="btn btn-outline-primary btn-sm btn-editar" data-id="${producto.id}" title="Editar producto">
-                      <i class="fa fa-pencil mr-1"></i>Editar
+                      <i class="fa fa-edit mr-1"></i>Editar
                     </button>
                     <button class="btn btn-outline-danger btn-sm btn-eliminar" data-id="${producto.id}" title="Eliminar producto">
-                      <i class="fa fa-trash mr-1"></i>Eliminar
+                <i class="fa fa-trash mr-1"></i>Eliminar
                     </button>`
                   }
                   ${producto.pdf_url ? 
@@ -696,6 +696,63 @@ function getClientesHTML() {
           mostrarProductos(productosFiltrados);
         }
         
+        // Función para limpiar campos de archivo y estados visuales
+        function limpiarCamposArchivo() {
+          // Limpiar archivos del modal principal de productos
+          const productoImagenFile = document.getElementById('productoImagenFile');
+          const productoImagenMosaicoFile = document.getElementById('productoImagenMosaicoFile');
+          const archivoEstadoMolde = document.getElementById('archivoEstadoMolde');
+          const archivoEstadoMosaico = document.getElementById('archivoEstadoMosaico');
+          const productoImagen = document.getElementById('productoImagen');
+          const productoImagenMosaico = document.getElementById('productoImagenMosaico');
+          
+          if (productoImagenFile) {
+            productoImagenFile.value = '';
+          }
+          if (productoImagenMosaicoFile) {
+            productoImagenMosaicoFile.value = '';
+          }
+          if (archivoEstadoMolde) {
+            archivoEstadoMolde.style.display = 'none';
+          }
+          if (archivoEstadoMosaico) {
+            archivoEstadoMosaico.style.display = 'none';
+          }
+          if (productoImagen) {
+            productoImagen.placeholder = 'O ingrese la URL de la imagen del molde';
+          }
+          if (productoImagenMosaico) {
+            productoImagenMosaico.placeholder = 'O ingrese la URL de la imagen del mosaico';
+          }
+          
+          // Limpiar archivos del modal de podotáctiles
+          const podotactilImagenMoldeFile = document.getElementById('podotactilImagenMoldeFile');
+          const podotactilImagenMosaicoFile = document.getElementById('podotactilImagenMosaicoFile');
+          const archivoEstadoMoldePodotactil = document.getElementById('archivoEstadoMoldePodotactil');
+          const archivoEstadoMosaicoPodotactil = document.getElementById('archivoEstadoMosaicoPodotactil');
+          const podotactilImagenMolde = document.getElementById('podotactilImagenMolde');
+          const podotactilImagenMosaico = document.getElementById('podotactilImagenMosaico');
+          
+          if (podotactilImagenMoldeFile) {
+            podotactilImagenMoldeFile.value = '';
+          }
+          if (podotactilImagenMosaicoFile) {
+            podotactilImagenMosaicoFile.value = '';
+          }
+          if (archivoEstadoMoldePodotactil) {
+            archivoEstadoMoldePodotactil.style.display = 'none';
+          }
+          if (archivoEstadoMosaicoPodotactil) {
+            archivoEstadoMosaicoPodotactil.style.display = 'none';
+          }
+          if (podotactilImagenMolde) {
+            podotactilImagenMolde.placeholder = 'O ingrese la URL de la imagen del molde';
+          }
+          if (podotactilImagenMosaico) {
+            podotactilImagenMosaico.placeholder = 'O ingrese la URL de la imagen del mosaico';
+          }
+        }
+        
         // 5. Función para mostrar modal de nuevo producto
         function mostrarModalProducto() {
           productoEditando = null;
@@ -706,6 +763,9 @@ function getClientesHTML() {
           if (modalTitle) modalTitle.textContent = 'Nuevo Producto';
           if (formProducto) formProducto.reset();
           if (productoId) productoId.value = '';
+          
+          // Limpiar campos de archivo y estados
+          limpiarCamposArchivo();
           
           mostrarVistaPrevia('', '');
           
@@ -956,10 +1016,63 @@ function getClientesHTML() {
           const formProducto = document.getElementById('formProducto');
           if (!formProducto) return;
           
-          const formData = new FormData(formProducto);
-          const productoData = Object.fromEntries(formData);
+          const btn = document.querySelector('#modalProducto .btn-primary[form="formProducto"]');
+          const originalText = btn ? btn.innerHTML : '';
           
           try {
+            if (btn) {
+              btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Guardando...';
+              btn.disabled = true;
+            }
+            
+            let imagenUrl = document.getElementById('productoImagen').value;
+            let imagenMosaicoUrl = document.getElementById('productoImagenMosaico').value;
+            
+            // Subir archivo de imagen del molde si existe
+            const fileInputMolde = document.getElementById('productoImagenFile');
+            if (fileInputMolde && fileInputMolde.files.length > 0) {
+              const formData = new FormData();
+              formData.append('file', fileInputMolde.files[0]);
+              
+              const uploadResponse = await fetch('http://localhost:5000/upload/producto', {
+                method: 'POST',
+                body: formData
+              });
+              
+              const uploadResult = await uploadResponse.json();
+              if (uploadResponse.ok) {
+                imagenUrl = uploadResult.path;
+              } else {
+                throw new Error('Error subiendo imagen del molde: ' + uploadResult.error);
+              }
+            }
+            
+            // Subir archivo de imagen del mosaico si existe
+            const fileInputMosaico = document.getElementById('productoImagenMosaicoFile');
+            if (fileInputMosaico && fileInputMosaico.files.length > 0) {
+              const formData = new FormData();
+              formData.append('file', fileInputMosaico.files[0]);
+              
+              const uploadResponse = await fetch('http://localhost:5000/upload/producto', {
+                method: 'POST',
+                body: formData
+              });
+              
+              const uploadResult = await uploadResponse.json();
+              if (uploadResponse.ok) {
+                imagenMosaicoUrl = uploadResult.path;
+              } else {
+                throw new Error('Error subiendo imagen del mosaico: ' + uploadResult.error);
+              }
+            }
+            
+            const formData = new FormData(formProducto);
+            const productoData = Object.fromEntries(formData);
+            
+            // Sobrescribir URLs de imagen con las subidas
+            if (imagenUrl) productoData.imagen_url = imagenUrl;
+            if (imagenMosaicoUrl) productoData.imagen_mosaico_url = imagenMosaicoUrl;
+            
             const url = productoEditando ? `/productos/${productoEditando}` : '/productos';
             const method = productoEditando ? 'PUT' : 'POST';
             
@@ -987,7 +1100,12 @@ function getClientesHTML() {
             }
           } catch (error) {
             console.error('Error:', error);
-            showErrorToast('Error al guardar el producto');
+            showErrorToast('Error al guardar el producto: ' + error.message);
+          } finally {
+            if (btn) {
+              btn.innerHTML = originalText || 'Guardar Producto';
+              btn.disabled = false;
+            }
           }
         }
         
@@ -1006,7 +1124,6 @@ function getClientesHTML() {
           const productoCategoria = document.getElementById('productoCategoria');
           const productoPrecio = document.getElementById('productoPrecio');
           const productoPrecioUsd = document.getElementById('productoPrecioUsd');
-          const productoEstado = document.getElementById('productoEstado');
           const productoImagen = document.getElementById('productoImagen');
           const productoImagenMosaico = document.getElementById('productoImagenMosaico');
           const productoPdf = document.getElementById('productoPdf');
@@ -1018,7 +1135,39 @@ function getClientesHTML() {
           if (productoCategoria) productoCategoria.value = producto.categoria;
           if (productoPrecio) productoPrecio.value = producto.precio || '';
           if (productoPrecioUsd) productoPrecioUsd.value = producto.precio_usd || '';
-          if (productoEstado) productoEstado.value = producto.activo !== undefined ? producto.activo : 1;
+          
+          // Establecer el estado del producto (activo/inactivo)
+          console.log('=== CONFIGURANDO CAMPO ESTADO ===');
+          console.log('Producto:', producto.nombre);
+          console.log('Estado del producto:', producto.activo);
+          
+          // Buscar el campo Estado tanto en el modal principal como en el componente
+          let productoEstado = document.getElementById('productoEstado');
+          
+          if (!productoEstado) {
+            console.log('Campo Estado no encontrado en modal principal, buscando en componente...');
+            // Buscar en el componente productos
+            const componenteProductos = document.querySelector('.productos-component');
+            if (componenteProductos) {
+              productoEstado = componenteProductos.querySelector('#productoEstado');
+            }
+          }
+          
+          if (productoEstado) {
+            console.log('✅ Campo Estado encontrado');
+            
+            // Establecer el valor del campo Estado
+            const estadoValor = producto.activo !== undefined ? producto.activo : 1;
+            productoEstado.value = estadoValor;
+            
+            console.log('Valor establecido en campo Estado:', estadoValor);
+            console.log('Campo Estado después de asignar:', productoEstado.value);
+            
+          } else {
+            console.error('❌ Campo Estado NO encontrado ni en modal principal ni en componente');
+            console.log('Elementos disponibles:', document.querySelectorAll('select[name="activo"], #productoEstado'));
+          }
+          
           if (productoImagen) productoImagen.value = producto.imagen_url || '';
           if (productoImagenMosaico) productoImagenMosaico.value = producto.imagen_mosaico_url || '';
           if (productoPdf) productoPdf.value = producto.pdf_url || '';
@@ -1225,8 +1374,8 @@ function getClientesHTML() {
           const id = parseInt(document.getElementById('podotactilId').value);
           const nombre = document.getElementById('podotactilNombre').value;
           const descripcion = document.getElementById('podotactilDescripcion').value;
-          const imagenMolde = document.getElementById('podotactilImagenMolde').value;
-          const imagenMosaico = document.getElementById('podotactilImagenMosaico').value;
+          let imagenMolde = document.getElementById('podotactilImagenMolde').value;
+          let imagenMosaico = document.getElementById('podotactilImagenMosaico').value;
           const activo = parseInt(document.getElementById('podotactilActivo').value);
           
           if (!nombre || !descripcion) {
@@ -1234,7 +1383,53 @@ function getClientesHTML() {
             return;
           }
           
+          const btn = document.querySelector('#modalEditarPodotactil .btn-primary[form="formEditarPodotactil"]');
+          const originalText = btn ? btn.innerHTML : '';
+          
           try {
+            if (btn) {
+              btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Guardando...';
+              btn.disabled = true;
+            }
+            
+            // Subir archivo de imagen del molde si existe
+            const fileInputMolde = document.getElementById('podotactilImagenMoldeFile');
+            if (fileInputMolde && fileInputMolde.files.length > 0) {
+              const formData = new FormData();
+              formData.append('file', fileInputMolde.files[0]);
+              
+              const uploadResponse = await fetch('http://localhost:5000/upload/producto', {
+                method: 'POST',
+                body: formData
+              });
+              
+              const uploadResult = await uploadResponse.json();
+              if (uploadResponse.ok) {
+                imagenMolde = uploadResult.path;
+              } else {
+                throw new Error('Error subiendo imagen del molde: ' + uploadResult.error);
+              }
+            }
+            
+            // Subir archivo de imagen del mosaico si existe
+            const fileInputMosaico = document.getElementById('podotactilImagenMosaicoFile');
+            if (fileInputMosaico && fileInputMosaico.files.length > 0) {
+              const formData = new FormData();
+              formData.append('file', fileInputMosaico.files[0]);
+              
+              const uploadResponse = await fetch('http://localhost:5000/upload/producto', {
+                method: 'POST',
+                body: formData
+              });
+              
+              const uploadResult = await uploadResponse.json();
+              if (uploadResponse.ok) {
+                imagenMosaico = uploadResult.path;
+              } else {
+                throw new Error('Error subiendo imagen del mosaico: ' + uploadResult.error);
+              }
+            }
+            
             // Preparar datos para enviar al servidor
             const productoData = {
               id: id,
@@ -1280,7 +1475,12 @@ function getClientesHTML() {
             }
           } catch (error) {
             console.error('Error:', error);
-            showErrorToast('Error al guardar los cambios');
+            showErrorToast('Error al guardar los cambios: ' + error.message);
+          } finally {
+            if (btn) {
+              btn.innerHTML = originalText || '<i class="fa fa-save mr-1"></i>Guardar Cambios';
+              btn.disabled = false;
+            }
           }
         }
         
@@ -1649,6 +1849,140 @@ function getClientesHTML() {
           if (productoImagenMosaico) {
             productoImagenMosaico.removeEventListener('input', actualizarVistaPrevia); // Remover listener anterior si existe
             productoImagenMosaico.addEventListener('input', actualizarVistaPrevia);
+          }
+          
+          // Event listeners para archivos de imagen del molde
+          const productoImagenFile = document.getElementById('productoImagenFile');
+          if (productoImagenFile) {
+            productoImagenFile.addEventListener('change', function() {
+              const file = this.files[0];
+              if (file) {
+                if (!file.type.startsWith('image/')) {
+                  showErrorToast('Seleccione un archivo de imagen válido');
+                  this.value = '';
+                  return;
+                }
+                if (file.size > 5 * 1024 * 1024) {
+                  showErrorToast('El archivo es muy grande (máx. 5MB)');
+                  this.value = '';
+                  return;
+                }
+                
+                document.getElementById('archivoEstadoMolde').style.display = 'block';
+                document.getElementById('productoImagen').placeholder = 'Archivo: ' + file.name;
+                
+                // Mostrar vista previa
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                  const urlMolde = e.target.result;
+                  const urlMosaico = document.getElementById('productoImagenMosaico').value;
+                  mostrarVistaPrevia(urlMolde, urlMosaico);
+                };
+                reader.readAsDataURL(file);
+              }
+            });
+          }
+          
+          // Event listeners para archivos de imagen del mosaico  
+          const productoImagenMosaicoFile = document.getElementById('productoImagenMosaicoFile');
+          if (productoImagenMosaicoFile) {
+            productoImagenMosaicoFile.addEventListener('change', function() {
+              const file = this.files[0];
+              if (file) {
+                if (!file.type.startsWith('image/')) {
+                  showErrorToast('Seleccione un archivo de imagen válido');
+                  this.value = '';
+                  return;
+                }
+                if (file.size > 5 * 1024 * 1024) {
+                  showErrorToast('El archivo es muy grande (máx. 5MB)');
+                  this.value = '';
+                  return;
+                }
+                
+                document.getElementById('archivoEstadoMosaico').style.display = 'block';
+                document.getElementById('productoImagenMosaico').placeholder = 'Archivo: ' + file.name;
+                
+                // Mostrar vista previa
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                  const urlMolde = document.getElementById('productoImagen').value || '';
+                  const urlMosaico = e.target.result;
+                  mostrarVistaPrevia(urlMolde, urlMosaico);
+                };
+                reader.readAsDataURL(file);
+              }
+            });
+          }
+          
+          // Event listeners para archivos de podotáctiles
+          const podotactilImagenMoldeFile = document.getElementById('podotactilImagenMoldeFile');
+          if (podotactilImagenMoldeFile) {
+            podotactilImagenMoldeFile.addEventListener('change', function() {
+              const file = this.files[0];
+              if (file) {
+                if (!file.type.startsWith('image/')) {
+                  showErrorToast('Seleccione un archivo de imagen válido');
+                  this.value = '';
+                  return;
+                }
+                if (file.size > 5 * 1024 * 1024) {
+                  showErrorToast('El archivo es muy grande (máx. 5MB)');
+                  this.value = '';
+                  return;
+                }
+                
+                document.getElementById('archivoEstadoMoldePodotactil').style.display = 'block';
+                document.getElementById('podotactilImagenMolde').placeholder = 'Archivo: ' + file.name;
+                
+                // Mostrar vista previa
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                  const podotactilMoldeImg = document.getElementById('podotactilMoldeImg');
+                  if (podotactilMoldeImg) {
+                    podotactilMoldeImg.src = e.target.result;
+                    document.getElementById('vistasIndividualesPodotactil').style.display = 'block';
+                    document.getElementById('sinImagenPodotactil').style.display = 'none';
+                  }
+                };
+                reader.readAsDataURL(file);
+              }
+            });
+          }
+          
+          const podotactilImagenMosaicoFile = document.getElementById('podotactilImagenMosaicoFile');
+          if (podotactilImagenMosaicoFile) {
+            podotactilImagenMosaicoFile.addEventListener('change', function() {
+              const file = this.files[0];
+              if (file) {
+                if (!file.type.startsWith('image/')) {
+                  showErrorToast('Seleccione un archivo de imagen válido');
+                  this.value = '';
+                  return;
+                }
+                if (file.size > 5 * 1024 * 1024) {
+                  showErrorToast('El archivo es muy grande (máx. 5MB)');
+                  this.value = '';
+                  return;
+                }
+                
+                document.getElementById('archivoEstadoMosaicoPodotactil').style.display = 'block';
+                document.getElementById('podotactilImagenMosaico').placeholder = 'Archivo: ' + file.name;
+                
+                // Mostrar vista previa
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                  const podotactilMosaicoImg = document.getElementById('podotactilMosaicoImg');
+                  const sinMosaicoPodotactil = document.getElementById('sinMosaicoPodotactil');
+                  if (podotactilMosaicoImg && sinMosaicoPodotactil) {
+                    podotactilMosaicoImg.src = e.target.result;
+                    podotactilMosaicoImg.style.display = 'block';
+                    sinMosaicoPodotactil.style.display = 'none';
+                  }
+                };
+                reader.readAsDataURL(file);
+              }
+            });
           }
         }
         
@@ -2533,11 +2867,24 @@ function getClientesHTML() {
               </div>
             </div>
 
-            <div class="form-group">
-              <label for="productoSubcategoria">Subcategoría *</label>
-              <select class="form-control" id="productoSubcategoria" name="subcategoria" required>
-                <option value="">Seleccionar subcategoría</option>
-              </select>
+            <div class="row">
+              <div class="col-md-8">
+                <div class="form-group">
+                  <label for="productoSubcategoria">Subcategoría *</label>
+                  <select class="form-control" id="productoSubcategoria" name="subcategoria" required>
+                    <option value="">Seleccionar subcategoría</option>
+                  </select>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label for="productoEstado">Estado</label>
+                  <select class="form-control" id="productoEstado" name="activo">
+                    <option value="1">Activo</option>
+                    <option value="0">Inactivo</option>
+                  </select>
+                </div>
+              </div>
             </div>
 
             <div class="form-group">
@@ -2546,26 +2893,16 @@ function getClientesHTML() {
             </div>
 
             <div class="row">
-              <div class="col-md-4">
+              <div class="col-md-6">
                 <div class="form-group">
                   <label for="productoPrecio">Precio en $ *</label>
                   <input type="number" class="form-control" id="productoPrecio" name="precio" step="0.01" min="0" required>
                 </div>
               </div>
-              <div class="col-md-4">
+              <div class="col-md-6">
                 <div class="form-group">
                   <label for="productoPrecioUsd">Precio en U$D</label>
                   <input type="number" class="form-control" id="productoPrecioUsd" name="precio_usd" step="0.01" min="0">
-                </div>
-              </div>
-              <div class="col-md-4">
-                <div class="form-group">
-                  <label for="productoEstado">Estado</label>
-                  <!-- CAMPO ESTADO AGREGADO - SI NO LO VES HAY PROBLEMA DE CACHE -->
-                  <select class="form-control" id="productoEstado" name="activo">
-                    <option value="1" selected>Activo</option>
-                    <option value="0">Inactivo</option>
-                  </select>
                 </div>
               </div>
             </div>
@@ -2654,5 +2991,7 @@ function getClientesHTML() {
 
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Script para asegurar que el campo Estado funcione correctamente -->
+  <script src="js/campo-estado.js?v=20250807_1245"></script>
 </body>
 </html>

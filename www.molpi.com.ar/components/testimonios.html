@@ -1,5 +1,181 @@
-<!-- Componente de Gestión de Testimonios -->
-<div class="container-fluid">
+<!-- Estilos minimalistas para testimonios -->
+<style>
+/* Estilos base para la tabla */
+.testimonios-component .table {
+  margin-bottom: 0;
+  font-size: 0.95rem;
+}
+
+.testimonios-component .table th,
+.testimonios-component .table td {
+  padding: 0.5rem 0.75rem;
+  vertical-align: middle;
+  border-top: 1px solid #dee2e6;
+  white-space: nowrap;
+  font-size: 0.9rem;
+}
+
+.testimonios-component .table th {
+  background-color: #f8f9fa;
+  border-bottom: 2px solid #dee2e6;
+  font-weight: 500;
+  font-size: 0.85rem;
+  color: #495057;
+  text-transform: none;
+  letter-spacing: normal;
+  padding: 0.5rem 0.75rem;
+}
+
+.testimonios-component .table-striped tbody tr:nth-of-type(odd) {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.testimonios-component .table tbody tr:hover {
+  background-color: inherit;
+}
+
+.testimonios-component .table-striped tbody tr:nth-of-type(odd):hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.testimonios-component .table-striped tbody tr:nth-of-type(even):hover {
+  background-color: transparent;
+}
+
+/* Estilos para modal minimalista y moderno */
+.testimonios-component .modal-content {
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+}
+
+.testimonios-component .modal-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 12px 12px 0 0;
+  padding: 1.5rem 2rem;
+}
+
+.testimonios-component .modal-title {
+  font-weight: 600;
+  font-size: 1.25rem;
+  display: flex;
+  align-items: center;
+}
+
+.testimonios-component .modal-title i {
+  margin-right: 0.75rem;
+  font-size: 1.5rem;
+  opacity: 0.9;
+}
+
+.testimonios-component .modal-header .close {
+  color: white;
+  opacity: 0.8;
+  font-size: 1.5rem;
+  text-shadow: none;
+  padding: 0;
+  background: none;
+  border: none;
+}
+
+.testimonios-component .modal-header .close:hover {
+  opacity: 1;
+  color: white;
+}
+
+.testimonios-component .modal-body {
+  padding: 2rem;
+  background-color: #fafafa;
+}
+
+.testimonios-component .form-group {
+  margin-bottom: 1.5rem;
+}
+
+.testimonios-component .form-group label {
+  font-weight: 600;
+  color: #4a5568;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  font-size: 0.9rem;
+}
+
+.testimonios-component .form-group label i {
+  margin-right: 0.5rem;
+  color: #667eea;
+  width: 16px;
+  text-align: center;
+}
+
+.testimonios-component .form-control {
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  transition: all 0.2s ease;
+  background-color: white;
+  font-size: 0.9rem;
+}
+
+.testimonios-component .form-control:focus {
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  outline: none;
+}
+
+.testimonios-component .form-text {
+  font-size: 0.8rem;
+  color: #718096;
+  margin-top: 0.25rem;
+}
+
+.testimonios-component .modal-footer {
+  padding: 1.5rem 2rem;
+  border: none;
+  background-color: #f7fafc;
+  border-radius: 0 0 12px 12px;
+}
+
+.testimonios-component .btn {
+  border-radius: 8px;
+  padding: 0.75rem 1.5rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.testimonios-component .btn-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+}
+
+.testimonios-component .btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.testimonios-component .btn-secondary {
+  background-color: #e2e8f0;
+  border: none;
+  color: #4a5568;
+}
+
+.testimonios-component .btn-secondary:hover {
+  background-color: #cbd5e0;
+  color: #2d3748;
+}
+
+.testimonios-component .card {
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.testimonios-component .table-responsive {
+  border-radius: 8px;
+}
+</style>
+
+<div class="container-fluid testimonios-component">
   <div class="d-flex justify-content-between align-items-center mb-4">
     <h2 class="mb-0">
       <i class="fa fa-comments mr-2"></i>
@@ -48,8 +224,8 @@
   <div class="card">
     <div class="card-body">
       <div class="table-responsive">
-        <table class="table table-striped table-hover">
-          <thead class="thead-dark">
+        <table class="table table-striped">
+          <thead>
             <tr>
               <th>Orden</th>
               <th>Nombre</th>
@@ -81,11 +257,11 @@
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="modalTestimonioLabel">
-          <i class="fa fa-comment mr-2"></i>
+          <i class="fa fa-comment"></i>
           <span id="modalTitle">Agregar Testimonio</span>
         </h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
-          <span aria-hidden="true">&times;</span>
+          <span>&times;</span>
         </button>
       </div>
       <form id="formTestimonio">
@@ -96,27 +272,31 @@
             <div class="col-md-6">
               <div class="form-group">
                 <label for="testimonioNombre">
-                  <i class="fa fa-user"></i> Nombre *
+                  <i class="fa fa-user"></i>Nombre *
                 </label>
-                <input type="text" class="form-control" id="testimonioNombre" required maxlength="100">
+                <input type="text" class="form-control" id="testimonioNombre" required maxlength="100"
+                       placeholder="Ej: Juan Pérez">
               </div>
             </div>
             <div class="col-md-6">
               <div class="form-group">
                 <label for="testimonioEmpresa">
-                  <i class="fa fa-building"></i> Empresa *
+                  <i class="fa fa-building"></i>Empresa *
                 </label>
-                <input type="text" class="form-control" id="testimonioEmpresa" required maxlength="100">
+                <input type="text" class="form-control" id="testimonioEmpresa" required maxlength="100"
+                       placeholder="Ej: Constructora ABC">
               </div>
             </div>
           </div>
 
           <div class="form-group">
             <label for="testimonioTexto">
-              <i class="fa fa-quote-left"></i> Testimonio *
+              <i class="fa fa-quote-left"></i>Testimonio *
             </label>
-            <textarea class="form-control" id="testimonioTexto" rows="4" required maxlength="500" placeholder="Escribe el testimonio del cliente..."></textarea>
-            <small class="form-text text-muted">
+            <textarea class="form-control" id="testimonioTexto" rows="4" required maxlength="500" 
+                      placeholder="Escribe el testimonio del cliente..."></textarea>
+            <small class="form-text">
+              <i class="fa fa-info-circle"></i>
               <span id="contadorCaracteres">0</span>/500 caracteres
             </small>
           </div>
@@ -125,29 +305,33 @@
             <div class="col-md-6">
               <div class="form-group">
                 <label for="testimonioImagen">
-                  <i class="fa fa-image"></i> Imagen
+                  <i class="fa fa-image"></i>Imagen
                 </label>
-                <input type="text" class="form-control" id="testimonioImagen" placeholder="img/clients/client-1.png" value="img/clients/client-1.png">
-                <small class="form-text text-muted">Ruta de la imagen del cliente</small>
+                <input type="text" class="form-control" id="testimonioImagen" 
+                       placeholder="img/clients/client-1.png" value="img/clients/client-1.png">
+                <small class="form-text">
+                  <i class="fa fa-camera"></i> Ruta de la imagen del cliente
+                </small>
               </div>
             </div>
             <div class="col-md-3">
               <div class="form-group">
                 <label for="testimonioOrden">
-                  <i class="fa fa-sort-numeric-asc"></i> Orden
+                  <i class="fa fa-sort-numeric-asc"></i>Orden
                 </label>
-                <input type="number" class="form-control" id="testimonioOrden" min="1" max="100">
+                <input type="number" class="form-control" id="testimonioOrden" min="1" max="100"
+                       placeholder="1">
               </div>
             </div>
             <div class="col-md-3">
               <div class="form-group">
                 <label>
-                  <i class="fa fa-toggle-on"></i> Estado
+                  <i class="fa fa-toggle-on"></i>Estado
                 </label>
                 <div class="form-check">
                   <input class="form-check-input" type="checkbox" id="testimonioActivo" checked>
                   <label class="form-check-label" for="testimonioActivo">
-                    Activo
+                    ✅ Activo
                   </label>
                 </div>
               </div>
@@ -155,11 +339,11 @@
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">
-            <i class="fa fa-times"></i> Cancelar
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">
+            <i class="fa fa-times mr-1"></i>Cancelar
           </button>
-          <button type="submit" class="btn btn-success">
-            <i class="fa fa-save"></i> <span id="btnGuardarTexto">Guardar Testimonio</span>
+          <button type="submit" class="btn btn-primary">
+            <i class="fa fa-save mr-1"></i><span id="btnGuardarTexto">Guardar Testimonio</span>
           </button>
         </div>
       </form>

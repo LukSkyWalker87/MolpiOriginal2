@@ -469,6 +469,184 @@ def get_productos_linea_50x50():
     
     return jsonify(productos)
 
+# ========= Endpoint específico para Piscinas =========
+
+@app.route('/productos/piscinas', methods=['GET'])
+def get_productos_piscinas():
+    """Obtener todos los productos de la categoría Piscinas organizados por subcategoría"""
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    
+    c.execute("""
+        SELECT id, nombre, descripcion, pdf_url, imagen_url, imagen_mosaico_url, categoria, subcategoria, 
+               precio, precio_usd, activo, fecha_creacion, fecha_modificacion
+        FROM productos 
+        WHERE activo = 1 AND categoria = 'Piscinas'
+        ORDER BY subcategoria, nombre
+    """)
+    rows = c.fetchall()
+    conn.close()
+    
+    # Organizar productos por subcategoría
+    productos_por_subcategoria = {}
+    
+    for row in rows:
+        producto = {
+            'id': row[0],
+            'nombre': row[1],
+            'descripcion': row[2],
+            'pdf_url': row[3],
+            'imagen_url': row[4],
+            'imagen_mosaico_url': row[5],
+            'categoria': row[6],
+            'subcategoria': row[7],
+            'precio': row[8],
+            'precio_usd': row[9],
+            'activo': row[10],
+            'fecha_creacion': row[11],
+            'fecha_modificacion': row[12]
+        }
+        
+        subcategoria = producto['subcategoria']
+        if subcategoria not in productos_por_subcategoria:
+            productos_por_subcategoria[subcategoria] = []
+        
+        productos_por_subcategoria[subcategoria].append(producto)
+    
+    return jsonify(productos_por_subcategoria)
+
+@app.route('/productos/revestimientos', methods=['GET'])
+def get_productos_revestimientos():
+    """Obtener todos los productos de la categoría Revestimientos organizados por subcategoría"""
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    
+    c.execute("""
+        SELECT id, nombre, descripcion, pdf_url, imagen_url, imagen_mosaico_url, categoria, subcategoria, 
+               precio, precio_usd, activo, fecha_creacion, fecha_modificacion
+        FROM productos 
+        WHERE activo = 1 AND categoria = 'Revestimientos'
+        ORDER BY subcategoria, nombre
+    """)
+    rows = c.fetchall()
+    conn.close()
+    
+    # Organizar productos por subcategoría
+    productos_por_subcategoria = {}
+    
+    for row in rows:
+        producto = {
+            'id': row[0],
+            'nombre': row[1],
+            'descripcion': row[2],
+            'pdf_url': row[3],
+            'imagen_url': row[4],
+            'imagen_mosaico_url': row[5],
+            'categoria': row[6],
+            'subcategoria': row[7],
+            'precio': row[8],
+            'precio_usd': row[9],
+            'activo': row[10],
+            'fecha_creacion': row[11],
+            'fecha_modificacion': row[12]
+        }
+        
+        subcategoria = producto['subcategoria']
+        if subcategoria not in productos_por_subcategoria:
+            productos_por_subcategoria[subcategoria] = []
+        
+        productos_por_subcategoria[subcategoria].append(producto)
+    
+    return jsonify(productos_por_subcategoria)
+
+@app.route('/productos/placas-antihumedad', methods=['GET'])
+def get_productos_placas_antihumedad():
+    """Obtener todos los productos de la categoría Placas Antihumedad organizados por subcategoría"""
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    
+    c.execute("""
+        SELECT id, nombre, descripcion, pdf_url, imagen_url, imagen_mosaico_url, categoria, subcategoria, 
+               precio, precio_usd, activo, fecha_creacion, fecha_modificacion
+        FROM productos 
+        WHERE activo = 1 AND categoria = 'Placas Antihumedad'
+        ORDER BY subcategoria, nombre
+    """)
+    rows = c.fetchall()
+    conn.close()
+    
+    # Organizar productos por subcategoría
+    productos_por_subcategoria = {}
+    
+    for row in rows:
+        producto = {
+            'id': row[0],
+            'nombre': row[1],
+            'descripcion': row[2],
+            'pdf_url': row[3],
+            'imagen_url': row[4],
+            'imagen_mosaico_url': row[5],
+            'categoria': row[6],
+            'subcategoria': row[7],
+            'precio': row[8],
+            'precio_usd': row[9],
+            'activo': row[10],
+            'fecha_creacion': row[11],
+            'fecha_modificacion': row[12]
+        }
+        
+        subcategoria = producto['subcategoria']
+        if subcategoria not in productos_por_subcategoria:
+            productos_por_subcategoria[subcategoria] = []
+        
+        productos_por_subcategoria[subcategoria].append(producto)
+    
+    return jsonify(productos_por_subcategoria)
+
+@app.route('/productos/insumos', methods=['GET'])
+def get_productos_insumos():
+    """Obtener todos los productos de la categoría Insumos organizados por subcategoría"""
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    
+    c.execute("""
+        SELECT id, nombre, descripcion, pdf_url, imagen_url, imagen_mosaico_url, categoria, subcategoria, 
+               precio, precio_usd, activo, fecha_creacion, fecha_modificacion
+        FROM productos 
+        WHERE activo = 1 AND categoria = 'Insumos'
+        ORDER BY subcategoria, nombre
+    """)
+    rows = c.fetchall()
+    conn.close()
+    
+    # Organizar productos por subcategoría
+    productos_por_subcategoria = {}
+    
+    for row in rows:
+        producto = {
+            'id': row[0],
+            'nombre': row[1],
+            'descripcion': row[2],
+            'pdf_url': row[3],
+            'imagen_url': row[4],
+            'imagen_mosaico_url': row[5],
+            'categoria': row[6],
+            'subcategoria': row[7],
+            'precio': row[8],
+            'precio_usd': row[9],
+            'activo': row[10],
+            'fecha_creacion': row[11],
+            'fecha_modificacion': row[12]
+        }
+        
+        subcategoria = producto['subcategoria']
+        if subcategoria not in productos_por_subcategoria:
+            productos_por_subcategoria[subcategoria] = []
+        
+        productos_por_subcategoria[subcategoria].append(producto)
+    
+    return jsonify(productos_por_subcategoria)
+
 # ========= Fin de endpoints de líneas =========
 
 @app.route('/productos/<int:producto_id>', methods=['DELETE'])
@@ -598,6 +776,42 @@ def admin():
 @app.route('/admin.html')
 def admin_panel():
     response = make_response(send_from_directory(os.path.join(app.root_path, '..', 'www.molpi.com.ar'), 'admin.html'))
+    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '0'
+    return response
+
+@app.route('/piscinas-dinamico.html')
+def piscinas_dinamico():
+    """Servir la página dinámica de piscinas"""
+    response = make_response(send_from_directory(os.path.join(app.root_path, '..', 'www.molpi.com.ar'), 'piscinas_dinamico.html'))
+    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '0'
+    return response
+
+@app.route('/revestimientos-dinamico.html')
+def revestimientos_dinamico():
+    """Servir la página dinámica de revestimientos"""
+    response = make_response(send_from_directory(os.path.join(app.root_path, '..', 'www.molpi.com.ar'), 'revestimientos_dinamico.html'))
+    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '0'
+    return response
+
+@app.route('/placas-antihumedad-dinamico.html')
+def placas_antihumedad_dinamico():
+    """Servir la página dinámica de placas antihumedad"""
+    response = make_response(send_from_directory(os.path.join(app.root_path, '..', 'www.molpi.com.ar'), 'placas_antihumedad_dinamico.html'))
+    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '0'
+    return response
+
+@app.route('/insumos-dinamico.html')
+def insumos_dinamico():
+    """Servir la página dinámica de insumos"""
+    response = make_response(send_from_directory(os.path.join(app.root_path, '..', 'www.molpi.com.ar'), 'insumos_dinamico.html'))
     response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
     response.headers['Pragma'] = 'no-cache'
     response.headers['Expires'] = '0'
