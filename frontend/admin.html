@@ -1034,7 +1034,7 @@ function getClientesHTML() {
               const formData = new FormData();
               formData.append('file', fileInputMolde.files[0]);
               
-              const uploadResponse = await fetch('http://localhost:5000/upload/producto', {
+              const uploadResponse = await fetch(`${window.env.API_URL}/upload/producto`, {
                 method: 'POST',
                 body: formData
               });
@@ -1053,7 +1053,7 @@ function getClientesHTML() {
               const formData = new FormData();
               formData.append('file', fileInputMosaico.files[0]);
               
-              const uploadResponse = await fetch('http://localhost:5000/upload/producto', {
+              const uploadResponse = await fetch(`${window.env.API_URL}/upload/producto`, {
                 method: 'POST',
                 body: formData
               });

@@ -929,7 +929,7 @@ loginForm.addEventListener('submit', async function(e) {
 				try {
 					// Hacer la petición AJAX para obtener promociones activas
 					$.ajax({
-						url: 'http://localhost:5000/promociones',
+						url: `${window.env.API_URL}/promociones`,
 						method: 'GET',
 						timeout: 5000,
 						success: function(response) {
@@ -1178,7 +1178,7 @@ loginForm.addEventListener('submit', async function(e) {
 				try {
 					// Hacer la petición AJAX para obtener testimonios activos
 					$.ajax({
-						url: 'http://localhost:5000/testimonios',
+						url: `${window.env.API_URL}/testimonios`,
 						method: 'GET',
 						timeout: 5000,
 						success: function(response) {
