@@ -1,0 +1,1707 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>Panel de Administración | Molpi</title>
+  <link rel="icon" href="img/favicon.ico" type="image/x-icon">
+
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="css/general.css">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Open Sans', sans-serif;
+      margin: 0;
+      display: flex;
+    }
+
+    /* Estilos para botones de acciones minimalistas */
+    .btn-group .btn {
+      font-size: 0.75rem;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      margin-right: 2px;
+      transition: all 0.2s ease;
+      border-width: 1px;
+    }
+    
+    .btn-group .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .btn-group .btn i {
+      font-size: 0.7rem;
+    }
+    
+    .btn-outline-primary:hover {
+      background-color: #007bff;
+      border-color: #007bff;
+      color: white;
+    }
+    
+    .btn-outline-danger:hover {
+      background-color: #dc3545;
+      border-color: #dc3545;
+      color: white;
+    }
+    
+    .btn-outline-info:hover {
+      background-color: #17a2b8;
+      border-color: #17a2b8;
+      color: white;
+    }
+
+    /* Estilos para notificaciones toast personalizadas */
+    .toast-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1050;
+    }
+
+    .custom-toast {
+      min-width: 300px;
+      max-width: 400px;
+      margin-bottom: 10px;
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+      border: none;
+      backdrop-filter: blur(10px);
+      animation: slideInRight 0.4s ease-out;
+    }
+
+    .custom-toast.success {
+      background: linear-gradient(135deg, #28a745, #20c997);
+      color: white;
+    }
+
+    .custom-toast.error {
+      background: linear-gradient(135deg, #dc3545, #e83e8c);
+      color: white;
+    }
+
+    .custom-toast.info {
+      background: linear-gradient(135deg, #17a2b8, #007bff);
+      color: white;
+    }
+
+    .custom-toast .toast-header {
+      background: transparent;
+      border-bottom: 1px solid rgba(255,255,255,0.2);
+      color: inherit;
+      padding: 12px 16px 8px;
+    }
+
+    .custom-toast .toast-body {
+      padding: 8px 16px 12px;
+      font-weight: 500;
+    }
+
+    .custom-toast .close {
+      color: white;
+      opacity: 0.8;
+      text-shadow: none;
+    }
+
+    .custom-toast .close:hover {
+      opacity: 1;
+    }
+
+    @keyframes slideInRight {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    .sidebar {
+      width: 280px;
+      height: 100vh;
+      background-color: #0e2133;
+      color: white;
+      position: fixed;
+      left: 0;
+      top: 0;
+      padding: 30px 20px;
+      box-shadow: 2px 0 10px rgba(0,0,0,0.3);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .sidebar h2 {
+      font-size: 1.8em;
+      text-align: center;
+      margin-bottom: 30px;
+      font-weight: bold;
+    }
+
+    .sidebar-content {
+      flex-grow: 1;
+      overflow-y: auto;
+    }
+
+    .sidebar a {
+      display: block;
+      padding: 12px 20px;
+      margin-bottom: 8px;
+      text-decoration: none;
+      color: white;
+      font-size: 16px;
+      border-radius: 5px;
+      transition: background 0.3s ease;
+    }
+
+    .sidebar a:hover {
+      background-color: #294663;
+    }
+
+    .sidebar a.active {
+      background-color: #e74c3c;
+      font-weight: bold;
+    }
+
+    .sidebar a.exit-button {
+      margin-top: auto;
+      background-color: #32495f;
+      text-align: center;
+      font-weight: bold;
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+
+    .sidebar a.exit-button:hover {
+      background-color: #e74c3c;
+    }
+
+    .main-content {
+      margin-left: 280px;
+      padding: 40px;
+      width: 100%;
+      background-color: #f8f9fa;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="sidebar" id="adminSidebar">
+    <div class="d-flex align-items-center justify-content-center mb-3">
+      <img src="img/logo.png" alt="Molpi" style="height: 40px; margin-right: 10px;">
+      <h2 class="mb-0">MOLPI</h2>
+    </div>
+    <h2>Panel de Administración</h2>
+    <a href="#" data-section="productos" class="active">📦 Productos</a>
+    <a href="#" data-section="promociones">📢 Promociones</a>
+    <a href="#" data-section="contacto">📍 Contacto</a>
+    <a href="#" data-section="testimonios">💬 Testimonios</a>
+      <!-- Botón de salir -->
+  <a href="index.html" class="exit-button">🚪 SALIR</a>
+  </div>
+
+
+
+  <div class="main-content" id="adminContent">
+    <h1 class="text-danger">Panel de Administración de Molpi</h1>
+    <p class="text-muted">Desde aquí podés editar contenido del sitio.</p>
+  </div>
+  
+  
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      console.log('Admin panel JavaScript loaded');
+      
+      const sidebarLinks = document.querySelectorAll("#adminSidebar a[data-section]");
+      const contentArea = document.getElementById("adminContent");
+      
+      // ========== FUNCIONES PARA NOTIFICACIONES TOAST ==========
+      
+      function showToast(message, type = 'success', duration = 4000) {
+        const toastContainer = document.getElementById('toastContainer');
+        const toastId = 'toast-' + Date.now();
+        
+        const toastHTML = `
+          <div class="toast custom-toast ${type}" id="${toastId}" role="alert">
+            <div class="toast-header">
+              <strong class="mr-auto">
+                ${type === 'success' ? '✅ Éxito' : type === 'error' ? '❌ Error' : '💡 Info'}
+              </strong>
+              <button type="button" class="close" data-dismiss="toast">
+                <span>&times;</span>
+              </button>
+            </div>
+            <div class="toast-body">
+              ${message}
+            </div>
+          </div>
+        `;
+        
+        toastContainer.insertAdjacentHTML('beforeend', toastHTML);
+        const toastElement = document.getElementById(toastId);
+        
+        // Mostrar el toast
+        $(toastElement).toast({
+          autohide: true,
+          delay: duration
+        });
+        $(toastElement).toast('show');
+        
+        // Eliminar el elemento del DOM después de que se oculte
+        $(toastElement).on('hidden.bs.toast', function() {
+          toastElement.remove();
+        });
+      }
+      
+      // Funciones de conveniencia
+      window.showSuccessToast = (message, duration = 4000) => showToast(message, 'success', duration);
+      window.showErrorToast = (message, duration = 5000) => showToast(message, 'error', duration);
+      window.showInfoToast = (message, duration = 4000) => showToast(message, 'info', duration);
+      
+      // ========== FIN FUNCIONES TOAST ==========
+      
+      console.log('Found sidebar links:', sidebarLinks.length);
+      console.log('Content area:', contentArea);
+sidebarLinks.forEach((link) => {
+  link.addEventListener("click", async function (e) {
+    e.preventDefault();
+    const section = this.getAttribute("data-section");
+    
+    console.log('Clicked section:', section);
+    
+    // Actualizar la URL con hash
+    window.location.hash = section;
+
+    sidebarLinks.forEach(l => l.classList.remove("active"));
+    this.classList.add("active");
+
+    try {
+      if (section === "productos") {
+        console.log('Loading productos section');
+        loadProductosComponent();
+      } else if (section === "promociones") {
+        console.log('Loading promociones section');
+        loadPromocionesComponent();
+      } else if (section === "contacto") {
+        contentArea.innerHTML = getContactoHTML();
+      } else if (section === "testimonios") {
+        console.log('Loading testimonios section');
+        loadTestimoniosComponent();
+      } else {
+        // Sección desconocida
+        contentArea.innerHTML = `
+          <div class="alert alert-warning">
+            <h3>Sección en desarrollo</h3>
+            <p>La sección "${section}" está actualmente en desarrollo.</p>
+          </div>
+        `;
+      }
+    } catch (error) {
+      console.error("Error al cargar la sección:", error);
+      contentArea.innerHTML = `
+        <div class="alert alert-danger">
+          <h3>Error al cargar la sección</h3>
+          <p>No se pudo cargar la sección "${section}". Por favor intente nuevamente.</p>
+        </div>
+      `;
+    }
+  });
+});
+
+// Cargar la sección productos por defecto al inicializar
+console.log('Cargando sección productos por defecto...');
+loadProductosComponent();
+
+// Agregar estas funciones para cada sección
+
+function getContactoHTML() {
+  return `
+    <h1 class="mb-4">Administrar información de contacto</h1>
+    
+    <form>
+      <div class="form-group">
+        <label for="direccion">Dirección</label>
+        <input type="text" class="form-control" id="direccion" value="Av. Ejemplo 1234, Buenos Aires">
+      </div>
+      <div class="form-group">
+        <label for="telefono">Teléfono</label>
+        <input type="text" class="form-control" id="telefono" value="11-3556-8417">
+      </div>
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" class="form-control" id="email" value="info@molpi.com.ar">
+      </div>
+      <div class="form-group">
+        <label for="horarios">Horarios de atención</label>
+        <input type="text" class="form-control" id="horarios" value="Lunes a Viernes de 9 a 18hs">
+      </div>
+      
+      <h3 class="mt-4">Redes sociales</h3>
+      <div class="form-group">
+        <label for="facebook">Facebook URL</label>
+        <input type="url" class="form-control" id="facebook" value="https://facebook.com/molpi">
+      </div>
+      <div class="form-group">
+        <label for="instagram">Instagram URL</label>
+        <input type="url" class="form-control" id="instagram" value="https://instagram.com/molpi">
+      </div>
+      
+      <button type="submit" class="btn btn-primary">Guardar cambios</button>
+    </form>
+  `;
+}
+function getClientesHTML() {
+  return `
+    <h1 class="mb-4">Administrar Clientes / Logos</h1>
+    <p class="text-muted">Agregá o modificá los logos de clientes que aparecen en la sección.</p>
+    
+    <form class="mb-4">
+      <div class="form-group">
+        <label for="nuevoLogo">Agregar nuevo logo</label>
+        <input type="file" class="form-control-file" id="nuevoLogo" accept="image/*">
+      </div>
+      <div class="form-group">
+        <label for="nombreCliente">Nombre del cliente</label>
+        <input type="text" class="form-control" id="nombreCliente" placeholder="Ingrese el nombre del cliente">
+      </div>
+      <button type="submit" class="btn btn-success">Agregar cliente</button>
+    </form>
+    
+    <h3>Logos existentes</h3>
+    <div class="alert alert-info">Arrastre y suelte para reordenar los logos.</div>
+    
+    <div class="row" id="logosExistentes">
+      <div class="col-md-2 mb-3 text-center">
+        <img src="img/placeholder-logo.png" class="img-fluid mb-2" alt="Logo Cliente">
+        <p>Cliente Ejemplo</p>
+        <button class="btn btn-sm btn-danger">Eliminar</button>
+      </div>
+    </div>
+  `;
+}
+
+      async function loadProductosComponent() {
+        try {
+          console.log('Fetching productos component...');
+          const response = await fetch('/admin/component/productos');
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          const componentHTML = await response.text();
+          contentArea.innerHTML = componentHTML;
+          console.log('Productos component loaded successfully');
+          
+          // Esperar un poco para que el DOM se actualice y luego inicializar
+          setTimeout(() => {
+            console.log('Iniciando carga de productos...');
+            initComponenteProductos();
+          }, 300);
+          
+        } catch (error) {
+          console.error('Error loading productos component:', error);
+          contentArea.innerHTML = `
+            <div class="alert alert-danger">
+              <h4>Error al cargar el componente de productos</h4>
+              <p>No se pudo cargar el componente de productos. Error: ${error.message}</p>
+              <p>Verifica que el archivo /components/productos.html existe y el servidor está funcionando correctamente.</p>
+            </div>
+          `;
+        }
+      }
+
+      // Función para inicializar completamente el componente productos
+      async function initComponenteProductos() {
+        console.log('=== Iniciando componente productos ===');
+        
+        // Verificar que estamos en la vista correcta
+        const selectCategoria = document.getElementById('productoCategoria');
+        const filtroCategoria = document.getElementById('filtroCategoria');
+        
+        if (!selectCategoria || !filtroCategoria) {
+          console.log('No estamos en la vista de productos, saltando inicialización');
+          return;
+        }
+        
+        // Variables locales para el componente
+        let productos = [];
+        let categorias = [];
+        let productoEditando = null;
+        
+        // 1. Cargar categorías
+        try {
+          console.log('Cargando categorías...');
+          const response = await fetch('/categorias');
+          categorias = await response.json();
+          
+          // Rellenar select de categorías
+          selectCategoria.innerHTML = '<option value="">Selecciona una categoría</option>';
+          categorias.forEach(categoria => {
+            const option = new Option(categoria.nombre, categoria.nombre);
+            selectCategoria.add(option);
+          });
+          
+          // Rellenar filtro de categorías
+          filtroCategoria.innerHTML = '<option value="">Todas las categorías</option>';
+          categorias.forEach(categoria => {
+            const option = new Option(categoria.nombre, categoria.nombre);
+            filtroCategoria.add(option);
+          });
+          
+          console.log('Categorías cargadas:', categorias.length);
+          
+          // Inicializar filtro de subcategorías con todas las subcategorías
+          actualizarFiltroSubcategorias();
+        } catch (error) {
+          console.error('Error cargando categorías:', error);
+        }
+        
+        // 2. Cargar productos
+        try {
+          console.log('Cargando productos...');
+          const response = await fetch('/productos');
+          productos = await response.json();
+          mostrarProductos(productos);
+          console.log('Productos cargados:', productos.length);
+        } catch (error) {
+          console.error('Error cargando productos:', error);
+          const tbody = document.getElementById('tablaProductos');
+          if (tbody) {
+            tbody.innerHTML = '<tr><td colspan="8" class="text-center text-danger">Error al cargar productos</td></tr>';
+          }
+        }
+        
+        // 3. Función para mostrar productos en la tabla
+        function mostrarProductos(productosAMostrar) {
+          const tbody = document.getElementById('tablaProductos');
+          if (!tbody) return;
+          
+          tbody.innerHTML = '';
+          
+          if (productosAMostrar.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="8" class="text-center">No hay productos para mostrar</td></tr>';
+            return;
+          }
+          
+          productosAMostrar.forEach(producto => {
+            const fila = document.createElement('tr');
+            fila.innerHTML = `
+              <td>${producto.id}</td>
+              <td>
+                ${producto.imagen_url ? 
+                  `<img src="${producto.imagen_url}" alt="${producto.nombre}" style="width: 60px; height: 60px; object-fit: cover;" class="rounded">` : 
+                  '<span class="text-muted">Sin imagen</span>'
+                }
+              </td>
+              <td>
+                <strong>${producto.nombre}</strong>
+                ${producto.descripcion ? `<br><small class="text-muted">${producto.descripcion.substring(0, 100)}...</small>` : ''}
+              </td>
+              <td><span class="badge badge-info">${producto.categoria}</span></td>
+              <td><span class="badge badge-secondary">${producto.subcategoria}</span></td>
+              <td>${producto.precio ? '$' + producto.precio.toFixed(2) : 'No definido'}</td>
+              <td>
+                <span class="badge badge-${producto.activo ? 'success' : 'danger'}">
+                  ${producto.activo ? 'Activo' : 'Inactivo'}
+                </span>
+              </td>
+              <td>
+                <div class="btn-group" role="group">
+                  <button class="btn btn-outline-primary btn-sm btn-editar" data-id="${producto.id}" title="Editar producto">
+                    <i class="fa fa-pencil mr-1"></i>Editar
+                  </button>
+                  <button class="btn btn-outline-danger btn-sm btn-eliminar" data-id="${producto.id}" title="Eliminar producto">
+                    <i class="fa fa-trash mr-1"></i>Eliminar
+                  </button>
+                  ${producto.pdf_url ? 
+                    `<a href="${producto.pdf_url}" target="_blank" class="btn btn-outline-info btn-sm" title="Ver catálogo PDF">
+                      <i class="fa fa-file-pdf-o mr-1"></i>PDF
+                    </a>` : ''
+                  }
+                </div>
+              </td>
+            `;
+            tbody.appendChild(fila);
+          });
+          
+          // Configurar botones de editar y eliminar
+          document.querySelectorAll('.btn-editar').forEach(btn => {
+            btn.addEventListener('click', function() {
+              const id = parseInt(this.dataset.id);
+              editarProducto(id);
+            });
+          });
+          
+          document.querySelectorAll('.btn-eliminar').forEach(btn => {
+            btn.addEventListener('click', function() {
+              const id = parseInt(this.dataset.id);
+              eliminarProducto(id);
+            });
+          });
+        }
+        
+        // 4. Función para filtrar productos
+        function filtrarProductos() {
+          const filtroCategoria = document.getElementById('filtroCategoria');
+          const filtroSubcategoria = document.getElementById('filtroSubcategoria');
+          const buscarProducto = document.getElementById('buscarProducto');
+          
+          const categoria = filtroCategoria ? filtroCategoria.value : '';
+          const subcategoria = filtroSubcategoria ? filtroSubcategoria.value : '';
+          const busqueda = buscarProducto ? buscarProducto.value.toLowerCase() : '';
+          
+          let productosFiltrados = productos;
+          
+          if (categoria) {
+            productosFiltrados = productosFiltrados.filter(p => p.categoria === categoria);
+          }
+          
+          if (subcategoria) {
+            productosFiltrados = productosFiltrados.filter(p => p.subcategoria === subcategoria);
+          }
+          
+          if (busqueda) {
+            productosFiltrados = productosFiltrados.filter(p => 
+              p.nombre.toLowerCase().includes(busqueda) || 
+              (p.descripcion && p.descripcion.toLowerCase().includes(busqueda))
+            );
+          }
+          
+          mostrarProductos(productosFiltrados);
+        }
+        
+        // 5. Función para mostrar modal de nuevo producto
+        function mostrarModalProducto() {
+          productoEditando = null;
+          const modalTitle = document.getElementById('modalProductoTitle');
+          const formProducto = document.getElementById('formProducto');
+          const productoId = document.getElementById('productoId');
+          
+          if (modalTitle) modalTitle.textContent = 'Nuevo Producto';
+          if (formProducto) formProducto.reset();
+          if (productoId) productoId.value = '';
+          
+          mostrarVistaPrevia('', '');
+          
+          if (typeof $ !== 'undefined' && $('#modalProducto').length) {
+            $('#modalProducto').modal('show');
+          }
+        }
+        
+        // 6. Función para mostrar vista previa de imagen
+        function mostrarVistaPrevia(urlMolde, urlMosaico = '') {
+          const imgPrevia = document.getElementById('imagenPrevia');
+          const imgMosaicoPrevia = document.getElementById('imagenMosaicoPrevia');
+          const contenedorImagenes = document.getElementById('contenedorImagenes');
+          const sinImagen = document.getElementById('sinImagen');
+          
+          if (!imgPrevia || !sinImagen || !contenedorImagenes) return;
+          
+          if (urlMolde && urlMolde.trim() !== '') {
+            imgPrevia.src = urlMolde;
+            contenedorImagenes.style.display = 'inline-block';
+            sinImagen.style.display = 'none';
+            
+            imgPrevia.onerror = function() {
+              contenedorImagenes.style.display = 'none';
+              sinImagen.style.display = 'block';
+              sinImagen.textContent = 'Error al cargar la imagen del molde';
+            };
+            
+            // Manejar imagen del mosaico si existe
+            if (imgMosaicoPrevia && urlMosaico && urlMosaico.trim() !== '') {
+              imgMosaicoPrevia.src = urlMosaico;
+              imgMosaicoPrevia.style.display = 'block';
+              
+              imgMosaicoPrevia.onerror = function() {
+                imgMosaicoPrevia.style.display = 'none';
+              };
+            } else if (imgMosaicoPrevia) {
+              imgMosaicoPrevia.style.display = 'none';
+            }
+          } else {
+            contenedorImagenes.style.display = 'none';
+            sinImagen.style.display = 'block';
+            sinImagen.textContent = 'No hay imagen para mostrar';
+          }
+        }
+        
+        // 7. Función para cargar subcategorías dinámicamente en modal
+        async function cargarSubcategorias() {
+          const categoriaSeleccionada = document.getElementById('productoCategoria').value;
+          const selectSubcategoria = document.getElementById('productoSubcategoria');
+          
+          if (selectSubcategoria) {
+            selectSubcategoria.innerHTML = '<option value="">Selecciona una subcategoría</option>';
+          }
+          
+          if (!categoriaSeleccionada) return;
+          
+          try {
+            const response = await fetch('/subcategorias');
+            const todasSubcategorias = await response.json();
+            
+            // Filtrar subcategorías por categoría
+            const categoria = categorias.find(c => c.nombre === categoriaSeleccionada);
+            if (categoria && selectSubcategoria) {
+              const subcategoriasFiltered = todasSubcategorias.filter(s => s.categoria_id === categoria.id);
+              
+              // Eliminar duplicados por nombre usando Set
+              const nombresUnicos = new Set();
+              const subcategoriasUnicas = [];
+              
+              subcategoriasFiltered.forEach(subcategoria => {
+                if (!nombresUnicos.has(subcategoria.nombre)) {
+                  nombresUnicos.add(subcategoria.nombre);
+                  subcategoriasUnicas.push(subcategoria);
+                }
+              });
+              
+              subcategoriasUnicas.forEach(subcategoria => {
+                const option = new Option(subcategoria.nombre, subcategoria.nombre);
+                selectSubcategoria.add(option);
+              });
+            }
+          } catch (error) {
+            console.error('Error cargando subcategorías:', error);
+          }
+        }
+        
+        // 7b. Función para actualizar filtro de subcategorías
+        async function actualizarFiltroSubcategorias() {
+          const categoriaSeleccionada = document.getElementById('filtroCategoria');
+          const filtroSubcategoria = document.getElementById('filtroSubcategoria');
+          
+          // Verificar que los elementos existan antes de continuar
+          if (!categoriaSeleccionada || !filtroSubcategoria) {
+            console.log('Elementos de filtro no encontrados - probablemente no estamos en la vista de productos');
+            return;
+          }
+          
+          const categoriaValue = categoriaSeleccionada.value;
+          
+          // Limpiar completamente el select
+          filtroSubcategoria.innerHTML = '';
+          
+          // Agregar la opción por defecto
+          const defaultOption = document.createElement('option');
+          defaultOption.value = '';
+          defaultOption.textContent = 'Todas las subcategorías';
+          filtroSubcategoria.appendChild(defaultOption);
+          
+          try {
+            const response = await fetch('/subcategorias');
+            const todasSubcategorias = await response.json();
+            
+            let subcategoriasParaMostrar = todasSubcategorias;
+            
+            if (categoriaValue) {
+              // Filtrar subcategorías por categoría seleccionada
+              const categoria = categorias.find(c => c.nombre === categoriaValue);
+              if (categoria) {
+                subcategoriasParaMostrar = todasSubcategorias.filter(s => s.categoria_id === categoria.id);
+              }
+            }
+            
+            // Eliminar duplicados por nombre usando Set
+            const nombresUnicos = new Set();
+            const subcategoriasUnicas = [];
+            
+            subcategoriasParaMostrar.forEach(subcategoria => {
+              if (!nombresUnicos.has(subcategoria.nombre)) {
+                nombresUnicos.add(subcategoria.nombre);
+                subcategoriasUnicas.push(subcategoria);
+              }
+            });
+            
+            // Agregar las subcategorías únicas
+            subcategoriasUnicas.forEach(subcategoria => {
+              const option = document.createElement('option');
+              option.value = subcategoria.nombre;
+              option.textContent = subcategoria.nombre;
+              filtroSubcategoria.appendChild(option);
+            });
+            
+          } catch (error) {
+            console.error('Error cargando subcategorías del filtro:', error);
+          }
+        }
+        
+        // 8. Función para guardar producto
+        async function guardarProducto() {
+          const formProducto = document.getElementById('formProducto');
+          if (!formProducto) return;
+          
+          const formData = new FormData(formProducto);
+          const productoData = Object.fromEntries(formData);
+          
+          try {
+            const url = productoEditando ? `/productos/${productoEditando}` : '/productos';
+            const method = productoEditando ? 'PUT' : 'POST';
+            
+            const response = await fetch(url, {
+              method: method,
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(productoData)
+            });
+            
+            const result = await response.json();
+            
+            if (response.ok) {
+              if (typeof $ !== 'undefined' && $('#modalProducto').length) {
+                $('#modalProducto').modal('hide');
+              }
+              // Recargar productos
+              const response2 = await fetch('/productos');
+              productos = await response2.json();
+              mostrarProductos(productos);
+              showSuccessToast('🎉 Producto guardado exitosamente');
+            } else {
+              showErrorToast('Error al guardar: ' + result.message);
+            }
+          } catch (error) {
+            console.error('Error:', error);
+            showErrorToast('Error al guardar el producto');
+          }
+        }
+        
+        // 9. Función para editar producto
+        function editarProducto(id) {
+          const producto = productos.find(p => p.id === id);
+          if (!producto) return;
+          
+          productoEditando = id;
+          
+          const modalTitle = document.getElementById('modalProductoTitle');
+          const productoIdInput = document.getElementById('productoId');
+          const productoNombre = document.getElementById('productoNombre');
+          const productoDescripcion = document.getElementById('productoDescripcion');
+          const productoCategoria = document.getElementById('productoCategoria');
+          const productoPrecio = document.getElementById('productoPrecio');
+          const productoImagen = document.getElementById('productoImagen');
+          const productoImagenMosaico = document.getElementById('productoImagenMosaico');
+          const productoPdf = document.getElementById('productoPdf');
+          
+          if (modalTitle) modalTitle.textContent = 'Editar Producto';
+          if (productoIdInput) productoIdInput.value = producto.id;
+          if (productoNombre) productoNombre.value = producto.nombre;
+          if (productoDescripcion) productoDescripcion.value = producto.descripcion || '';
+          if (productoCategoria) productoCategoria.value = producto.categoria;
+          if (productoPrecio) productoPrecio.value = producto.precio || '';
+          if (productoImagen) productoImagen.value = producto.imagen_url || '';
+          if (productoImagenMosaico) productoImagenMosaico.value = producto.imagen_mosaico_url || '';
+          if (productoPdf) productoPdf.value = producto.pdf_url || '';
+          
+          // Cargar subcategorías y seleccionar la correcta
+          cargarSubcategorias().then(() => {
+            const productoSubcategoria = document.getElementById('productoSubcategoria');
+            if (productoSubcategoria) {
+              productoSubcategoria.value = producto.subcategoria;
+            }
+          });
+          
+          mostrarVistaPrevia(producto.imagen_url || '', producto.imagen_mosaico_url || '');
+          
+          if (typeof $ !== 'undefined' && $('#modalProducto').length) {
+            $('#modalProducto').modal('show');
+          }
+        }
+        
+        // 10. Función para eliminar producto
+        async function eliminarProducto(id) {
+          if (!confirm('¿Estás seguro de que quieres eliminar este producto?')) {
+            return;
+          }
+          
+          try {
+            const response = await fetch(`/productos/${id}`, {
+              method: 'DELETE'
+            });
+            
+            if (response.ok) {
+              // Recargar productos
+              const response2 = await fetch('/productos');
+              productos = await response2.json();
+              mostrarProductos(productos);
+              showSuccessToast('🗑️ Producto eliminado exitosamente');
+            } else {
+              showErrorToast('Error al eliminar el producto');
+            }
+          } catch (error) {
+            console.error('Error:', error);
+            showErrorToast('Error al eliminar el producto');
+          }
+        }
+        
+        // 11. Configurar event listeners
+        const btnNuevoProducto = document.getElementById('btnNuevoProducto');
+        if (btnNuevoProducto) {
+          btnNuevoProducto.addEventListener('click', function() {
+            mostrarModalProducto();
+          });
+        }
+        
+        // Event listeners para los filtros (ya declarados arriba)
+        const filtroSubcategoria = document.getElementById('filtroSubcategoria');
+        const buscarProducto = document.getElementById('buscarProducto');
+        
+        if (filtroCategoria) {
+          filtroCategoria.addEventListener('change', function() {
+            actualizarFiltroSubcategorias();
+            filtrarProductos();
+          });
+        }
+        
+        if (filtroSubcategoria) {
+          filtroSubcategoria.addEventListener('change', filtrarProductos);
+        }
+        
+        if (buscarProducto) {
+          buscarProducto.addEventListener('input', filtrarProductos);
+        }
+        
+        // Configurar botones de filtro rápido
+        const filtroTodos = document.getElementById('filtroTodos');
+        const filtro20x20 = document.getElementById('filtro20x20');
+        const filtro40x40 = document.getElementById('filtro40x40');
+        const filtro50x50 = document.getElementById('filtro50x50');
+        
+        if (filtroTodos) {
+          filtroTodos.addEventListener('click', function() {
+            // Resetear todos los filtros
+            if (filtroCategoria) filtroCategoria.value = '';
+            if (filtroSubcategoria) filtroSubcategoria.value = '';
+            if (buscarProducto) buscarProducto.value = '';
+            
+            // Actualizar botones activos
+            document.querySelectorAll('.btn-group .btn').forEach(btn => btn.classList.remove('active'));
+            this.classList.add('active');
+            
+            // Cargar todos los productos
+            cargarProductos();
+          });
+        }
+        
+        if (filtro20x20) {
+          filtro20x20.addEventListener('click', async function() {
+            try {
+              // Actualizar botones activos
+              document.querySelectorAll('.btn-group .btn').forEach(btn => btn.classList.remove('active'));
+              this.classList.add('active');
+              
+              // Cargar productos específicos de línea 20x20
+              const response = await fetch('/productos/linea/20x20');
+              if (response.ok) {
+                const productosLinea = await response.json();
+                productos = productosLinea;
+                mostrarProductos(productos);
+              } else {
+                throw new Error('Error al cargar productos 20x20');
+              }
+            } catch (error) {
+              console.error('Error cargando productos 20x20:', error);
+              showErrorToast('Error al cargar productos de línea 20x20');
+            }
+          });
+        }
+        
+        if (filtro40x40) {
+          filtro40x40.addEventListener('click', async function() {
+            try {
+              // Actualizar botones activos
+              document.querySelectorAll('.btn-group .btn').forEach(btn => btn.classList.remove('active'));
+              this.classList.add('active');
+              
+              // Cargar productos específicos de zócalos 40x40
+              const response = await fetch('/productos/linea/40x40');
+              if (response.ok) {
+                const productosLinea = await response.json();
+                productos = productosLinea;
+                mostrarProductos(productos);
+              } else {
+                throw new Error('Error al cargar productos 40x40');
+              }
+            } catch (error) {
+              console.error('Error cargando productos 40x40:', error);
+              showErrorToast('Error al cargar productos de zócalos 40x40');
+            }
+          });
+        }
+        
+        if (filtro50x50) {
+          filtro50x50.addEventListener('click', async function() {
+            try {
+              // Actualizar botones activos
+              document.querySelectorAll('.btn-group .btn').forEach(btn => btn.classList.remove('active'));
+              this.classList.add('active');
+              
+              // Cargar productos específicos de zócalos 50x50
+              const response = await fetch('/productos/linea/50x50');
+              if (response.ok) {
+                const productosLinea = await response.json();
+                productos = productosLinea;
+                mostrarProductos(productos);
+              } else {
+                throw new Error('Error al cargar productos 50x50');
+              }
+            } catch (error) {
+              console.error('Error cargando productos 50x50:', error);
+              showErrorToast('Error al cargar productos de zócalos 50x50');
+            }
+          });
+        }
+        
+        // Configurar cambio de categoria en el modal
+        const productoCategoria = document.getElementById('productoCategoria');
+        if (productoCategoria) {
+          productoCategoria.addEventListener('change', cargarSubcategorias);
+        }
+        
+        // Configurar vista previa de imagen
+        const productoImagen = document.getElementById('productoImagen');
+        const productoImagenMosaico = document.getElementById('productoImagenMosaico');
+        
+        function actualizarVistaPrevia() {
+          const productoImagen = document.getElementById('productoImagen');
+          const productoImagenMosaico = document.getElementById('productoImagenMosaico');
+          const urlMolde = productoImagen ? productoImagen.value : '';
+          const urlMosaico = productoImagenMosaico ? productoImagenMosaico.value : '';
+          mostrarVistaPrevia(urlMolde, urlMosaico);
+        }
+        
+        const productoImagen = document.getElementById('productoImagen');
+        const productoImagenMosaico = document.getElementById('productoImagenMosaico');
+        
+        if (productoImagen) {
+          productoImagen.addEventListener('input', actualizarVistaPrevia);
+        }
+        
+        if (productoImagenMosaico) {
+          productoImagenMosaico.addEventListener('input', actualizarVistaPrevia);
+        }
+        
+        // Configurar formulario
+        const formProducto = document.getElementById('formProducto');
+        if (formProducto) {
+          formProducto.addEventListener('submit', function(e) {
+            e.preventDefault();
+            guardarProducto();
+          });
+        }
+        
+        console.log('=== Componente productos inicializado correctamente ===');
+      }
+
+      function getProductosHTML() {
+        return `
+          <div class="container-fluid">
+            <div class="row">
+              <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                  <h2>Gestión de Productos</h2>
+                  <button class="btn btn-primary" onclick="mostrarModalProducto()">
+                    <i class="fa fa-plus"></i> Nuevo Producto
+                  </button>
+                </div>
+                
+                <!-- Filtros -->
+                <div class="card mb-4">
+                  <div class="card-body">
+                    <div class="row">
+                      <div class="col-md-4">
+                        <label for="filtroCategoria">Categoría</label>
+                        <select id="filtroCategoria" class="form-control" onchange="actualizarSubcategorias(); filtrarProductos()">
+                          <option value="">Todas las categorías</option>
+                        </select>
+                      </div>
+                      <div class="col-md-4">
+                        <label for="filtroSubcategoria">Subcategoría</label>
+                        <select id="filtroSubcategoria" class="form-control" onchange="filtrarProductos()">
+                          <option value="">Todas las subcategorías</option>
+                        </select>
+                      </div>
+                      <div class="col-md-4">
+                        <label for="buscarProducto">Buscar</label>
+                        <div class="input-group">
+                          <input type="text" id="buscarProducto" class="form-control" placeholder="Buscar producto..." onkeyup="filtrarProductos()">
+                          <div class="input-group-append">
+                            <button class="btn btn-outline-secondary" type="button" onclick="limpiarFiltros()" title="Limpiar filtros">
+                              <i class="fa fa-refresh"></i>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Tabla de productos -->
+                <div class="card">
+                  <div class="card-body">
+                    <div class="table-responsive">
+                      <table class="table table-striped">
+                        <thead>
+                          <tr>
+                            <th>ID</th>
+                            <th>Imagen</th>
+                            <th>Nombre</th>
+                            <th>Categoría</th>
+                            <th>Subcategoría</th>
+                            <th>Precio</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                          </tr>
+                        </thead>
+                        <tbody id="tablaProductos">
+                          <!-- Los productos se cargarán aquí -->
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      function initProductosScript() {
+        console.log('initProductosScript called - loading data directly');
+        
+        // Cargar categorías, subcategorías y productos
+        cargarCategorias();
+        cargarSubcategorias();
+        cargarProductos();
+      }
+      
+      // Funciones del ABM de productos
+      function cargarCategorias() {
+        fetch('/categorias')
+          .then(response => response.json())
+          .then(categorias => {
+            const selectCategoria = document.getElementById('filtroCategoria');
+            if (selectCategoria) {
+              categorias.forEach(categoria => {
+                const option = document.createElement('option');
+                option.value = categoria.nombre;
+                option.textContent = categoria.nombre;
+                selectCategoria.appendChild(option);
+              });
+            }
+          })
+          .catch(error => console.error('Error cargando categorías:', error));
+      }
+      
+      function cargarSubcategorias(categoriaSeleccionada = null) {
+        const selectSubcategoria = document.getElementById('filtroSubcategoria');
+        if (!selectSubcategoria) return;
+        
+        // Limpiar opciones existentes excepto la primera
+        selectSubcategoria.innerHTML = '<option value="">Todas las subcategorías</option>';
+        
+        let url = '/subcategorias';
+        if (categoriaSeleccionada) {
+          // Buscar el ID de la categoría seleccionada
+          fetch('/categorias')
+            .then(response => response.json())
+            .then(categorias => {
+              const categoria = categorias.find(cat => cat.nombre === categoriaSeleccionada);
+              if (categoria) {
+                url += `?categoria_id=${categoria.id}`;
+              }
+              
+              fetch(url)
+                .then(response => response.json())
+                .then(subcategorias => {
+                  subcategorias.forEach(subcategoria => {
+                    const option = document.createElement('option');
+                    option.value = subcategoria.nombre;
+                    option.textContent = subcategoria.nombre;
+                    selectSubcategoria.appendChild(option);
+                  });
+                })
+                .catch(error => console.error('Error cargando subcategorías:', error));
+            });
+        } else {
+          // Cargar todas las subcategorías
+          fetch(url)
+            .then(response => response.json())
+            .then(subcategorias => {
+              subcategorias.forEach(subcategoria => {
+                const option = document.createElement('option');
+                option.value = subcategoria.nombre;
+                option.textContent = subcategoria.nombre;
+                selectSubcategoria.appendChild(option);
+              });
+            })
+            .catch(error => console.error('Error cargando subcategorías:', error));
+        }
+      }
+      
+      // Variables para evitar cargas múltiples
+      let cargandoProductos = false;
+      let filtrandoProductos = false;
+      
+      function cargarProductos() {
+        if (cargandoProductos) return;
+        cargandoProductos = true;
+        
+        fetch('/productos')
+          .then(response => response.json())
+          .then(productos => {
+            console.log('Productos cargados:', productos.length);
+            console.log('Primer producto:', productos[0]);
+            mostrarProductos(productos);
+          })
+          .catch(error => {
+            console.error('Error cargando productos:', error);
+            const tabla = document.getElementById('tablaProductos');
+            if (tabla) {
+              tabla.innerHTML = '<tr><td colspan="8" class="text-center text-danger">Error cargando productos</td></tr>';
+            }
+          })
+          .finally(() => {
+            cargandoProductos = false;
+          });
+      }
+      
+      function mostrarProductos(productos) {
+        const tabla = document.getElementById('tablaProductos');
+        if (!tabla) return;
+        
+        // Limpiar tabla explícitamente
+        tabla.innerHTML = '';
+        
+        console.log('Mostrando productos:', productos.length);
+        if (productos.length > 0) {
+          console.log('Primer producto:', productos[0]);
+        }
+        
+        if (productos.length === 0) {
+          tabla.innerHTML = '<tr><td colspan="8" class="text-center">No hay productos disponibles</td></tr>';
+          return;
+        }
+        
+        // Crear filas de productos de manera más segura
+        const filas = productos.map(producto => `
+          <tr>
+            <td>${producto.id}</td>
+            <td>
+              ${producto.imagen_url ? 
+                `<img src="${producto.imagen_url}" alt="${producto.nombre}" 
+                     style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px; border: 1px solid #ddd;" 
+                     onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'60\\' height=\\'60\\' viewBox=\\'0 0 24 24\\' fill=\\'%23ccc\\'%3E%3Cpath d=\\'M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z\\'/%3E%3C/svg%3E'; this.title='Error cargando imagen';">` : 
+                '<div style="width: 60px; height: 60px; background: #f8f9fa; border: 1px solid #ddd; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #6c757d; font-size: 12px;">Sin imagen</div>'
+              }
+            </td>
+            <td><strong>${producto.nombre}</strong></td>
+            <td><span class="badge badge-info">${producto.categoria || 'Sin categoría'}</span></td>
+            <td><span class="badge badge-secondary">${producto.subcategoria || 'Sin subcategoría'}</span></td>
+            <td><strong>$${parseFloat(producto.precio || 0).toFixed(2)}</strong></td>
+            <td><span class="badge badge-success">Activo</span></td>
+            <td>
+              <button class="btn btn-sm btn-outline-primary" onclick="editarProducto(${producto.id})" title="Editar">
+                <i class="fa fa-edit"></i>
+              </button>
+              <button class="btn btn-sm btn-outline-danger ml-1" onclick="eliminarProducto(${producto.id})" title="Eliminar">
+                <i class="fa fa-trash"></i>
+              </button>
+            </td>
+          </tr>
+        `).join('');
+        
+        tabla.innerHTML = filas;
+      }
+      
+      function filtrarProductos() {
+        if (filtrandoProductos) return;
+        filtrandoProductos = true;
+        
+        // Obtener valores de los filtros
+        const categoria = document.getElementById('filtroCategoria').value;
+        const subcategoria = document.getElementById('filtroSubcategoria').value;
+        const busqueda = document.getElementById('buscarProducto').value.toLowerCase();
+        
+        console.log('🔍 Filtrando productos:', { categoria, subcategoria, busqueda });
+        
+        // Cargar productos y aplicar filtros
+        fetch('/productos')
+          .then(response => response.json())
+          .then(productos => {
+            console.log('📦 Productos recibidos:', productos.length);
+            let productosFiltrados = productos;
+            
+            // Filtrar por categoría
+            if (categoria && categoria !== '') {
+              productosFiltrados = productosFiltrados.filter(p => {
+                const match = p.categoria === categoria;
+                if (!match) console.log(`❌ Producto ${p.nombre} no coincide con categoría ${categoria} (tiene: ${p.categoria})`);
+                return match;
+              });
+              console.log(`📊 Después de filtrar por categoría "${categoria}": ${productosFiltrados.length} productos`);
+            }
+            
+            // Filtrar por subcategoría
+            if (subcategoria && subcategoria !== '') {
+              productosFiltrados = productosFiltrados.filter(p => 
+                p.subcategoria === subcategoria
+              );
+              console.log(`📊 Después de filtrar por subcategoría "${subcategoria}": ${productosFiltrados.length} productos`);
+            }
+            
+            // Filtrar por búsqueda de texto
+            if (busqueda && busqueda !== '') {
+              productosFiltrados = productosFiltrados.filter(p => 
+                p.nombre.toLowerCase().includes(busqueda) ||
+                (p.descripcion && p.descripcion.toLowerCase().includes(busqueda))
+              );
+              console.log(`📊 Después de filtrar por búsqueda "${busqueda}": ${productosFiltrados.length} productos`);
+            }
+            
+            console.log(`✅ Productos filtrados: ${productosFiltrados.length} de ${productos.length}`);
+            mostrarProductos(productosFiltrados);
+          })
+          .catch(error => {
+            console.error('❌ Error filtrando productos:', error);
+          })
+          .finally(() => {
+            filtrandoProductos = false;
+          });
+      }
+      
+      function limpiarFiltros() {
+        console.log('🧹 Limpiando filtros...');
+        document.getElementById('filtroCategoria').value = '';
+        document.getElementById('filtroSubcategoria').value = '';
+        document.getElementById('buscarProducto').value = '';
+        cargarSubcategorias(); // Recargar todas las subcategorías
+        cargarProductos(); // Cargar todos los productos
+      }
+      
+      function mostrarModalProducto() {
+        alert('Modal de producto - Por implementar');
+      }
+      
+      function editarProducto(id) {
+        alert('Editar producto ' + id + ' - Por implementar');
+      }
+      
+      function eliminarProducto(id) {
+        if (confirm('¿Estás seguro de que quieres eliminar este producto?')) {
+          alert('Eliminar producto ' + id + ' - Por implementar');
+        }
+      }
+
+      // ========= Componente de Promociones =========
+      async function loadPromocionesComponent() {
+        try {
+          console.log('Fetching promociones component...');
+          const response = await fetch('/admin/component/promociones');
+          
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          
+          const html = await response.text();
+          contentArea.innerHTML = html;
+          console.log('Promociones component loaded successfully');
+          
+          // Inicializar event listeners después de cargar el componente
+          setTimeout(() => {
+            if (typeof window.inicializarPromociones === 'function') {
+              console.log('🔄 Inicializando promociones después de carga dinámica...');
+              window.inicializarPromociones();
+            } else {
+              console.log('⚠️ Función inicializarPromociones no disponible, intentando inicialización manual...');
+              // Fallback: intentar inicializar directamente
+              if (typeof inicializarPromocionesEventListeners === 'function') {
+                inicializarPromocionesEventListeners();
+                if (typeof cargarPromociones === 'function') {
+                  cargarPromociones();
+                }
+              }
+            }
+          }, 100);
+          
+        } catch (error) {
+          console.error('Error loading promociones component:', error);
+          contentArea.innerHTML = `
+            <div class="alert alert-danger">
+              <h4>Error al cargar el componente de promociones</h4>
+              <p>No se pudo cargar el componente de promociones. Error: ${error.message}</p>
+              <p>Verifica que el archivo /components/promociones.html existe y el servidor está funcionando correctamente.</p>
+            </div>
+          `;
+        }
+      }
+
+      // Manejar clics en enlaces dentro del contenido dinámico
+      document.addEventListener('click', function(e) {
+        if (e.target && e.target.matches('a[data-section]')) {
+          const section = e.target.getAttribute('data-section');
+          const sidebarLink = document.querySelector(`#adminSidebar a[data-section="${section}"]`);
+          if (sidebarLink) {
+            sidebarLink.click();
+          }
+        }
+      });
+
+      // Manejar navegación con hash
+      // ========= Componente de Testimonios =========
+      async function loadTestimoniosComponent() {
+        try {
+          console.log('Fetching testimonios component...');
+          const response = await fetch('/admin/component/testimonios');
+          
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          
+          const html = await response.text();
+          contentArea.innerHTML = html;
+          console.log('Testimonios component loaded successfully');
+          
+          // Inicializar funcionalidad del componente después de cargar
+          setTimeout(() => {
+            console.log('Iniciando carga de testimonios...');
+            initComponenteTestimonios();
+          }, 100);
+          
+        } catch (error) {
+          console.error('Error loading testimonios component:', error);
+          contentArea.innerHTML = `
+            <div class="alert alert-danger">
+              <h4>Error al cargar el componente de testimonios</h4>
+              <p>No se pudo cargar el componente de testimonios. Error: ${error.message}</p>
+              <p>Verifica que el archivo /components/testimonios.html existe y el servidor está funcionando correctamente.</p>
+            </div>
+          `;
+        }
+      }
+
+      // Función para inicializar completamente el componente testimonios
+      async function initComponenteTestimonios() {
+        console.log('=== Iniciando componente testimonios ===');
+        
+        // Variables locales para el componente
+        let testimonios = [];
+        let testimonioEditando = null;
+        
+        // 1. Cargar testimonios al inicializar
+        await cargarTestimonios();
+        
+        // 2. Event listeners del formulario
+        const formTestimonio = document.getElementById('formTestimonio');
+        if (formTestimonio) {
+          formTestimonio.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            await guardarTestimonio();
+          });
+        }
+        
+        // 3. Event listeners de filtros
+        const buscarTestimonio = document.getElementById('buscarTestimonio');
+        const filtroEstado = document.getElementById('filtroEstado');
+        
+        if (buscarTestimonio) {
+          buscarTestimonio.addEventListener('input', filtrarTestimonios);
+        }
+        
+        if (filtroEstado) {
+          filtroEstado.addEventListener('change', filtrarTestimonios);
+        }
+        
+        // 4. Contador de caracteres en textarea
+        const testimonioTexto = document.getElementById('testimonioTexto');
+        const contadorCaracteres = document.getElementById('contadorCaracteres');
+        
+        if (testimonioTexto && contadorCaracteres) {
+          testimonioTexto.addEventListener('input', function() {
+            contadorCaracteres.textContent = this.value.length;
+            if (this.value.length > 450) {
+              contadorCaracteres.style.color = '#dc3545';
+            } else {
+              contadorCaracteres.style.color = '#6c757d';
+            }
+          });
+        }
+        
+        // 5. Resetear modal al cerrarse
+        $('#modalTestimonio').on('hidden.bs.modal', function() {
+          resetearFormulario();
+        });
+        
+        // Funciones del componente
+        async function cargarTestimonios() {
+          try {
+            console.log('Cargando testimonios...');
+            const response = await fetch('/testimonios/admin');
+            testimonios = await response.json();
+            mostrarTestimonios(testimonios);
+            console.log('Testimonios cargados:', testimonios.length);
+          } catch (error) {
+            console.error('Error cargando testimonios:', error);
+            const tbody = document.getElementById('tablaTestimonios');
+            if (tbody) {
+              tbody.innerHTML = '<tr><td colspan="8" class="text-center text-danger">Error al cargar testimonios</td></tr>';
+            }
+          }
+        }
+        
+        function mostrarTestimonios(testimoniosAMostrar) {
+          const tbody = document.getElementById('tablaTestimonios');
+          if (!tbody) return;
+          
+          tbody.innerHTML = '';
+          
+          if (testimoniosAMostrar.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7" class="text-center">No hay testimonios para mostrar</td></tr>';
+            return;
+          }
+          
+          testimoniosAMostrar.forEach(testimonio => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+              <td>
+                <span class="badge badge-secondary">${testimonio.orden}</span>
+              </td>
+              <td>
+                <strong>${testimonio.nombre}</strong>
+              </td>
+              <td>
+                <i class="fa fa-building text-muted mr-1"></i>
+                ${testimonio.empresa}
+              </td>
+              <td>
+                <div class="testimonio-texto" title="${testimonio.testimonio}">
+                  ${testimonio.testimonio}
+                </div>
+              </td>
+              <td>
+                <span class="badge ${testimonio.activo ? 'badge-activo' : 'badge-inactivo'}">
+                  ${testimonio.activo ? 'Activo' : 'Inactivo'}
+                </span>
+              </td>
+              <td>
+                <small class="text-muted">
+                  ${new Date(testimonio.fecha_creacion).toLocaleDateString()}
+                </small>
+              </td>
+              <td>
+                <div class="btn-group btn-group-sm" role="group">
+                  <button type="button" class="btn btn-primary btn-sm" onclick="editarTestimonio(${testimonio.id})" title="Editar testimonio">
+                    <i class="fa fa-edit mr-1"></i>Editar
+                  </button>
+                  <button type="button" class="btn btn-danger btn-sm ml-1" onclick="eliminarTestimonio(${testimonio.id})" title="Eliminar testimonio">
+                    <i class="fa fa-trash mr-1"></i>Eliminar
+                  </button>
+                </div>
+              </td>
+            `;
+            tbody.appendChild(row);
+          });
+        }
+        
+        function filtrarTestimonios() {
+          const buscar = (document.getElementById('buscarTestimonio')?.value || '').toLowerCase();
+          const estado = document.getElementById('filtroEstado')?.value;
+          
+          let testimoniosFiltrados = testimonios;
+          
+          if (buscar) {
+            testimoniosFiltrados = testimoniosFiltrados.filter(t => 
+              t.nombre.toLowerCase().includes(buscar) ||
+              t.empresa.toLowerCase().includes(buscar) ||
+              t.testimonio.toLowerCase().includes(buscar)
+            );
+          }
+          
+          if (estado !== '') {
+            testimoniosFiltrados = testimoniosFiltrados.filter(t => 
+              t.activo.toString() === estado
+            );
+          }
+          
+          mostrarTestimonios(testimoniosFiltrados);
+        }
+        
+        async function guardarTestimonio() {
+          // Prevenir múltiples envíos
+          const btnGuardar = document.querySelector('#formTestimonio button[type="submit"]');
+          if (btnGuardar.disabled) {
+            return; // Ya se está procesando
+          }
+          
+          btnGuardar.disabled = true;
+          const textoOriginal = btnGuardar.innerHTML;
+          btnGuardar.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Guardando...';
+          
+          try {
+            const id = document.getElementById('testimonioId').value;
+            const nombre = document.getElementById('testimonioNombre').value;
+            const empresa = document.getElementById('testimonioEmpresa').value;
+            const testimonio = document.getElementById('testimonioTexto').value;
+            const imagen = document.getElementById('testimonioImagen').value;
+            const orden = parseInt(document.getElementById('testimonioOrden').value) || 1;
+            const activo = document.getElementById('testimonioActivo').checked ? 1 : 0;
+            
+            if (!nombre || !empresa || !testimonio) {
+              alert('Por favor complete todos los campos requeridos');
+              return;
+            }
+            
+            const datos = {
+              nombre,
+              empresa,
+              testimonio,
+              imagen,
+              orden,
+              activo
+            };
+            
+            let response;
+            if (id) {
+              // Actualizar
+              response = await fetch(`/testimonios/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(datos)
+              });
+            } else {
+              // Crear
+              response = await fetch('/testimonios', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(datos)
+              });
+            }
+            
+            if (response.ok) {
+              $('#modalTestimonio').modal('hide');
+              await cargarTestimonios();
+              alert(id ? 'Testimonio actualizado exitosamente' : 'Testimonio creado exitosamente');
+            } else {
+              const error = await response.json();
+              alert('Error: ' + (error.error || 'Error desconocido'));
+            }
+          } catch (error) {
+            console.error('Error guardando testimonio:', error);
+            alert('Error al guardar el testimonio');
+          } finally {
+            // Restaurar el botón
+            btnGuardar.disabled = false;
+            btnGuardar.innerHTML = textoOriginal;
+          }
+        }
+        
+        window.editarTestimonio = function(id) {
+          const testimonio = testimonios.find(t => t.id === id);
+          if (!testimonio) return;
+          
+          testimonioEditando = testimonio;
+          
+          document.getElementById('testimonioId').value = testimonio.id;
+          document.getElementById('testimonioNombre').value = testimonio.nombre;
+          document.getElementById('testimonioEmpresa').value = testimonio.empresa;
+          document.getElementById('testimonioTexto').value = testimonio.testimonio;
+          document.getElementById('testimonioImagen').value = testimonio.imagen;
+          document.getElementById('testimonioOrden').value = testimonio.orden;
+          document.getElementById('testimonioActivo').checked = testimonio.activo;
+          
+          // Actualizar contador de caracteres
+          const contadorCaracteres = document.getElementById('contadorCaracteres');
+          if (contadorCaracteres) {
+            contadorCaracteres.textContent = testimonio.testimonio.length;
+          }
+          
+          document.getElementById('modalTitle').textContent = 'Editar Testimonio';
+          document.getElementById('btnGuardarTexto').textContent = 'Actualizar Testimonio';
+          
+          $('#modalTestimonio').modal('show');
+        };
+        
+        window.eliminarTestimonio = async function(id) {
+          const testimonio = testimonios.find(t => t.id === id);
+          if (!testimonio) return;
+          
+          if (!confirm(`¿Está seguro de eliminar el testimonio de ${testimonio.nombre}?`)) {
+            return;
+          }
+          
+          try {
+            const response = await fetch(`/testimonios/${id}`, {
+              method: 'DELETE'
+            });
+            
+            if (response.ok) {
+              await cargarTestimonios();
+              alert('Testimonio eliminado exitosamente');
+            } else {
+              const error = await response.json();
+              alert('Error: ' + (error.error || 'Error desconocido'));
+            }
+          } catch (error) {
+            console.error('Error eliminando testimonio:', error);
+            alert('Error al eliminar el testimonio');
+          }
+        };
+        
+        function resetearFormulario() {
+          document.getElementById('formTestimonio').reset();
+          document.getElementById('testimonioId').value = '';
+          document.getElementById('testimonioImagen').value = 'img/clients/client-1.png';
+          document.getElementById('testimonioActivo').checked = true;
+          
+          const contadorCaracteres = document.getElementById('contadorCaracteres');
+          if (contadorCaracteres) {
+            contadorCaracteres.textContent = '0';
+            contadorCaracteres.style.color = '#6c757d';
+          }
+          
+          document.getElementById('modalTitle').textContent = 'Agregar Testimonio';
+          document.getElementById('btnGuardarTexto').textContent = 'Guardar Testimonio';
+          
+          testimonioEditando = null;
+        }
+        
+        // Función global para recargar testimonios
+        window.cargarTestimonios = cargarTestimonios;
+        
+        console.log('=== Componente testimonios inicializado correctamente ===');
+      }
+
+      function loadSectionFromHash() {
+        const hash = window.location.hash.substring(1); // Remover el #
+        if (hash) {
+          const sectionLink = document.querySelector(`#adminSidebar a[data-section="${hash}"]`);
+          if (sectionLink) {
+            sectionLink.click();
+            return;
+          }
+        }
+        // Si no hay hash o no se encuentra la sección, cargar dashboard por defecto
+        const dashboardLink = document.querySelector('#adminSidebar a[data-section="dashboard"]');
+        if (dashboardLink) {
+          dashboardLink.click();
+        }
+      }
+
+      // Escuchar cambios en el hash
+      window.addEventListener('hashchange', loadSectionFromHash);
+
+      // Cargar la sección según el hash inicial
+      loadSectionFromHash();
+    });
+  </script>
+
+  <!-- Contenedor para notificaciones toast -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

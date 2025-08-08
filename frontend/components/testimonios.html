@@ -1,0 +1,429 @@
+﻿<!-- Estilos minimalistas para testimonios -->
+<style>
+/* Estilos base para la tabla */
+.testimonios-component .table {
+  margin-bottom: 0;
+  font-size: 0.95rem;
+}
+
+.testimonios-component .table th,
+.testimonios-component .table td {
+  padding: 0.5rem 0.75rem;
+  vertical-align: middle;
+  border-top: 1px solid #dee2e6;
+  white-space: nowrap;
+  font-size: 0.9rem;
+}
+
+.testimonios-component .table th {
+  background-color: #f8f9fa;
+  border-bottom: 2px solid #dee2e6;
+  font-weight: 500;
+  font-size: 0.85rem;
+  color: #495057;
+  text-transform: none;
+  letter-spacing: normal;
+  padding: 0.5rem 0.75rem;
+}
+
+.testimonios-component .table-striped tbody tr:nth-of-type(odd) {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.testimonios-component .table tbody tr:hover {
+  background-color: inherit;
+}
+
+.testimonios-component .table-striped tbody tr:nth-of-type(odd):hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.testimonios-component .table-striped tbody tr:nth-of-type(even):hover {
+  background-color: transparent;
+}
+
+/* Estilos para modal minimalista y moderno */
+.testimonios-component .modal-content {
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+}
+
+.testimonios-component .modal-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 12px 12px 0 0;
+  padding: 1.5rem 2rem;
+}
+
+.testimonios-component .modal-title {
+  font-weight: 600;
+  font-size: 1.25rem;
+  display: flex;
+  align-items: center;
+}
+
+.testimonios-component .modal-title i {
+  margin-right: 0.75rem;
+  font-size: 1.5rem;
+  opacity: 0.9;
+}
+
+.testimonios-component .modal-header .close {
+  color: white;
+  opacity: 0.8;
+  font-size: 1.5rem;
+  text-shadow: none;
+  padding: 0;
+  background: none;
+  border: none;
+}
+
+.testimonios-component .modal-header .close:hover {
+  opacity: 1;
+  color: white;
+}
+
+.testimonios-component .modal-body {
+  padding: 2rem;
+  background-color: #fafafa;
+}
+
+.testimonios-component .form-group {
+  margin-bottom: 1.5rem;
+}
+
+.testimonios-component .form-group label {
+  font-weight: 600;
+  color: #4a5568;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  font-size: 0.9rem;
+}
+
+.testimonios-component .form-group label i {
+  margin-right: 0.5rem;
+  color: #667eea;
+  width: 16px;
+  text-align: center;
+}
+
+.testimonios-component .form-control {
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  transition: all 0.2s ease;
+  background-color: white;
+  font-size: 0.9rem;
+}
+
+.testimonios-component .form-control:focus {
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  outline: none;
+}
+
+.testimonios-component .form-text {
+  font-size: 0.8rem;
+  color: #718096;
+  margin-top: 0.25rem;
+}
+
+.testimonios-component .modal-footer {
+  padding: 1.5rem 2rem;
+  border: none;
+  background-color: #f7fafc;
+  border-radius: 0 0 12px 12px;
+}
+
+.testimonios-component .btn {
+  border-radius: 8px;
+  padding: 0.75rem 1.5rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.testimonios-component .btn-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+}
+
+.testimonios-component .btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.testimonios-component .btn-secondary {
+  background-color: #e2e8f0;
+  border: none;
+  color: #4a5568;
+}
+
+.testimonios-component .btn-secondary:hover {
+  background-color: #cbd5e0;
+  color: #2d3748;
+}
+
+.testimonios-component .card {
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.testimonios-component .table-responsive {
+  border-radius: 8px;
+}
+</style>
+
+<div class="container-fluid testimonios-component">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="mb-0">
+      <i class="fa fa-comments mr-2"></i>
+      Gestión de Testimonios
+    </h2>
+  </div>
+
+  <!-- Filtros y Búsqueda -->
+  <div class="card mb-4">
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-4">
+          <div class="form-group">
+            <label for="buscarTestimonio">Buscar:</label>
+            <input type="text" class="form-control" id="buscarTestimonio" placeholder="Nombre, empresa o testimonio...">
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="form-group">
+            <label for="filtroEstado">Estado:</label>
+            <select class="form-control" id="filtroEstado">
+              <option value="">Todos</option>
+              <option value="1">Activos</option>
+              <option value="0">Inactivos</option>
+            </select>
+          </div>
+        </div>
+        <div class="col-md-4 d-flex align-items-end">
+          <div class="form-group w-100">
+            <label>&nbsp;</label>
+            <div class="d-flex">
+              <button type="button" class="btn btn-info mr-2" onclick="cargarTestimonios()">
+                <i class="fa fa-refresh"></i> Actualizar
+              </button>
+              <button type="button" class="btn btn-success" data-toggle="modal" data-target="#modalTestimonio">
+                <i class="fa fa-plus"></i> Agregar Testimonio
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabla de Testimonios -->
+  <div class="card">
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>Orden</th>
+              <th>Nombre</th>
+              <th>Empresa</th>
+              <th>Testimonio</th>
+              <th>Estado</th>
+              <th>Fecha</th>
+              <th style="width: 180px;">Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="tablaTestimonios">
+            <tr>
+              <td colspan="7" class="text-center">
+                <div class="spinner-border" role="status">
+                  <span class="sr-only">Cargando...</span>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para Agregar/Editar Testimonio -->
+<div class="modal fade" id="modalTestimonio" tabindex="-1" role="dialog" aria-labelledby="modalTestimonioLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalTestimonioLabel">
+          <i class="fa fa-comment"></i>
+          <span id="modalTitle">Agregar Testimonio</span>
+        </h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+          <span>&times;</span>
+        </button>
+      </div>
+      <form id="formTestimonio">
+        <div class="modal-body">
+          <input type="hidden" id="testimonioId">
+          
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="testimonioNombre">
+                  <i class="fa fa-user"></i>Nombre *
+                </label>
+                <input type="text" class="form-control" id="testimonioNombre" required maxlength="100"
+                       placeholder="Ej: Juan Pérez">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="testimonioEmpresa">
+                  <i class="fa fa-building"></i>Empresa *
+                </label>
+                <input type="text" class="form-control" id="testimonioEmpresa" required maxlength="100"
+                       placeholder="Ej: Constructora ABC">
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="testimonioTexto">
+              <i class="fa fa-quote-left"></i>Testimonio *
+            </label>
+            <textarea class="form-control" id="testimonioTexto" rows="4" required maxlength="500" 
+                      placeholder="Escribe el testimonio del cliente..."></textarea>
+            <small class="form-text">
+              <i class="fa fa-info-circle"></i>
+              <span id="contadorCaracteres">0</span>/500 caracteres
+            </small>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="testimonioImagen">
+                  <i class="fa fa-image"></i>Imagen
+                </label>
+                <input type="text" class="form-control" id="testimonioImagen" 
+                       placeholder="img/clients/client-1.png" value="img/clients/client-1.png">
+                <small class="form-text">
+                  <i class="fa fa-camera"></i> Ruta de la imagen del cliente
+                </small>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="form-group">
+                <label for="testimonioOrden">
+                  <i class="fa fa-sort-numeric-asc"></i>Orden
+                </label>
+                <input type="number" class="form-control" id="testimonioOrden" min="1" max="100"
+                       placeholder="1">
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="form-group">
+                <label>
+                  <i class="fa fa-toggle-on"></i>Estado
+                </label>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="testimonioActivo" checked>
+                  <label class="form-check-label" for="testimonioActivo">
+                    ✅ Activo
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">
+            <i class="fa fa-times mr-1"></i>Cancelar
+          </button>
+          <button type="submit" class="btn btn-primary">
+            <i class="fa fa-save mr-1"></i><span id="btnGuardarTexto">Guardar Testimonio</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de confirmación para eliminar testimonio -->
+<div class="modal fade" id="deleteTestimonioConfirmModal" tabindex="-1" role="dialog" aria-labelledby="deleteTestimonioConfirmModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="deleteTestimonioConfirmModalLabel">
+                    <i class="fa fa-exclamation-triangle mr-2"></i>
+                    Confirmar eliminación
+                </h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="text-center">
+                    <div class="mb-3">
+                        <i class="fa fa-trash-o" style="font-size: 48px; color: #dc3545;"></i>
+                    </div>
+                    <h5 class="mb-3" id="deleteTestimonioMessage">¿Estás seguro de eliminar este testimonio?</h5>
+                    <p class="text-muted mb-0">Esta acción no se puede deshacer. El testimonio será eliminado permanentemente del sistema.</p>
+                </div>
+            </div>
+            <div class="modal-footer justify-content-center">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                    <i class="fa fa-times mr-1"></i> Cancelar
+                </button>
+                <button type="button" class="btn btn-danger ml-2" id="confirmDeleteTestimonioBtn">
+                    <i class="fa fa-trash-o mr-1"></i> Sí, eliminar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Estilos específicos para testimonios -->
+<style>
+.table td {
+  vertical-align: middle;
+}
+
+.testimonio-texto {
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.testimonio-imagen {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.badge-activo {
+  background-color: #28a745;
+}
+
+.badge-inactivo {
+  background-color: #6c757d;
+}
+
+.btn-group-sm .btn {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+}
+
+#contadorCaracteres {
+  font-weight: bold;
+}
+
+.form-text.text-muted {
+  font-size: 0.8rem;
+}
+</style>
+

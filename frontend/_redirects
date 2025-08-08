@@ -1,0 +1,16 @@
+# Archivo de configuración para Netlify
+
+# Redireccionamientos para SPA (Single Page Application)
+/*    /index.html   200
+
+# Redirecciones específicas
+/admin    /admin.html    200
+/productos    /index.html    200
+/contacto    /contacto.html    200
+
+# Headers de seguridad
+/*
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  X-XSS-Protection: 1; mode=block
+  Referrer-Policy: strict-origin-when-cross-origin

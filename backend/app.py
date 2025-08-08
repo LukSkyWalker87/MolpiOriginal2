@@ -1,0 +1,807 @@
+from flask import Flask, request, jsonify
+from flask_cors import CORS
+import os
+import sqlite3
+import json
+from datetime import datetime
+
+# ========= Configuración de Flask =========
+app = Flask(__name__)
+app.config['SECRET_KEY'] = 'molpi-secret-key-2025'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///molpi.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+# ========= CORS - Configuración para PythonAnywhere =========
+CORS(app, origins=[
+    "https://your-netlify-site.netlify.app",  # Cambiar por tu dominio de Netlify
+    "https://molpi.netlify.app",  # Ejemplo
+    "https://www.molpi.com.ar",   # Si usas dominio personalizado
+    "http://localhost:3000",       # Para desarrollo local
+    "http://127.0.0.1:3000"       # Para desarrollo local
+])
+
+# ========= Ruta de la base de datos =========
+DB_PATH = os.path.join(os.path.dirname(__file__), 'molpi.db')
+
+# ========= API ENDPOINTS =========
+
+@app.route('/api/health', methods=['GET'])
+def health_check():
+    """Endpoint para verificar que la API está funcionando"""
+    return jsonify({
+        'status': 'OK',
+        'message': 'Molpi API is running',
+        'timestamp': datetime.now().isoformat()
+    })
+
+# ========= Login =========
+@app.route('/api/login', methods=['POST'])
+def login():
+    """Endpoint de autenticación"""
+    data = request.get_json()
+    username = data.get('username')
+    password = data.get('password')
+    
+    if username == 'admin' and password == '1234':
+        return jsonify({'token': 'valid-token'}), 200
+    else:
+        return jsonify({'message': 'Credenciales inválidas'}), 401
+
+# ========= Productos =========
+@app.route('/api/productos', methods=['GET'])
+def get_productos():
+    """Obtener productos"""
+    categoria = request.args.get('categoria')
+    subcategoria = request.args.get('subcategoria')
+    incluir_inactivos = request.args.get('incluir_inactivos', 'false').lower() == 'true'
+    
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    
+    query = """
+        SELECT id, nombre, descripcion, pdf_url, imagen_url, imagen_mosaico_url, categoria, subcategoria, 
+               precio, precio_usd, activo, fecha_creacion, fecha_modificacion
+        FROM productos 
+    """
+    params = []
+    
+    if not incluir_inactivos:
+        query += "WHERE activo = 1"
+    else:
+        query += "WHERE 1=1"
+    
+    if categoria:
+        query += " AND categoria = ?"
+        params.append(categoria)
+    
+    if subcategoria:
+        query += " AND subcategoria = ?"
+        params.append(subcategoria)
+    
+    query += " ORDER BY fecha_creacion DESC"
+    
+    c.execute(query, params)
+    rows = c.fetchall()
+    conn.close()
+    
+    productos = []
+    for row in rows:
+        productos.append({
+            'id': row[0],
+            'nombre': row[1],
+            'descripcion': row[2],
+            'pdf_url': row[3],
+            'imagen_url': row[4],
+            'imagen_mosaico_url': row[5],
+            'categoria': row[6],
+            'subcategoria': row[7],
+            'precio': row[8],
+            'precio_usd': row[9],
+            'activo': row[10],
+            'fecha_creacion': row[11],
+            'fecha_modificacion': row[12]
+        })
+    
+    return jsonify(productos)
+
+@app.route('/api/productos', methods=['POST'])
+def add_producto():
+    """Agregar producto"""
+    data = request.get_json()
+    
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    
+    c.execute("""
+        INSERT INTO productos (nombre, descripcion, categoria, subcategoria, pdf_url, imagen_url, imagen_mosaico_url, precio, precio_usd)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    """, (
+        data.get('nombre'),
+        data.get('descripcion'),
+        data.get('categoria'),
+        data.get('subcategoria'),
+        data.get('pdf_url'),
+        data.get('imagen_url'),
+        data.get('imagen_mosaico_url'),
+        data.get('precio', 0),
+        data.get('precio_usd', 0)
+    ))
+    
+    producto_id = c.lastrowid
+    conn.commit()
+    conn.close()
+    
+    return jsonify({'message': 'Producto agregado correctamente', 'id': producto_id}), 201
+
+@app.route('/api/productos/<int:producto_id>', methods=['PUT'])
+def update_producto(producto_id):
+    """Actualizar producto"""
+    data = request.get_json()
+    
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    
+    c.execute("""
+        UPDATE productos 
+        SET nombre = ?, descripcion = ?, categoria = ?, subcategoria = ?, 
+            pdf_url = ?, imagen_url = ?, imagen_mosaico_url = ?, precio = ?, precio_usd = ?, activo = ?, 
+            fecha_modificacion = CURRENT_TIMESTAMP
+        WHERE id = ?
+    """, (
+        data.get('nombre'),
+        data.get('descripcion'),
+        data.get('categoria'),
+        data.get('subcategoria'),
+        data.get('pdf_url'),
+        data.get('imagen_url'),
+        data.get('imagen_mosaico_url'),
+        data.get('precio', 0),
+        data.get('precio_usd', 0),
+        data.get('activo', 1),
+        producto_id
+    ))
+    
+    conn.commit()
+    conn.close()
+    
+    return jsonify({'message': 'Producto actualizado correctamente'})
+
+@app.route('/api/productos/<int:producto_id>', methods=['DELETE'])
+def delete_producto(producto_id):
+    """Eliminar producto (eliminación lógica)"""
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    
+    c.execute("SELECT id FROM productos WHERE id = ?", (producto_id,))
+    if not c.fetchone():
+        conn.close()
+        return jsonify({'error': 'Producto no encontrado'}), 404
+    
+    c.execute("UPDATE productos SET activo = 0 WHERE id = ?", (producto_id,))
+    conn.commit()
+    conn.close()
+    
+    return jsonify({'message': 'Producto eliminado correctamente'})
+
+# ========= Endpoints específicos por línea =========
+@app.route('/api/productos/linea/20x20', methods=['GET'])
+def get_productos_linea_20x20():
+    """Productos línea 20x20"""
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    
+    c.execute("""
+        SELECT id, nombre, descripcion, pdf_url, imagen_url, imagen_mosaico_url, categoria, subcategoria, 
+               precio, precio_usd, activo, fecha_creacion, fecha_modificacion
+        FROM productos 
+        WHERE activo = 1 AND categoria = 'Pisos y Zócalos' AND subcategoria = 'Línea 20x20'
+        ORDER BY nombre
+    """)
+    rows = c.fetchall()
+    conn.close()
+    
+    productos = []
+    for row in rows:
+        productos.append({
+            'id': row[0],
+            'nombre': row[1],
+            'descripcion': row[2],
+            'pdf_url': row[3],
+            'imagen_url': row[4],
+            'imagen_mosaico_url': row[5],
+            'categoria': row[6],
+            'subcategoria': row[7],
+            'precio': row[8],
+            'precio_usd': row[9],
+            'activo': row[10],
+            'fecha_creacion': row[11],
+            'fecha_modificacion': row[12]
+        })
+    
+    return jsonify(productos)
+
+@app.route('/api/productos/linea/40x40', methods=['GET'])
+def get_productos_linea_40x40():
+    """Productos línea 40x40"""
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    
+    c.execute("""
+        SELECT id, nombre, descripcion, pdf_url, imagen_url, imagen_mosaico_url, categoria, subcategoria, 
+               precio, precio_usd, activo, fecha_creacion, fecha_modificacion
+        FROM productos 
+        WHERE activo = 1 AND categoria = 'Pisos y Zócalos' AND subcategoria = 'Línea 40x40'
+        ORDER BY nombre
+    """)
+    rows = c.fetchall()
+    conn.close()
+    
+    productos = []
+    for row in rows:
+        productos.append({
+            'id': row[0],
+            'nombre': row[1],
+            'descripcion': row[2],
+            'pdf_url': row[3],
+            'imagen_url': row[4],
+            'imagen_mosaico_url': row[5],
+            'categoria': row[6],
+            'subcategoria': row[7],
+            'precio': row[8],
+            'precio_usd': row[9],
+            'activo': row[10],
+            'fecha_creacion': row[11],
+            'fecha_modificacion': row[12]
+        })
+    
+    return jsonify(productos)
+
+@app.route('/api/productos/linea/50x50', methods=['GET'])
+def get_productos_linea_50x50():
+    """Productos línea 50x50"""
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    
+    c.execute("""
+        SELECT id, nombre, descripcion, pdf_url, imagen_url, imagen_mosaico_url, categoria, subcategoria, 
+               precio, precio_usd, activo, fecha_creacion, fecha_modificacion
+        FROM productos 
+        WHERE activo = 1 AND categoria = 'Pisos y Zócalos' AND subcategoria = 'Línea 50x50'
+        ORDER BY nombre
+    """)
+    rows = c.fetchall()
+    conn.close()
+    
+    productos = []
+    for row in rows:
+        productos.append({
+            'id': row[0],
+            'nombre': row[1],
+            'descripcion': row[2],
+            'pdf_url': row[3],
+            'imagen_url': row[4],
+            'imagen_mosaico_url': row[5],
+            'categoria': row[6],
+            'subcategoria': row[7],
+            'precio': row[8],
+            'precio_usd': row[9],
+            'activo': row[10],
+            'fecha_creacion': row[11],
+            'fecha_modificacion': row[12]
+        })
+    
+    return jsonify(productos)
+
+@app.route('/api/productos/piscinas', methods=['GET'])
+def get_productos_piscinas():
+    """Productos de piscinas organizados por subcategoría"""
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    
+    c.execute("""
+        SELECT id, nombre, descripcion, pdf_url, imagen_url, imagen_mosaico_url, categoria, subcategoria, 
+               precio, precio_usd, activo, fecha_creacion, fecha_modificacion
+        FROM productos 
+        WHERE activo = 1 AND categoria = 'Piscinas'
+        ORDER BY subcategoria, nombre
+    """)
+    rows = c.fetchall()
+    conn.close()
+    
+    productos_por_subcategoria = {}
+    for row in rows:
+        producto = {
+            'id': row[0],
+            'nombre': row[1],
+            'descripcion': row[2],
+            'pdf_url': row[3],
+            'imagen_url': row[4],
+            'imagen_mosaico_url': row[5],
+            'categoria': row[6],
+            'subcategoria': row[7],
+            'precio': row[8],
+            'precio_usd': row[9],
+            'activo': row[10],
+            'fecha_creacion': row[11],
+            'fecha_modificacion': row[12]
+        }
+        
+        subcategoria = producto['subcategoria']
+        if subcategoria not in productos_por_subcategoria:
+            productos_por_subcategoria[subcategoria] = []
+        
+        productos_por_subcategoria[subcategoria].append(producto)
+    
+    return jsonify(productos_por_subcategoria)
+
+@app.route('/api/productos/revestimientos', methods=['GET'])
+def get_productos_revestimientos():
+    """Productos de revestimientos organizados por subcategoría"""
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    
+    c.execute("""
+        SELECT id, nombre, descripcion, pdf_url, imagen_url, imagen_mosaico_url, categoria, subcategoria, 
+               precio, precio_usd, activo, fecha_creacion, fecha_modificacion
+        FROM productos 
+        WHERE activo = 1 AND categoria = 'Revestimientos'
+        ORDER BY subcategoria, nombre
+    """)
+    rows = c.fetchall()
+    conn.close()
+    
+    productos_por_subcategoria = {}
+    for row in rows:
+        producto = {
+            'id': row[0],
+            'nombre': row[1],
+            'descripcion': row[2],
+            'pdf_url': row[3],
+            'imagen_url': row[4],
+            'imagen_mosaico_url': row[5],
+            'categoria': row[6],
+            'subcategoria': row[7],
+            'precio': row[8],
+            'precio_usd': row[9],
+            'activo': row[10],
+            'fecha_creacion': row[11],
+            'fecha_modificacion': row[12]
+        }
+        
+        subcategoria = producto['subcategoria']
+        if subcategoria not in productos_por_subcategoria:
+            productos_por_subcategoria[subcategoria] = []
+        
+        productos_por_subcategoria[subcategoria].append(producto)
+    
+    return jsonify(productos_por_subcategoria)
+
+@app.route('/api/productos/placas-antihumedad', methods=['GET'])
+def get_productos_placas_antihumedad():
+    """Productos de placas antihumedad organizados por subcategoría"""
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    
+    c.execute("""
+        SELECT id, nombre, descripcion, pdf_url, imagen_url, imagen_mosaico_url, categoria, subcategoria, 
+               precio, precio_usd, activo, fecha_creacion, fecha_modificacion
+        FROM productos 
+        WHERE activo = 1 AND categoria = 'Placas Antihumedad'
+        ORDER BY subcategoria, nombre
+    """)
+    rows = c.fetchall()
+    conn.close()
+    
+    productos_por_subcategoria = {}
+    for row in rows:
+        producto = {
+            'id': row[0],
+            'nombre': row[1],
+            'descripcion': row[2],
+            'pdf_url': row[3],
+            'imagen_url': row[4],
+            'imagen_mosaico_url': row[5],
+            'categoria': row[6],
+            'subcategoria': row[7],
+            'precio': row[8],
+            'precio_usd': row[9],
+            'activo': row[10],
+            'fecha_creacion': row[11],
+            'fecha_modificacion': row[12]
+        }
+        
+        subcategoria = producto['subcategoria']
+        if subcategoria not in productos_por_subcategoria:
+            productos_por_subcategoria[subcategoria] = []
+        
+        productos_por_subcategoria[subcategoria].append(producto)
+    
+    return jsonify(productos_por_subcategoria)
+
+@app.route('/api/productos/insumos', methods=['GET'])
+def get_productos_insumos():
+    """Productos de insumos organizados por subcategoría"""
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    
+    c.execute("""
+        SELECT id, nombre, descripcion, pdf_url, imagen_url, imagen_mosaico_url, categoria, subcategoria, 
+               precio, precio_usd, activo, fecha_creacion, fecha_modificacion
+        FROM productos 
+        WHERE activo = 1 AND categoria = 'Insumos'
+        ORDER BY subcategoria, nombre
+    """)
+    rows = c.fetchall()
+    conn.close()
+    
+    productos_por_subcategoria = {}
+    for row in rows:
+        producto = {
+            'id': row[0],
+            'nombre': row[1],
+            'descripcion': row[2],
+            'pdf_url': row[3],
+            'imagen_url': row[4],
+            'imagen_mosaico_url': row[5],
+            'categoria': row[6],
+            'subcategoria': row[7],
+            'precio': row[8],
+            'precio_usd': row[9],
+            'activo': row[10],
+            'fecha_creacion': row[11],
+            'fecha_modificacion': row[12]
+        }
+        
+        subcategoria = producto['subcategoria']
+        if subcategoria not in productos_por_subcategoria:
+            productos_por_subcategoria[subcategoria] = []
+        
+        productos_por_subcategoria[subcategoria].append(producto)
+    
+    return jsonify(productos_por_subcategoria)
+
+# ========= Testimonios =========
+@app.route('/api/testimonios', methods=['GET'])
+def get_testimonios():
+    """Obtener testimonios activos"""
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    
+    cursor.execute('''
+        SELECT id, nombre, empresa, testimonio, imagen, orden, activo, fecha_creacion
+        FROM testimonios 
+        WHERE activo = 1 
+        ORDER BY orden ASC, id ASC
+    ''')
+    
+    testimonios = []
+    for row in cursor.fetchall():
+        testimonios.append({
+            'id': row[0],
+            'nombre': row[1],
+            'empresa': row[2],
+            'testimonio': row[3],
+            'imagen': row[4],
+            'orden': row[5],
+            'activo': row[6],
+            'fecha_creacion': row[7]
+        })
+    
+    conn.close()
+    return jsonify(testimonios)
+
+@app.route('/api/testimonios', methods=['POST'])
+def crear_testimonio():
+    """Crear testimonio"""
+    data = request.get_json()
+    
+    if not all(key in data for key in ['nombre', 'empresa', 'testimonio']):
+        return jsonify({'error': 'Faltan campos requeridos'}), 400
+    
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    
+    cursor.execute('SELECT MAX(orden) FROM testimonios')
+    max_orden = cursor.fetchone()[0] or 0
+    nuevo_orden = max_orden + 1
+    
+    cursor.execute('''
+        INSERT INTO testimonios (nombre, empresa, testimonio, imagen, orden, activo)
+        VALUES (?, ?, ?, ?, ?, ?)
+    ''', (
+        data['nombre'],
+        data['empresa'],
+        data['testimonio'],
+        data.get('imagen', 'img/clients/client-1.png'),
+        data.get('orden', nuevo_orden),
+        data.get('activo', 1)
+    ))
+    
+    testimonio_id = cursor.lastrowid
+    conn.commit()
+    conn.close()
+    
+    return jsonify({'id': testimonio_id, 'message': 'Testimonio creado exitosamente'}), 201
+
+@app.route('/api/testimonios/<int:testimonio_id>', methods=['PUT'])
+def actualizar_testimonio(testimonio_id):
+    """Actualizar testimonio"""
+    data = request.get_json()
+    
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    
+    cursor.execute('SELECT id FROM testimonios WHERE id = ?', (testimonio_id,))
+    if not cursor.fetchone():
+        conn.close()
+        return jsonify({'error': 'Testimonio no encontrado'}), 404
+    
+    cursor.execute('''
+        UPDATE testimonios 
+        SET nombre = ?, empresa = ?, testimonio = ?, imagen = ?, orden = ?, activo = ?,
+            fecha_modificacion = CURRENT_TIMESTAMP
+        WHERE id = ?
+    ''', (
+        data.get('nombre'),
+        data.get('empresa'),
+        data.get('testimonio'),
+        data.get('imagen', 'img/clients/client-1.png'),
+        data.get('orden'),
+        data.get('activo', 1),
+        testimonio_id
+    ))
+    
+    conn.commit()
+    conn.close()
+    
+    return jsonify({'message': 'Testimonio actualizado exitosamente'})
+
+@app.route('/api/testimonios/<int:testimonio_id>', methods=['DELETE'])
+def eliminar_testimonio(testimonio_id):
+    """Eliminar testimonio"""
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    
+    cursor.execute('SELECT id FROM testimonios WHERE id = ?', (testimonio_id,))
+    if not cursor.fetchone():
+        conn.close()
+        return jsonify({'error': 'Testimonio no encontrado'}), 404
+    
+    cursor.execute('''
+        UPDATE testimonios 
+        SET activo = 0, fecha_modificacion = CURRENT_TIMESTAMP
+        WHERE id = ?
+    ''', (testimonio_id,))
+    
+    conn.commit()
+    conn.close()
+    
+    return jsonify({'message': 'Testimonio eliminado exitosamente'})
+
+@app.route('/api/testimonios/admin', methods=['GET'])
+def get_testimonios_admin():
+    """Obtener todos los testimonios para admin"""
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    
+    cursor.execute('''
+        SELECT id, nombre, empresa, testimonio, imagen, orden, activo, fecha_creacion, fecha_modificacion
+        FROM testimonios 
+        ORDER BY orden ASC, id ASC
+    ''')
+    
+    testimonios = []
+    for row in cursor.fetchall():
+        testimonios.append({
+            'id': row[0],
+            'nombre': row[1],
+            'empresa': row[2],
+            'testimonio': row[3],
+            'imagen': row[4],
+            'orden': row[5],
+            'activo': row[6],
+            'fecha_creacion': row[7],
+            'fecha_modificacion': row[8]
+        })
+    
+    conn.close()
+    return jsonify(testimonios)
+
+# ========= Promociones =========
+@app.route('/api/promociones', methods=['GET'])
+def get_promociones():
+    """Obtener promociones activas"""
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    
+    cursor.execute('''
+        SELECT id, titulo, imagen, cartilla_pdf, orden 
+        FROM promociones 
+        WHERE activo = 1 
+        ORDER BY orden ASC, id ASC
+    ''')
+    
+    promociones = []
+    for row in cursor.fetchall():
+        promociones.append({
+            'id': row[0],
+            'titulo': row[1],
+            'imagen': row[2],
+            'cartilla_pdf': row[3],
+            'orden': row[4]
+        })
+    
+    conn.close()
+    return jsonify(promociones)
+
+@app.route('/api/promociones', methods=['POST'])
+def create_promocion():
+    """Crear promoción"""
+    data = request.json
+    titulo = data.get('titulo', '')
+    imagen = data.get('imagen', '')
+    cartilla_pdf = data.get('cartilla_pdf', '')
+    
+    if not imagen:
+        return jsonify({'error': 'La imagen es requerida'}), 400
+    
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    
+    cursor.execute('''
+        INSERT INTO promociones (titulo, imagen, cartilla_pdf, orden, activo, fecha_creacion, fecha_modificacion)
+        VALUES (?, ?, ?, 0, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+    ''', (titulo, imagen, cartilla_pdf))
+    
+    promocion_id = cursor.lastrowid
+    conn.commit()
+    conn.close()
+    
+    return jsonify({
+        'message': 'Promoción creada exitosamente',
+        'id': promocion_id
+    }), 201
+
+@app.route('/api/promociones/<int:promocion_id>', methods=['PUT'])
+def update_promocion(promocion_id):
+    """Actualizar promoción"""
+    data = request.json
+    titulo = data.get('titulo', '')
+    imagen = data.get('imagen', '')
+    cartilla_pdf = data.get('cartilla_pdf', '')
+    activo = data.get('activo', 1)
+    
+    if not imagen:
+        return jsonify({'error': 'La imagen es requerida'}), 400
+    
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    
+    cursor.execute('SELECT id FROM promociones WHERE id = ?', (promocion_id,))
+    if not cursor.fetchone():
+        return jsonify({'error': 'Promoción no encontrada'}), 404
+    
+    cursor.execute('''
+        UPDATE promociones 
+        SET titulo = ?, imagen = ?, cartilla_pdf = ?, activo = ?, fecha_modificacion = CURRENT_TIMESTAMP
+        WHERE id = ?
+    ''', (titulo, imagen, cartilla_pdf, activo, promocion_id))
+    
+    conn.commit()
+    conn.close()
+    
+    return jsonify({'message': 'Promoción actualizada exitosamente'})
+
+@app.route('/api/promociones/<int:promocion_id>', methods=['DELETE'])
+def delete_promocion(promocion_id):
+    """Eliminar promoción"""
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    
+    cursor.execute('SELECT id FROM promociones WHERE id = ?', (promocion_id,))
+    if not cursor.fetchone():
+        return jsonify({'error': 'Promoción no encontrada'}), 404
+    
+    cursor.execute('''
+        UPDATE promociones 
+        SET activo = 0, fecha_modificacion = CURRENT_TIMESTAMP
+        WHERE id = ?
+    ''', (promocion_id,))
+    
+    conn.commit()
+    conn.close()
+    
+    return jsonify({'message': 'Promoción eliminada exitosamente'})
+
+@app.route('/api/promociones/admin', methods=['GET'])
+def get_promociones_admin():
+    """Obtener todas las promociones para admin"""
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    
+    cursor.execute('''
+        SELECT id, titulo, imagen, cartilla_pdf, orden, activo, fecha_inicio, fecha_fin, fecha_creacion, fecha_modificacion
+        FROM promociones 
+        ORDER BY orden ASC, id ASC
+    ''')
+    
+    promociones = []
+    for row in cursor.fetchall():
+        promociones.append({
+            'id': row[0],
+            'titulo': row[1],
+            'imagen': row[2],
+            'cartilla_pdf': row[3],
+            'orden': row[4],
+            'activo': row[5],
+            'fecha_inicio': row[6],
+            'fecha_fin': row[7],
+            'fecha_creacion': row[8],
+            'fecha_modificacion': row[9]
+        })
+    
+    conn.close()
+    return jsonify(promociones)
+
+# ========= Categorías y Subcategorías =========
+@app.route('/api/categorias', methods=['GET'])
+def get_categorias():
+    """Obtener categorías"""
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    
+    c.execute("SELECT * FROM categorias WHERE activo = 1 ORDER BY nombre")
+    rows = c.fetchall()
+    conn.close()
+    
+    categorias = []
+    for row in rows:
+        categorias.append({
+            'id': row[0],
+            'nombre': row[1],
+            'descripcion': row[2],
+            'activo': row[3]
+        })
+    
+    return jsonify(categorias)
+
+@app.route('/api/subcategorias', methods=['GET'])
+def get_subcategorias():
+    """Obtener subcategorías"""
+    categoria_id = request.args.get('categoria_id')
+    
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    
+    if categoria_id:
+        c.execute("SELECT * FROM subcategorias WHERE categoria_id = ? AND activo = 1 ORDER BY nombre", (categoria_id,))
+    else:
+        c.execute("SELECT * FROM subcategorias WHERE activo = 1 ORDER BY nombre")
+    
+    rows = c.fetchall()
+    conn.close()
+    
+    subcategorias = []
+    for row in rows:
+        subcategorias.append({
+            'id': row[0],
+            'nombre': row[1],
+            'categoria_id': row[2],
+            'descripcion': row[3],
+            'activo': row[4]
+        })
+    
+    return jsonify(subcategorias)
+
+# ========= Error Handlers =========
+@app.errorhandler(404)
+def not_found(error):
+    return jsonify({'error': 'Endpoint no encontrado'}), 404
+
+@app.errorhandler(500)
+def internal_error(error):
+    return jsonify({'error': 'Error interno del servidor'}), 500
+
+# ========= Main =========
+if __name__ == '__main__':
+    app.run(debug=True)
