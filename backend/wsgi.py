@@ -11,7 +11,7 @@ import sys
 import os
 
 # Agrega el directorio de tu aplicación al path
-path = '/home/tuusuario/mysite'  # Cambia 'tuusuario' por tu nombre de usuario en PythonAnywhere
+path = '/home/sgit'  # Tu nombre de usuario en PythonAnywhere
 if path not in sys.path:
     sys.path.append(path)
 
