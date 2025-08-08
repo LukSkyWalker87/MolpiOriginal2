@@ -490,16 +490,65 @@ function getClientesHTML() {
 
       async function loadProductosComponent() {
         try {
-          console.log('Fetching productos component...');
-          const response = await fetch('/admin/component/productos');
-          if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-          }
-          const componentHTML = await response.text();
-          contentArea.innerHTML = componentHTML;
-          console.log('Productos component loaded successfully');
+          console.log('Loading productos admin interface...');
+          contentArea.innerHTML = `
+            <div class="admin-header">
+              <h1>Gestión de Productos</h1>
+              <p class="mb-0 text-muted">Administra el catálogo de productos de Molpi</p>
+            </div>
+            
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <button id="agregarProducto" class="btn btn-primary">
+                  <i class="fa fa-plus"></i> Agregar Nuevo Producto
+                </button>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <select id="filtroCategoria" class="form-control">
+                    <option value="">Todas las categorías</option>
+                    <!-- Las opciones se cargarán dinámicamente -->
+                  </select>
+                </div>
+              </div>
+            </div>
+            
+            <div class="card">
+              <div class="card-header">
+                <h5 class="mb-0">Lista de Productos</h5>
+              </div>
+              <div class="card-body">
+                <div class="table-responsive">
+                  <table class="table table-striped table-hover">
+                    <thead>
+                      <tr>
+                        <th>ID</th>
+                        <th>Imagen</th>
+                        <th>Nombre</th>
+                        <th>Categoría</th>
+                        <th>Subcategoría</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                      </tr>
+                    </thead>
+                    <tbody id="tablaProductos">
+                      <tr>
+                        <td colspan="7" class="text-center">
+                          <div class="spinner-border" role="status">
+                            <span class="sr-only">Cargando...</span>
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          `;
           
-          // Esperar un poco para que el DOM se actualice y luego inicializar
+          console.log('Productos interface loaded successfully');
+          
+          // Inicializar el componente
           setTimeout(() => {
             console.log('Iniciando carga de productos...');
             initComponenteProductos();
@@ -511,7 +560,6 @@ function getClientesHTML() {
             <div class="alert alert-danger">
               <h4>Error al cargar el componente de productos</h4>
               <p>No se pudo cargar el componente de productos. Error: ${error.message}</p>
-              <p>Verifica que el archivo /components/productos.html existe y el servidor está funcionando correctamente.</p>
             </div>
           `;
         }
@@ -2455,31 +2503,75 @@ function getClientesHTML() {
       // ========= Componente de Promociones =========
       async function loadPromocionesComponent() {
         try {
-          console.log('Fetching promociones component...');
-          const response = await fetch('http://localhost:5000/admin/component/promociones');
+          console.log('Loading promociones admin interface...');
+          contentArea.innerHTML = `
+            <div class="admin-header">
+              <h1><i class="fa fa-bullhorn"></i> Gestión de Promociones</h1>
+              <p class="mb-0 text-muted">Administra las promociones y ofertas especiales</p>
+            </div>
+            
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <button id="agregarPromocion" class="btn btn-primary">
+                  <i class="fa fa-plus"></i> Agregar Nueva Promoción
+                </button>
+              </div>
+              <div class="col-md-6">
+                <button id="recargarPromociones" class="btn btn-outline-secondary">
+                  <i class="fa fa-refresh"></i> Recargar Promociones
+                </button>
+              </div>
+            </div>
+            
+            <div class="card">
+              <div class="card-header">
+                <h5 class="mb-0">Lista de Promociones</h5>
+              </div>
+              <div class="card-body">
+                <div class="table-responsive">
+                  <table class="table table-striped table-hover">
+                    <thead>
+                      <tr>
+                        <th>Imagen</th>
+                        <th>Título</th>
+                        <th>Estado</th>
+                        <th>Fecha Creación</th>
+                        <th>Acciones</th>
+                      </tr>
+                    </thead>
+                    <tbody id="tablaPromociones">
+                      <tr>
+                        <td colspan="5" class="text-center">
+                          <div class="spinner-border" role="status">
+                            <span class="sr-only">Cargando...</span>
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          `;
           
-          if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-          }
+          console.log('Promociones interface loaded successfully');
           
-          const html = await response.text();
-          contentArea.innerHTML = html;
-          console.log('Promociones component loaded successfully');
+          // Inicializar event listeners y cargar datos
+          setTimeout(() => {
+            initPromocionesEvents();
+            cargarPromociones();
+          }, 300);
           
-          // Ejecutar scripts del componente manualmente
-          const scripts = contentArea.querySelectorAll('script');
-          scripts.forEach(script => {
-            try {
-              const newScript = document.createElement('script');
-              newScript.innerHTML = script.innerHTML;
-              document.head.appendChild(newScript);
-              document.head.removeChild(newScript);
-            } catch (e) {
-              console.log('Error ejecutando script:', e);
-            }
-          });
-          
-          // Inicializar event listeners después de cargar el componente
+        } catch (error) {
+          console.error('Error loading promociones component:', error);
+          contentArea.innerHTML = `
+            <div class="alert alert-danger">
+              <h4>Error al cargar el componente de promociones</h4>
+              <p>Error: ${error.message}</p>
+            </div>
+          `;
+        }
+      }
           setTimeout(() => {
             console.log('🔄 Intentando inicializar promociones...');
             
@@ -2531,16 +2623,59 @@ function getClientesHTML() {
       // ========= Componente de Testimonios =========
       async function loadTestimoniosComponent() {
         try {
-          console.log('Fetching testimonios component...');
-          const response = await fetch('/admin/component/testimonios');
+          console.log('Loading testimonios admin interface...');
+          contentArea.innerHTML = `
+            <div class="admin-header">
+              <h1><i class="fa fa-comments"></i> Gestión de Testimonios</h1>
+              <p class="mb-0 text-muted">Administra los testimonios de clientes</p>
+            </div>
+            
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <button id="agregarTestimonio" class="btn btn-primary">
+                  <i class="fa fa-plus"></i> Agregar Nuevo Testimonio
+                </button>
+              </div>
+              <div class="col-md-6">
+                <button id="recargarTestimonios" class="btn btn-outline-secondary">
+                  <i class="fa fa-refresh"></i> Recargar Testimonios
+                </button>
+              </div>
+            </div>
+            
+            <div class="card">
+              <div class="card-header">
+                <h5 class="mb-0">Lista de Testimonios</h5>
+              </div>
+              <div class="card-body">
+                <div class="table-responsive">
+                  <table class="table table-striped table-hover">
+                    <thead>
+                      <tr>
+                        <th>Cliente</th>
+                        <th>Empresa</th>
+                        <th>Testimonio</th>
+                        <th>Estado</th>
+                        <th>Orden</th>
+                        <th>Acciones</th>
+                      </tr>
+                    </thead>
+                    <tbody id="tablaTestimonios">
+                      <tr>
+                        <td colspan="6" class="text-center">
+                          <div class="spinner-border" role="status">
+                            <span class="sr-only">Cargando...</span>
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          `;
           
-          if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-          }
-          
-          const html = await response.text();
-          contentArea.innerHTML = html;
-          console.log('Testimonios component loaded successfully');
+          console.log('Testimonios interface loaded successfully');
           
           // Inicializar funcionalidad del componente después de cargar
           setTimeout(() => {
@@ -2554,8 +2689,10 @@ function getClientesHTML() {
             <div class="alert alert-danger">
               <h4>Error al cargar el componente de testimonios</h4>
               <p>No se pudo cargar el componente de testimonios. Error: ${error.message}</p>
-              <p>Verifica que el archivo /components/testimonios.html existe y el servidor está funcionando correctamente.</p>
             </div>
+          `;
+        }
+      }
           `;
         }
       }
