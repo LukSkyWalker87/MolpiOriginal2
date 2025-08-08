@@ -446,7 +446,7 @@ function getClientesHTML() {
         // 1. Cargar categorías
         try {
           console.log('Cargando categorías...');
-          const response = await fetch(${window.env.API_URL}/categorias');
+          const response = await fetch(`${window.env.API_URL}/categorias`);
           categorias = await response.json();
           
           // Rellenar select de categorías
@@ -474,7 +474,7 @@ function getClientesHTML() {
         // 2. Cargar productos
         try {
           console.log('Cargando productos...');
-          const response = await fetch(${window.env.API_URL}/productos?incluir_inactivos=true');
+          const response = await fetch(`${window.env.API_URL}/productos?incluir_inactivos=true`);
           productos = await response.json();
           mostrarProductos(productos);
           console.log('Productos cargados:', productos.length);
@@ -591,7 +591,7 @@ function getClientesHTML() {
           if (categoria === 'Podotáctiles') {
             try {
               // Cargar productos podotáctiles desde la base de datos (incluyendo inactivos)
-              const response = await fetch(${window.env.API_URL}/productos?incluir_inactivos=true');
+              const response = await fetch(`${window.env.API_URL}/productos?incluir_inactivos=true`);
               const todosProductos = await response.json();
               
               // Filtrar solo productos podotáctiles
@@ -645,7 +645,7 @@ function getClientesHTML() {
                 await sincronizarPodotactilesConBD(productosPredefinidos);
                 
                 // Volver a cargar desde la BD para obtener los estados actuales
-                const responseRefresh = await fetch(${window.env.API_URL}/productos?incluir_inactivos=true');
+                const responseRefresh = await fetch(`${window.env.API_URL}/productos?incluir_inactivos=true`);
                 const productosRefresh = await responseRefresh.json();
                 productosPodotactiles = productosRefresh.filter(p => p.categoria === 'Podotáctiles');
               }
@@ -922,7 +922,7 @@ function getClientesHTML() {
           if (!categoriaSeleccionada) return;
           
           try {
-            const response = await fetch(${window.env.API_URL}/subcategorias');
+            const response = await fetch(`${window.env.API_URL}/subcategorias`);
             const todasSubcategorias = await response.json();
             
             // Filtrar subcategorías por categoría
@@ -974,7 +974,7 @@ function getClientesHTML() {
           filtroSubcategoria.appendChild(defaultOption);
           
           try {
-            const response = await fetch(${window.env.API_URL}/subcategorias');
+            const response = await fetch(`${window.env.API_URL}/subcategorias`);
             const todasSubcategorias = await response.json();
             
             let subcategoriasParaMostrar = todasSubcategorias;
@@ -1091,7 +1091,7 @@ function getClientesHTML() {
                 $('#modalProducto').modal('hide');
               }
               // Recargar productos
-              const response2 = await fetch(${window.env.API_URL}/productos');
+              const response2 = await fetch(`${window.env.API_URL}/productos`);
               productos = await response2.json();
               mostrarProductos(productos);
               showSuccessToast('🎉 Producto guardado exitosamente');
@@ -1234,7 +1234,7 @@ function getClientesHTML() {
                     console.log('🔄 Recargando vista de podotáctiles...');
                     
                     // Forzar recarga desde servidor para podotáctiles (incluyendo inactivos)
-                    const response2 = await fetch(${window.env.API_URL}/productos?incluir_inactivos=true');
+                    const response2 = await fetch(`${window.env.API_URL}/productos?incluir_inactivos=true`);
                     const todosProductos = await response2.json();
                     const productosPodotactiles = todosProductos.filter(p => p.categoria === 'Podotáctiles');
                     
@@ -1249,7 +1249,7 @@ function getClientesHTML() {
                   } else {
                     // Para otras categorías o vista general, recargar normalmente
                     console.log('🔄 Recargando productos para categoría:', categoriaActual || 'todas');
-                    const response2 = await fetch(${window.env.API_URL}/productos?incluir_inactivos=true');
+                    const response2 = await fetch(`${window.env.API_URL}/productos?incluir_inactivos=true`);
                     productos = await response2.json();
                     
                     if (categoriaActual && categoriaActual !== '') {
@@ -1519,7 +1519,7 @@ function getClientesHTML() {
             
             if (response.ok) {
               // Recargar productos desde la base de datos para reflejar el cambio
-              const response2 = await fetch(${window.env.API_URL}/productos?incluir_inactivos=true');
+              const response2 = await fetch(`${window.env.API_URL}/productos?incluir_inactivos=true`);
               const todosProductos = await response2.json();
               
               // Actualizar el producto en el array local
@@ -1556,7 +1556,7 @@ function getClientesHTML() {
               
               if (response.status === 404) {
                 // El producto no existe, crearlo
-                const createResponse = await fetch(${window.env.API_URL}/productos', {
+                const createResponse = await fetch(`${window.env.API_URL}/productos`, {
                   method: 'POST',
                   headers: {
                     'Content-Type': 'application/json'
@@ -1666,7 +1666,7 @@ function getClientesHTML() {
               window.currentFilter = '20x20';
               
               // Cargar productos específicos de línea 20x20
-              const response = await fetch(${window.env.API_URL}/productos/linea/20x20');
+              const response = await fetch(`${window.env.API_URL}/productos/linea/20x20`);
               if (response.ok) {
                 const productosLinea = await response.json();
                 productos = productosLinea;
@@ -1692,7 +1692,7 @@ function getClientesHTML() {
               window.currentFilter = '40x40';
               
               // Cargar productos específicos de zócalos 40x40
-              const response = await fetch(${window.env.API_URL}/productos/linea/40x40');
+              const response = await fetch(`${window.env.API_URL}/productos/linea/40x40`);
               if (response.ok) {
                 const productosLinea = await response.json();
                 productos = productosLinea;
@@ -1718,7 +1718,7 @@ function getClientesHTML() {
               window.currentFilter = '50x50';
               
               // Cargar productos específicos de zócalos 50x50
-              const response = await fetch(${window.env.API_URL}/productos/linea/50x50');
+              const response = await fetch(`${window.env.API_URL}/productos/linea/50x50`);
               if (response.ok) {
                 const productosLinea = await response.json();
                 productos = productosLinea;
@@ -1741,7 +1741,7 @@ function getClientesHTML() {
               this.classList.add('active');
               
               // Cargar productos podotáctiles desde la base de datos
-              const response = await fetch(${window.env.API_URL}/productos?incluir_inactivos=true');
+              const response = await fetch(`${window.env.API_URL}/productos?incluir_inactivos=true`);
               if (response.ok) {
                 const todosLosProductos = await response.json();
                 let productosPodotactiles = todosLosProductos.filter(p => p.categoria === 'Podotáctiles');
@@ -1796,7 +1796,7 @@ function getClientesHTML() {
                   await sincronizarPodotactilesConBD(productosPredefinidos);
                   
                   // Volver a cargar desde la BD para obtener los productos creados
-                  const responseRefresh = await fetch(${window.env.API_URL}/productos?incluir_inactivos=true');
+                  const responseRefresh = await fetch(`${window.env.API_URL}/productos?incluir_inactivos=true`);
                   const productosRefresh = await responseRefresh.json();
                   productosPodotactiles = productosRefresh.filter(p => p.categoria === 'Podotáctiles');
                   
@@ -2101,7 +2101,7 @@ function getClientesHTML() {
       
       // Funciones del ABM de productos
       function cargarCategorias() {
-        fetch(${window.env.API_URL}/categorias')
+        fetch(`${window.env.API_URL}/categorias`)
           .then(response => response.json())
           .then(categorias => {
             const selectCategoria = document.getElementById('filtroCategoria');
@@ -2136,7 +2136,7 @@ function getClientesHTML() {
         let url = '/subcategorias';
         if (categoriaSeleccionada) {
           // Buscar el ID de la categoría seleccionada
-          fetch(${window.env.API_URL}/categorias')
+          fetch(`${window.env.API_URL}/categorias`)
             .then(response => response.json())
             .then(categorias => {
               const categoria = categorias.find(cat => cat.nombre === categoriaSeleccionada);
@@ -2203,7 +2203,7 @@ function getClientesHTML() {
         if (cargandoProductos) return;
         cargandoProductos = true;
         
-        fetch(${window.env.API_URL}/productos')
+        fetch(`${window.env.API_URL}/productos`)
           .then(response => response.json())
           .then(productos => {
             console.log('Productos cargados:', productos.length);
@@ -2284,7 +2284,7 @@ function getClientesHTML() {
         console.log('🔍 Filtrando productos:', { categoria, subcategoria, linea, busqueda });
         
         // Cargar productos y aplicar filtros
-        fetch(${window.env.API_URL}/productos')
+        fetch(`${window.env.API_URL}/productos`)
           .then(response => response.json())
           .then(productos => {
             console.log('📦 Productos recibidos:', productos.length);
@@ -2524,7 +2524,7 @@ function getClientesHTML() {
         async function cargarTestimonios() {
           try {
             console.log('Cargando testimonios...');
-            const response = await fetch(${window.env.API_URL}/testimonios/admin');
+            const response = await fetch(`${window.env.API_URL}/testimonios/admin`);
             testimonios = await response.json();
             mostrarTestimonios(testimonios);
             console.log('Testimonios cargados:', testimonios.length);
@@ -2658,7 +2658,7 @@ function getClientesHTML() {
               });
             } else {
               // Crear
-              response = await fetch(${window.env.API_URL}/testimonios', {
+              response = await fetch(`${window.env.API_URL}/testimonios`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(datos)

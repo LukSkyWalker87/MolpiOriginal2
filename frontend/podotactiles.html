@@ -234,7 +234,7 @@ Medidas del molde = 45cm x 45cm x 3cm.<br><br> </p><br><br><br>
                         console.log('🚀 Cargando productos podotáctiles desde la API...');
                         
                         // Llamar a la API para obtener solo productos activos
-                        const response = await fetch(${window.env.API_URL}/productos');
+                        const response = await fetch(`${window.env.API_URL}/productos`);
                         
                         if (!response.ok) {
                             throw new Error(`Error HTTP: ${response.status}`);
@@ -435,7 +435,7 @@ Medidas del molde = 45cm x 45cm x 3cm.<br><br> </p><br><br><br>
 				const username = document.getElementById('username').value;
 				const password = document.getElementById('password').value;
 		  
-				const res = await fetch(${window.env.API_URL}/login', {
+				const res = await fetch(`${window.env.API_URL}/login`, {
 				  method: 'POST',
 				  headers: { 'Content-Type': 'application/json' },
 				  body: JSON.stringify({ username, password })

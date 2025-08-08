@@ -314,7 +314,7 @@
 					document.getElementById('loading-message').style.display = 'block';
 					document.getElementById('error-message').style.display = 'none';
 					
-					const response = await fetch(${window.env.API_URL}/productos/insumos');
+					const response = await fetch(`${window.env.API_URL}/productos/insumos`);
 					
 					if (!response.ok) {
 						throw new Error('Error en la respuesta del servidor');

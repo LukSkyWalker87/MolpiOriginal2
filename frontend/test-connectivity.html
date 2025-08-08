@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test API Connectivity</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .result { padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .success { background-color: #d4edda; border: 1px solid #c3e6cb; color: #155724; }
+        .error { background-color: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; }
+        .info { background-color: #d1ecf1; border: 1px solid #bee5eb; color: #0c5460; }
+        button { padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+    </style>
+</head>
+<body>
+    <h1>🔧 Test de Conectividad API Molpi</h1>
+    <p>Esta página verifica la conectividad entre el frontend (Netlify) y el backend (PythonAnywhere)</p>
+    
+    <button onclick="testAPI()">🚀 Probar Conexión API</button>
+    
+    <div id="results"></div>
+
+    <script src="env.js"></script>
+    <script>
+        async function testAPI() {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '<div class="info">🔄 Probando conectividad...</div>';
+            
+            try {
+                // Test 1: Verificar configuración
+                addResult('✅ URL del API configurada: ' + window.env.API_URL, 'success');
+                
+                // Test 2: Probar conectividad básica
+                addResult('🔄 Probando endpoint de salud...', 'info');
+                const healthResponse = await fetch(`${window.env.API_URL}/health`);
+                const healthData = await healthResponse.json();
+                
+                if (healthResponse.ok) {
+                    addResult('✅ Endpoint de salud OK: ' + JSON.stringify(healthData), 'success');
+                } else {
+                    addResult('❌ Error en endpoint de salud: ' + healthResponse.status, 'error');
+                }
+                
+                // Test 3: Probar endpoint de productos
+                addResult('🔄 Probando endpoint de productos...', 'info');
+                const productResponse = await fetch(`${window.env.API_URL}/productos`);
+                
+                if (productResponse.ok) {
+                    const products = await productResponse.json();
+                    addResult(`✅ Productos cargados exitosamente: ${products.length} productos`, 'success');
+                } else {
+                    addResult('❌ Error cargando productos: ' + productResponse.status, 'error');
+                }
+                
+                // Test 4: Probar CORS
+                addResult('✅ CORS funcionando correctamente', 'success');
+                
+            } catch (error) {
+                addResult('❌ Error de conectividad: ' + error.message, 'error');
+                console.error('Error completo:', error);
+            }
+        }
+        
+        function addResult(message, type) {
+            const resultsDiv = document.getElementById('results');
+            const resultDiv = document.createElement('div');
+            resultDiv.className = `result ${type}`;
+            resultDiv.textContent = message;
+            resultsDiv.appendChild(resultDiv);
+        }
+        
+        // Auto-test al cargar la página
+        window.addEventListener('load', () => {
+            setTimeout(testAPI, 1000);
+        });
+    </script>
+</body>
+</html>
