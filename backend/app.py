@@ -23,18 +23,50 @@ CORS(app, origins=[
 ])
 
 # ========= Ruta de la base de datos =========
+import logging
+
+# Configurar logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+# Ruta de la base de datos
 DB_PATH = os.path.join(os.path.dirname(__file__), 'molpi.db')
+
+# Verificar que la base de datos existe
+if not os.path.exists(DB_PATH):
+    logger.error(f"Base de datos no encontrada en: {DB_PATH}")
+    # Crear una base de datos vacía si no existe
+    conn = sqlite3.connect(DB_PATH)
+    conn.close()
+    logger.info(f"Base de datos creada en: {DB_PATH}")
 
 # ========= API ENDPOINTS =========
 
 @app.route('/api/health', methods=['GET'])
 def health_check():
     """Endpoint para verificar que la API está funcionando"""
-    return jsonify({
-        'status': 'OK',
-        'message': 'Molpi API is running',
-        'timestamp': datetime.now().isoformat()
-    })
+    try:
+        # Verificar conexión a la base de datos
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        cursor.execute("SELECT 1")
+        conn.close()
+        
+        return jsonify({
+            'status': 'OK',
+            'message': 'Molpi API is running',
+            'timestamp': datetime.now().isoformat(),
+            'database': 'Connected',
+            'db_path': DB_PATH
+        })
+    except Exception as e:
+        logger.error(f"Error en health check: {str(e)}")
+        return jsonify({
+            'status': 'ERROR',
+            'message': 'Database connection failed',
+            'error': str(e),
+            'timestamp': datetime.now().isoformat()
+        }), 500
 
 # ========= Login =========
 @app.route('/api/login', methods=['POST'])
