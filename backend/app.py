@@ -13,11 +13,13 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # ========= CORS - Configuración para PythonAnywhere =========
 CORS(app, origins=[
-    "https://your-netlify-site.netlify.app",  # Cambiar por tu dominio de Netlify
-    "https://molpi.netlify.app",  # Ejemplo
-    "https://www.molpi.com.ar",   # Si usas dominio personalizado
-    "http://localhost:3000",       # Para desarrollo local
-    "http://127.0.0.1:3000"       # Para desarrollo local
+    "https://amazing-haupia-0b9b29.netlify.app",  # Tu dominio de Netlify (actualizar si es diferente)
+    "https://molpi.netlify.app",  
+    "https://www.molpi.com.ar",   
+    "http://localhost:3000",       
+    "http://127.0.0.1:3000",
+    "http://localhost:8000",
+    "http://127.0.0.1:8000"
 ])
 
 # ========= Ruta de la base de datos =========
