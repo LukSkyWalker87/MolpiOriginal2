@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <title>Panel de Administración | Molpi</title>
-  <!-- Cache buster: ACTUALIZADO 8 Agosto 2025 16:00 - Migración a Vercel desde Netlify -->
+  <!-- Cache buster: ACTUALIZADO 9 Agosto 2025 08:00 - Debug adicional para diagnosticar carga en Vercel -->
   <link rel="icon" href="img/favicon.ico" type="image/x-icon">
 
 
@@ -514,6 +514,9 @@ function getClientesHTML() {
 }
 
       async function loadProductosComponent() {
+        console.log('=== loadProductosComponent START ===');
+        console.log('ContentArea:', contentArea);
+        
         try {
           console.log('Loading productos admin interface...');
           contentArea.innerHTML = `
@@ -3087,7 +3090,9 @@ function getClientesHTML() {
       window.addEventListener('hashchange', loadSectionFromHash);
 
       // Cargar la sección según el hash inicial
+      console.log('=== About to call loadSectionFromHash ===');
       loadSectionFromHash();
+      console.log('=== loadSectionFromHash called ===');
     });
   </script>
 
