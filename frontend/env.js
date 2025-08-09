@@ -1,4 +1,4 @@
-// Configuración para producción - Netlify + PythonAnywhere
+// Configuración para producción - Vercel + PythonAnywhere
 window.env = {
     API_URL: 'https://sgit.pythonanywhere.com/api',
     DEBUG: false,
