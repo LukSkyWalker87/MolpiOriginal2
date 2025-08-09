@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <title>Panel de Administración | Molpi</title>
-  <!-- Cache buster: ACTUALIZADO 8 Agosto 2025 15:25 - Debugging extensivo para diagnosticar problema de carga -->
+  <!-- Cache buster: ACTUALIZADO 8 Agosto 2025 15:35 - Fix todas las llamadas API con window.env.API_URL -->
   <link rel="icon" href="img/favicon.ico" type="image/x-icon">
 
 
@@ -1370,7 +1370,7 @@ function getClientesHTML() {
             description: 'Esta acción no se puede deshacer. El producto será eliminado permanentemente del sistema.',
             onConfirm: async () => {
               try {
-                const response = await fetch(`/productos/${id}`, {
+                const response = await fetch(`${window.env.API_URL}/productos/${id}`, {
                   method: 'DELETE'
                 });
                 
@@ -1611,7 +1611,7 @@ function getClientesHTML() {
             };
             
             // Enviar al servidor
-            const response = await fetch(`/productos/${id}`, {
+            const response = await fetch(`${window.env.API_URL}/productos/${id}`, {
               method: 'PUT',
               headers: {
                 'Content-Type': 'application/json'
@@ -1674,7 +1674,7 @@ function getClientesHTML() {
               activo: nuevoEstado ? 1 : 0  // Solo cambiamos el estado activo
             };
             
-            const response = await fetch(`/productos/${id}`, {
+            const response = await fetch(`${window.env.API_URL}/productos/${id}`, {
               method: 'PUT',
               headers: {
                 'Content-Type': 'application/json'
@@ -1717,7 +1717,7 @@ function getClientesHTML() {
           try {
             for (const producto of productosPodotactiles) {
               // Verificar si el producto existe en la base de datos
-              const response = await fetch(`/productos/${producto.id}`);
+              const response = await fetch(`${window.env.API_URL}/productos/${producto.id}`);
               
               if (response.status === 404) {
                 // El producto no existe, crearlo
@@ -1743,7 +1743,7 @@ function getClientesHTML() {
                     productoExistente.imagen_url !== producto.imagen_url ||
                     productoExistente.imagen_mosaico_url !== producto.imagen_mosaico_url) {
                   
-                  const updateResponse = await fetch(`/productos/${producto.id}`, {
+                  const updateResponse = await fetch(`${window.env.API_URL}/productos/${producto.id}`, {
                     method: 'PUT',
                     headers: {
                       'Content-Type': 'application/json'
@@ -2905,7 +2905,7 @@ function getClientesHTML() {
             let response;
             if (id) {
               // Actualizar
-              response = await fetch(`/testimonios/${id}`, {
+              response = await fetch(`${window.env.API_URL}/testimonios/${id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(datos)
@@ -2997,7 +2997,7 @@ function getClientesHTML() {
               $('#deleteTestimonioConfirmModal').modal('hide');
               
               try {
-                const response = await fetch(`/testimonios/${id}`, {
+                const response = await fetch(`${window.env.API_URL}/testimonios/${id}`, {
                   method: 'DELETE'
                 });
                 
