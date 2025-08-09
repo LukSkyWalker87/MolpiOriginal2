@@ -1,21 +1,27 @@
 {
   "version": 2,
   "name": "molpi-frontend",
-  "builds": [
+  "rewrites": [
     {
-      "src": "frontend/**",
-      "use": "@vercel/static"
-    }
-  ],
-  "routes": [
+      "source": "/",
+      "destination": "/frontend/index.html"
+    },
     {
-      "src": "/(.*)",
-      "dest": "/frontend/$1"
+      "source": "/admin",
+      "destination": "/frontend/admin.html"
+    },
+    {
+      "source": "/admin.html",
+      "destination": "/frontend/admin.html"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/frontend/$1"
     }
   ],
   "headers": [
     {
-      "source": "/frontend/(.*)",
+      "source": "/(.*)",
       "headers": [
         {
           "key": "Access-Control-Allow-Origin",
@@ -30,20 +36,6 @@
           "value": "Content-Type, Authorization"
         }
       ]
-    }
-  ],
-  "rewrites": [
-    {
-      "source": "/",
-      "destination": "/frontend/index.html"
-    },
-    {
-      "source": "/admin",
-      "destination": "/frontend/admin.html"
-    },
-    {
-      "source": "/admin.html",
-      "destination": "/frontend/admin.html"
     }
   ]
 }
