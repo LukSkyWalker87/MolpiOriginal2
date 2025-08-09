@@ -16,6 +16,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 CORS(app, resources={r"/api/*": {
     "origins": [
         "https://molpi.netlify.app",
+        "https://molpi-original.vercel.app",
         "https://www.molpi.com.ar",
         "http://localhost:3000",
         "http://127.0.0.1:3000",
