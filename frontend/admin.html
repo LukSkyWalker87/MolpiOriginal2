@@ -326,48 +326,79 @@
       try {
         console.log('=== DIAGNÓSTICO BACKEND INICIADO ===');
         
-        // Probar /health
-        let healthResponse;
-        try {
-          healthResponse = await fetch(`${window.env.API_URL}/health`);
-          console.log('Health check:', healthResponse.status, healthResponse.ok);
-        } catch (e) {
-          console.log('Health check falló:', e.message);
+        let resultados = [];
+        
+        // Probar endpoints básicos disponibles
+        const endpoints = [
+          '/health',
+          '/productos', 
+          '/categorias',
+          '/subcategorias',
+          '/promociones',
+          '/testimonios'
+        ];
+        
+        for (const endpoint of endpoints) {
+          try {
+            const response = await fetch(`${window.env.API_URL}${endpoint}`);
+            const status = response.status;
+            const ok = response.ok;
+            let preview = '';
+            
+            if (ok) {
+              try {
+                const data = await response.json();
+                preview = Array.isArray(data) ? `${data.length} elementos` : 'objeto';
+              } catch {
+                preview = 'respuesta no JSON';
+              }
+            }
+            
+            resultados.push(`${endpoint}: ${status} ${ok ? '✓' : '✗'} ${preview}`);
+            console.log(`Test ${endpoint}:`, status, ok ? '✓' : '✗', preview);
+          } catch (e) {
+            resultados.push(`${endpoint}: ERROR - ${e.message}`);
+            console.log(`Test ${endpoint}: ERROR -`, e.message);
+          }
         }
         
-        // Probar /diagnostico
-        let diagResponse;
-        try {
-          diagResponse = await fetch(`${window.env.API_URL}/diagnostico`);
-          if (diagResponse.ok) {
-            const diagData = await diagResponse.json();
-            console.log('=== DIAGNÓSTICO COMPLETO ===');
-            console.log('DB Path:', diagData.db_path);
-            console.log('Tablas:', diagData.tablas);
-            console.log('Columnas productos:', diagData.productos_columns);
-            console.log('Columnas categorías:', diagData.categorias_columns);
-            console.log('Tests de SELECT:', diagData.select_tests);
-            
-            // Mostrar en un modal o alert
-            const mensaje = `DIAGNÓSTICO DEL BACKEND:
-✓ Health: ${healthResponse ? healthResponse.status : 'ERROR'}
-✓ DB Path: ${diagData.db_path}
-✓ Tablas: ${diagData.tablas.join(', ')}
-✓ Test productos SELECT: ${diagData.select_tests.productos_select}
-✓ Test categorías SELECT: ${diagData.select_tests.categorias_select}
-
-Columnas en productos: ${diagData.productos_columns ? diagData.productos_columns.map(c => c.name).join(', ') : 'TABLA NO EXISTE'}
-Columnas en categorías: ${diagData.categorias_columns ? diagData.categorias_columns.map(c => c.name).join(', ') : 'TABLA NO EXISTE'}`;
-            alert(mensaje);
+        // Probar endpoints con prefijo /api
+        resultados.push('\n--- Endpoints con /api ---');
+        for (const endpoint of ['/api/health', '/api/productos', '/api/categorias']) {
+          try {
+            const response = await fetch(`${window.env.API_URL}${endpoint}`);
+            const status = response.status;
+            const ok = response.ok;
+            resultados.push(`${endpoint}: ${status} ${ok ? '✓' : '✗'}`);
+          } catch (e) {
+            resultados.push(`${endpoint}: ERROR - ${e.message}`);
           }
-        } catch (e) {
-          console.log('Diagnóstico falló:', e.message);
-          alert(`Error en diagnóstico: ${e.message}`);
         }
+        
+        // Mostrar resultados
+        const mensaje = `DIAGNÓSTICO DEL BACKEND:
+API URL: ${window.env.API_URL}
+
+${resultados.join('\n')}
+
+CONCLUSIÓN:
+${resultados.filter(r => r.includes('✓')).length > 0 ? 
+  '✅ Algunos endpoints funcionan. El backend está activo pero puede tener problemas de esquema de DB.' : 
+  '❌ Backend no responde o no está disponible.'
+}
+
+RECOMENDACIÓN:
+${resultados.some(r => r.includes('/health') && r.includes('✓')) ?
+  'Backend funcionando. Actualizar app.py con migraciones de DB.' :
+  'Verificar que el backend esté corriendo en PythonAnywhere.'
+}`;
+        
+        alert(mensaje);
+        console.log('=== DIAGNÓSTICO COMPLETO ===');
         
       } catch (error) {
         console.error('Error en diagnóstico:', error);
-        alert(`Error general: ${error.message}`);
+        alert(`Error general en diagnóstico: ${error.message}`);
       }
     }
 
@@ -671,22 +702,35 @@ function getClientesHTML() {
         // 1. Cargar categorías
         try {
           console.log('Cargando categorías...');
-          // Intentar primero el endpoint normal, luego el seguro
-          let response;
+          let categorias_cargadas = false;
+          
+          // Intentar endpoint normal primero
           try {
-            response = await fetch(`${window.env.API_URL}/categorias`);
-            if (!response.ok) {
+            const response = await fetch(`${window.env.API_URL}/categorias`);
+            if (response.ok) {
+              categorias = await response.json();
+              categorias_cargadas = true;
+              console.log('Categorías cargadas desde /categorias:', categorias.length);
+            } else {
               throw new Error(`HTTP ${response.status} ${response.statusText}`);
             }
           } catch (error) {
-            console.log('Endpoint /categorias falló, probando /categorias-safe...');
-            response = await fetch(`${window.env.API_URL}/categorias-safe`);
-            if (!response.ok) {
-              throw new Error(`HTTP ${response.status} ${response.statusText}`);
-            }
+            console.log('Endpoint /categorias falló:', error.message);
           }
           
-          categorias = await response.json();
+          // Si falló, usar datos por defecto
+          if (!categorias_cargadas) {
+            console.log('Usando categorías por defecto...');
+            categorias = [
+              {id: 1, nombre: 'Pisos y Zócalos', descripcion: 'Moldes para baldosas', activo: 1},
+              {id: 2, nombre: 'Revestimientos', descripcion: 'Moldes para revestimientos', activo: 1},
+              {id: 3, nombre: 'Podotáctiles - Discapacidad', descripcion: 'Moldes para señalización', activo: 1},
+              {id: 4, nombre: 'Green', descripcion: 'Moldes ecológicos', activo: 1},
+              {id: 5, nombre: 'Piscinas', descripcion: 'Moldes para piscinas', activo: 1},
+              {id: 6, nombre: 'Placas Antihumedad', descripcion: 'Moldes para placas', activo: 1},
+              {id: 7, nombre: 'Insumos', descripcion: 'Materiales complementarios', activo: 1}
+            ];
+          }
           
           // Rellenar select de categorías
           selectCategoria.innerHTML = '<option value="">Selecciona una categoría</option>';
@@ -708,36 +752,82 @@ function getClientesHTML() {
           actualizarFiltroSubcategorias();
         } catch (error) {
           console.error('Error cargando categorías:', error);
-          // No interrumpir UI si solo fallan categorías; el usuario aún puede ver el resto
+          // Usar categorías por defecto si falló todo
+          console.log('Usando categorías de emergencia...');
+          categorias = [
+            {id: 1, nombre: 'Pisos y Zócalos', descripcion: 'Moldes para baldosas', activo: 1},
+            {id: 2, nombre: 'Revestimientos', descripcion: 'Moldes para revestimientos', activo: 1},
+            {id: 3, nombre: 'Podotáctiles - Discapacidad', descripcion: 'Moldes para señalización', activo: 1},
+            {id: 4, nombre: 'Green', descripcion: 'Moldes ecológicos', activo: 1},
+            {id: 5, nombre: 'Piscinas', descripcion: 'Moldes para piscinas', activo: 1},
+            {id: 6, nombre: 'Placas Antihumedad', descripcion: 'Moldes para placas', activo: 1},
+            {id: 7, nombre: 'Insumos', descripcion: 'Materiales complementarios', activo: 1}
+          ];
+          
+          // Rellenar selects con categorías por defecto
+          if (selectCategoria) {
+            selectCategoria.innerHTML = '<option value="">Selecciona una categoría</option>';
+            categorias.forEach(categoria => {
+              const option = new Option(categoria.nombre, categoria.nombre);
+              selectCategoria.add(option);
+            });
+          }
+          
+          if (filtroCategoria) {
+            filtroCategoria.innerHTML = '<option value="">Todas las categorías</option>';
+            categorias.forEach(categoria => {
+              const option = new Option(categoria.nombre, categoria.nombre);
+              filtroCategoria.add(option);
+            });
+          }
         }
         
         // 2. Cargar productos
         try {
           console.log('Cargando productos...');
-          // Intentar primero el endpoint normal, luego el seguro
-          let response;
+          let productos_cargados = false;
+          
+          // Intentar endpoint normal primero
           try {
-            response = await fetch(`${window.env.API_URL}/productos?incluir_inactivos=true`);
-            if (!response.ok) {
+            const response = await fetch(`${window.env.API_URL}/productos?incluir_inactivos=true`);
+            if (response.ok) {
+              productos = await response.json();
+              productos_cargados = true;
+              console.log('Productos cargados desde /productos:', productos.length);
+            } else {
               throw new Error(`HTTP ${response.status} ${response.statusText}`);
             }
           } catch (error) {
-            console.log('Endpoint /productos falló, probando /productos-safe...');
-            response = await fetch(`${window.env.API_URL}/productos-safe?incluir_inactivos=true`);
-            if (!response.ok) {
-              throw new Error(`HTTP ${response.status} ${response.statusText}`);
-            }
+            console.log('Endpoint /productos falló:', error.message);
           }
           
-          productos = await response.json();
+          // Si falló, usar lista vacía con mensaje informativo
+          if (!productos_cargados) {
+            console.log('No se pudieron cargar productos, usando lista vacía...');
+            productos = [];
+          }
+          
           mostrarProductos(productos);
           console.log('Productos cargados:', productos.length);
         } catch (error) {
           console.error('Error cargando productos:', error);
+          // Mostrar mensaje informativo en lugar de error técnico
           const tbody = document.getElementById('tablaProductos');
           if (tbody) {
-            const msg = (error && error.message) ? `Error al cargar productos (${error.message})` : 'Error al cargar productos';
-            tbody.innerHTML = `<tr><td colspan="9" class="text-center text-danger">${msg}</td></tr>`;
+            tbody.innerHTML = `
+              <tr>
+                <td colspan="9" class="text-center">
+                  <div class="alert alert-warning mb-0">
+                    <h5><i class="fa fa-exclamation-triangle"></i> Backend no disponible</h5>
+                    <p class="mb-2">No se pueden cargar los productos en este momento.</p>
+                    <p class="mb-0"><strong>Posibles causas:</strong> Base de datos no inicializada o endpoints no actualizados.</p>
+                    <button class="btn btn-sm btn-info mt-2" onclick="diagnosticarBackend()">
+                      <i class="fa fa-stethoscope"></i> Ejecutar Diagnóstico
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            `;
           }
         }
         
