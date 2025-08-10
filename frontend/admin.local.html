@@ -2583,62 +2583,12 @@ function getClientesHTML() {
           `;
           
           console.log('Promociones interface loaded successfully');
-          // Implementación mínima local para cargar y mostrar promociones
-          const tbody = document.getElementById('tablaPromociones');
-          const btnRecargar = document.getElementById('recargarPromociones');
-          const btnAgregar = document.getElementById('agregarPromocion');
-
-          function renderPromociones(list) {
-            if (!tbody) return;
-            tbody.innerHTML = '';
-            if (!list || list.length === 0) {
-              tbody.innerHTML = '<tr><td colspan="5" class="text-center">No hay promociones para mostrar</td></tr>';
-              return;
-            }
-            list.forEach(p => {
-              const tr = document.createElement('tr');
-              tr.innerHTML = `
-                <td><img src="${p.imagen || ''}" alt="${p.titulo}" style="width:64px;height:64px;object-fit:cover" onerror="this.style.display='none'" /></td>
-                <td>${p.titulo || ''}</td>
-                <td><span class="badge ${p.activo ? 'badge-activo' : 'badge-inactivo'}">${p.activo ? 'Activa' : 'Inactiva'}</span></td>
-                <td><small class="text-muted">${p.fecha_creacion ? new Date(p.fecha_creacion).toLocaleDateString() : '-'}</small></td>
-                <td>
-                  <div class="btn-group btn-group-sm" role="group">
-                    <button type="button" class="btn btn-primary" title="Editar" disabled>
-                      <i class="fa fa-edit"></i>
-                    </button>
-                    <button type="button" class="btn btn-danger ml-1" title="Eliminar" disabled>
-                      <i class="fa fa-trash"></i>
-                    </button>
-                  </div>
-                </td>
-              `;
-              tbody.appendChild(tr);
-            });
-          }
-
-          async function cargarPromociones() {
-            try {
-              const url = `${window.env.API_URL}/promociones/admin`;
-              console.log('Fetching promociones from:', url);
-              const resp = await fetch(url);
-              if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-              const data = await resp.json();
-              console.log('Promociones recibidas:', data?.length ?? 0);
-              renderPromociones(Array.isArray(data) ? data : []);
-            } catch (e) {
-              console.error('Error cargando promociones:', e);
-              if (tbody) {
-                tbody.innerHTML = '<tr><td colspan="5" class="text-center text-danger">Error al cargar promociones</td></tr>';
-              }
-            }
-          }
-
-          btnRecargar?.addEventListener('click', () => cargarPromociones());
-          btnAgregar?.addEventListener('click', () => alert('Agregar promoción - Por implementar'));
-
-          // Carga inicial
-          cargarPromociones();
+          
+          // Inicializar event listeners y cargar datos
+          setTimeout(() => {
+            initPromocionesEvents();
+            cargarPromociones();
+          }, 300);
           
         } catch (error) {
           console.error('Error loading promociones component:', error);
@@ -2650,7 +2600,41 @@ function getClientesHTML() {
           `;
         }
       }
-      
+          setTimeout(() => {
+            console.log('🔄 Intentando inicializar promociones...');
+            
+            // Verificar funciones disponibles
+            console.log('Funciones disponibles:', {
+              inicializarPromociones: typeof window.inicializarPromociones,
+              cargarPromociones: typeof window.cargarPromociones,
+              debugPromociones: typeof window.debugPromociones
+            });
+            
+            if (typeof window.inicializarPromociones === 'function') {
+              console.log('✅ Inicializando promociones después de carga dinámica...');
+              window.inicializarPromociones();
+            } else if (typeof window.cargarPromociones === 'function') {
+              console.log('✅ Cargando promociones directamente...');
+              window.cargarPromociones();
+            } else {
+              console.log('⚠️ Funciones no disponibles, intentando debug...');
+              if (typeof window.debugPromociones === 'function') {
+                window.debugPromociones();
+              }
+            }
+          }, 200);
+          
+        } catch (error) {
+          console.error('Error loading promociones component:', error);
+          contentArea.innerHTML = `
+            <div class="alert alert-danger">
+              <h4>Error al cargar el componente de promociones</h4>
+              <p>No se pudo cargar el componente de promociones. Error: ${error.message}</p>
+              <p>Verifica que el archivo /components/promociones.html existe y el servidor está funcionando correctamente.</p>
+            </div>
+          `;
+        }
+      }
 
       // Manejar clics en enlaces dentro del contenido dinámico
       document.addEventListener('click', function(e) {
@@ -2737,7 +2721,9 @@ function getClientesHTML() {
           `;
         }
       }
-      
+          `;
+        }
+      }
 
       // Función para inicializar completamente el componente testimonios
       async function initComponenteTestimonios() {
@@ -3268,7 +3254,7 @@ function getClientesHTML() {
   <!-- Contenedor para notificaciones toast -->
   <div class="toast-container" id="toastContainer"></div>
 
-  <script src="env.js"></script>
+  <script src="env.local.js"></script>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
   <!-- Script para asegurar que el campo Estado funcione correctamente -->
