@@ -1,0 +1,231 @@
+{
+  "fecha_generacion": "2025-08-09T23:25:47.002899",
+  "db_path": "Python\\molpi.db",
+  "db_size_bytes": 110592,
+  "tablas": {
+    "categorias": {
+      "columnas": [
+        {
+          "name": "id",
+          "type": "INTEGER"
+        },
+        {
+          "name": "nombre",
+          "type": "TEXT"
+        },
+        {
+          "name": "descripcion",
+          "type": "TEXT"
+        },
+        {
+          "name": "activo",
+          "type": "INTEGER"
+        }
+      ],
+      "registros": 7
+    },
+    "producto_imagenes": {
+      "columnas": [
+        {
+          "name": "id",
+          "type": "INTEGER"
+        },
+        {
+          "name": "producto_id",
+          "type": "INTEGER"
+        },
+        {
+          "name": "imagen_url",
+          "type": "TEXT"
+        },
+        {
+          "name": "orden",
+          "type": "INTEGER"
+        }
+      ],
+      "registros": 0
+    },
+    "productos": {
+      "columnas": [
+        {
+          "name": "id",
+          "type": "INTEGER"
+        },
+        {
+          "name": "nombre",
+          "type": "TEXT"
+        },
+        {
+          "name": "descripcion",
+          "type": "TEXT"
+        },
+        {
+          "name": "pdf_url",
+          "type": "TEXT"
+        },
+        {
+          "name": "imagen_url",
+          "type": "TEXT"
+        },
+        {
+          "name": "categoria",
+          "type": "TEXT"
+        },
+        {
+          "name": "subcategoria",
+          "type": "TEXT"
+        },
+        {
+          "name": "precio",
+          "type": "REAL"
+        },
+        {
+          "name": "activo",
+          "type": "INTEGER"
+        },
+        {
+          "name": "fecha_creacion",
+          "type": "TIMESTAMP"
+        },
+        {
+          "name": "fecha_modificacion",
+          "type": "TIMESTAMP"
+        },
+        {
+          "name": "imagen_mosaico_url",
+          "type": "TEXT"
+        },
+        {
+          "name": "precio_usd",
+          "type": "REAL"
+        }
+      ],
+      "registros": 112
+    },
+    "promociones": {
+      "columnas": [
+        {
+          "name": "id",
+          "type": "INTEGER"
+        },
+        {
+          "name": "titulo",
+          "type": "TEXT"
+        },
+        {
+          "name": "imagen",
+          "type": "TEXT"
+        },
+        {
+          "name": "orden",
+          "type": "INTEGER"
+        },
+        {
+          "name": "activo",
+          "type": "BOOLEAN"
+        },
+        {
+          "name": "fecha_inicio",
+          "type": "DATE"
+        },
+        {
+          "name": "fecha_fin",
+          "type": "DATE"
+        },
+        {
+          "name": "fecha_creacion",
+          "type": "TIMESTAMP"
+        },
+        {
+          "name": "fecha_modificacion",
+          "type": "TIMESTAMP"
+        },
+        {
+          "name": "cartilla_pdf",
+          "type": "TEXT"
+        }
+      ],
+      "registros": 2
+    },
+    "sqlite_sequence": {
+      "columnas": [
+        {
+          "name": "name",
+          "type": ""
+        },
+        {
+          "name": "seq",
+          "type": ""
+        }
+      ],
+      "registros": 5
+    },
+    "subcategorias": {
+      "columnas": [
+        {
+          "name": "id",
+          "type": "INTEGER"
+        },
+        {
+          "name": "nombre",
+          "type": "TEXT"
+        },
+        {
+          "name": "categoria_id",
+          "type": "INTEGER"
+        },
+        {
+          "name": "descripcion",
+          "type": "TEXT"
+        },
+        {
+          "name": "activo",
+          "type": "INTEGER"
+        }
+      ],
+      "registros": 1301
+    },
+    "testimonios": {
+      "columnas": [
+        {
+          "name": "id",
+          "type": "INTEGER"
+        },
+        {
+          "name": "nombre",
+          "type": "TEXT"
+        },
+        {
+          "name": "empresa",
+          "type": "TEXT"
+        },
+        {
+          "name": "testimonio",
+          "type": "TEXT"
+        },
+        {
+          "name": "imagen",
+          "type": "TEXT"
+        },
+        {
+          "name": "activo",
+          "type": "INTEGER"
+        },
+        {
+          "name": "orden",
+          "type": "INTEGER"
+        },
+        {
+          "name": "fecha_creacion",
+          "type": "TIMESTAMP"
+        },
+        {
+          "name": "fecha_modificacion",
+          "type": "TIMESTAMP"
+        }
+      ],
+      "registros": 5
+    }
+  },
+  "endpoints_ok": false
+}
