@@ -430,6 +430,149 @@ def api_diagnostico():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+# Endpoints de contingencia que funcionan con cualquier esquema
+@app.route('/api/categorias-safe', methods=['GET'])
+def get_categorias_safe():
+    """Endpoint de categorías que funciona con esquemas mínimos"""
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        c = conn.cursor()
+        
+        # Primero verificar si la tabla existe
+        c.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='categorias'")
+        if not c.fetchone():
+            conn.close()
+            return jsonify([
+                {'id': 1, 'nombre': 'Pisos y Zócalos', 'descripcion': '', 'activo': 1},
+                {'id': 2, 'nombre': 'Revestimientos', 'descripcion': '', 'activo': 1},
+                {'id': 3, 'nombre': 'Podotáctiles - Discapacidad', 'descripcion': '', 'activo': 1},
+                {'id': 4, 'nombre': 'Green', 'descripcion': '', 'activo': 1},
+                {'id': 5, 'nombre': 'Piscinas', 'descripcion': '', 'activo': 1},
+                {'id': 6, 'nombre': 'Placas Antihumedad', 'descripcion': '', 'activo': 1},
+                {'id': 7, 'nombre': 'Insumos', 'descripcion': '', 'activo': 1}
+            ])
+        
+        # Verificar qué columnas existen
+        c.execute("PRAGMA table_info(categorias)")
+        columns = [row[1] for row in c.fetchall()]
+        
+        # Construir SELECT dinámico basado en columnas disponibles
+        select_fields = ['id', 'nombre']
+        if 'descripcion' in columns:
+            select_fields.append('descripcion')
+        else:
+            select_fields.append("'' as descripcion")
+        if 'activo' in columns:
+            select_fields.append('activo')
+        else:
+            select_fields.append("1 as activo")
+            
+        query = f"SELECT {', '.join(select_fields)} FROM categorias"
+        if 'activo' in columns:
+            query += " WHERE IFNULL(activo, 1) = 1"
+        query += " ORDER BY nombre"
+        
+        c.execute(query)
+        rows = c.fetchall()
+        conn.close()
+        
+        categorias = []
+        for row in rows:
+            categorias.append({
+                'id': row[0],
+                'nombre': row[1],
+                'descripcion': row[2] if len(row) > 2 else '',
+                'activo': row[3] if len(row) > 3 else 1
+            })
+        
+        return jsonify(categorias)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/productos-safe', methods=['GET'])
+def get_productos_safe():
+    """Endpoint de productos que funciona con esquemas mínimos"""
+    try:
+        incluir_inactivos = request.args.get('incluir_inactivos', 'false').lower() == 'true'
+        
+        conn = sqlite3.connect(DB_PATH)
+        c = conn.cursor()
+        
+        # Verificar si la tabla existe
+        c.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='productos'")
+        if not c.fetchone():
+            conn.close()
+            return jsonify([])
+        
+        # Verificar qué columnas existen
+        c.execute("PRAGMA table_info(productos)")
+        columns = [row[1] for row in c.fetchall()]
+        
+        # Construir SELECT dinámico basado en columnas disponibles
+        base_fields = ['id', 'nombre', 'categoria', 'subcategoria']
+        optional_fields = {
+            'descripcion': "'' as descripcion",
+            'pdf_url': "'' as pdf_url", 
+            'imagen_url': "'' as imagen_url",
+            'imagen_mosaico_url': "'' as imagen_mosaico_url",
+            'precio': '0 as precio',
+            'precio_usd': '0 as precio_usd',
+            'activo': '1 as activo',
+            'fecha_creacion': "'' as fecha_creacion",
+            'fecha_modificacion': "'' as fecha_modificacion"
+        }
+        
+        select_fields = []
+        for field in base_fields:
+            if field in columns:
+                select_fields.append(field)
+            else:
+                select_fields.append(f"'' as {field}")
+        
+        for field, default in optional_fields.items():
+            if field in columns:
+                select_fields.append(field)
+            else:
+                select_fields.append(default)
+                
+        query = f"SELECT {', '.join(select_fields)} FROM productos"
+        
+        # Filtrar por activo si la columna existe
+        where_conditions = []
+        if not incluir_inactivos and 'activo' in columns:
+            where_conditions.append("IFNULL(activo, 1) = 1")
+        
+        if where_conditions:
+            query += f" WHERE {' AND '.join(where_conditions)}"
+            
+        query += " ORDER BY id DESC"
+        
+        c.execute(query)
+        rows = c.fetchall()
+        conn.close()
+        
+        productos = []
+        for row in rows:
+            productos.append({
+                'id': row[0],
+                'nombre': row[1] or '',
+                'descripcion': row[4] if len(row) > 4 else '',
+                'pdf_url': row[5] if len(row) > 5 else '',
+                'imagen_url': row[6] if len(row) > 6 else '',
+                'imagen_mosaico_url': row[7] if len(row) > 7 else '',
+                'categoria': row[2] or '',
+                'subcategoria': row[3] or '',
+                'precio': row[8] if len(row) > 8 else 0,
+                'precio_usd': row[9] if len(row) > 9 else 0,
+                'activo': row[10] if len(row) > 10 else 1,
+                'fecha_creacion': row[11] if len(row) > 11 else '',
+                'fecha_modificacion': row[12] if len(row) > 12 else ''
+            })
+        
+        return jsonify(productos)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 @app.route('/productos', methods=['POST'])
 def add_producto():
     data = request.get_json()

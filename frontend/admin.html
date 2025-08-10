@@ -321,6 +321,56 @@
   
   
   <script>
+    // Función de diagnóstico del backend
+    async function diagnosticarBackend() {
+      try {
+        console.log('=== DIAGNÓSTICO BACKEND INICIADO ===');
+        
+        // Probar /health
+        let healthResponse;
+        try {
+          healthResponse = await fetch(`${window.env.API_URL}/health`);
+          console.log('Health check:', healthResponse.status, healthResponse.ok);
+        } catch (e) {
+          console.log('Health check falló:', e.message);
+        }
+        
+        // Probar /diagnostico
+        let diagResponse;
+        try {
+          diagResponse = await fetch(`${window.env.API_URL}/diagnostico`);
+          if (diagResponse.ok) {
+            const diagData = await diagResponse.json();
+            console.log('=== DIAGNÓSTICO COMPLETO ===');
+            console.log('DB Path:', diagData.db_path);
+            console.log('Tablas:', diagData.tablas);
+            console.log('Columnas productos:', diagData.productos_columns);
+            console.log('Columnas categorías:', diagData.categorias_columns);
+            console.log('Tests de SELECT:', diagData.select_tests);
+            
+            // Mostrar en un modal o alert
+            const mensaje = `DIAGNÓSTICO DEL BACKEND:
+✓ Health: ${healthResponse ? healthResponse.status : 'ERROR'}
+✓ DB Path: ${diagData.db_path}
+✓ Tablas: ${diagData.tablas.join(', ')}
+✓ Test productos SELECT: ${diagData.select_tests.productos_select}
+✓ Test categorías SELECT: ${diagData.select_tests.categorias_select}
+
+Columnas en productos: ${diagData.productos_columns ? diagData.productos_columns.map(c => c.name).join(', ') : 'TABLA NO EXISTE'}
+Columnas en categorías: ${diagData.categorias_columns ? diagData.categorias_columns.map(c => c.name).join(', ') : 'TABLA NO EXISTE'}`;
+            alert(mensaje);
+          }
+        } catch (e) {
+          console.log('Diagnóstico falló:', e.message);
+          alert(`Error en diagnóstico: ${e.message}`);
+        }
+        
+      } catch (error) {
+        console.error('Error en diagnóstico:', error);
+        alert(`Error general: ${error.message}`);
+      }
+    }
+
     console.log('=== ADMIN PANEL DEBUG START ===');
   console.log('env.js loaded:', typeof window.env !== 'undefined');
   console.log('jQuery loaded:', !!window.jQuery);
@@ -528,12 +578,17 @@ function getClientesHTML() {
             </div>
             
             <div class="row mb-3">
-              <div class="col-md-6">
+              <div class="col-md-4">
                 <button id="btnNuevoProducto" class="btn btn-primary">
                   <i class="fa fa-plus"></i> Agregar Nuevo Producto
                 </button>
               </div>
-              <div class="col-md-6">
+              <div class="col-md-4">
+                <button class="btn btn-outline-info" onclick="diagnosticarBackend()">
+                  <i class="fa fa-stethoscope"></i> Diagnóstico Backend
+                </button>
+              </div>
+              <div class="col-md-4">
                 <div class="form-group">
                   <select id="filtroCategoria" class="form-control">
                     <option value="">Todas las categorías</option>
@@ -616,10 +671,21 @@ function getClientesHTML() {
         // 1. Cargar categorías
         try {
           console.log('Cargando categorías...');
-          const response = await fetch(`${window.env.API_URL}/categorias`);
-          if (!response.ok) {
-            throw new Error(`HTTP ${response.status} ${response.statusText}`);
+          // Intentar primero el endpoint normal, luego el seguro
+          let response;
+          try {
+            response = await fetch(`${window.env.API_URL}/categorias`);
+            if (!response.ok) {
+              throw new Error(`HTTP ${response.status} ${response.statusText}`);
+            }
+          } catch (error) {
+            console.log('Endpoint /categorias falló, probando /categorias-safe...');
+            response = await fetch(`${window.env.API_URL}/categorias-safe`);
+            if (!response.ok) {
+              throw new Error(`HTTP ${response.status} ${response.statusText}`);
+            }
           }
+          
           categorias = await response.json();
           
           // Rellenar select de categorías
@@ -648,10 +714,21 @@ function getClientesHTML() {
         // 2. Cargar productos
         try {
           console.log('Cargando productos...');
-          const response = await fetch(`${window.env.API_URL}/productos?incluir_inactivos=true`);
-          if (!response.ok) {
-            throw new Error(`HTTP ${response.status} ${response.statusText}`);
+          // Intentar primero el endpoint normal, luego el seguro
+          let response;
+          try {
+            response = await fetch(`${window.env.API_URL}/productos?incluir_inactivos=true`);
+            if (!response.ok) {
+              throw new Error(`HTTP ${response.status} ${response.statusText}`);
+            }
+          } catch (error) {
+            console.log('Endpoint /productos falló, probando /productos-safe...');
+            response = await fetch(`${window.env.API_URL}/productos-safe?incluir_inactivos=true`);
+            if (!response.ok) {
+              throw new Error(`HTTP ${response.status} ${response.statusText}`);
+            }
           }
+          
           productos = await response.json();
           mostrarProductos(productos);
           console.log('Productos cargados:', productos.length);
