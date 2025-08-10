@@ -404,8 +404,8 @@ ${resultados.some(r => r.includes('/health') && r.includes('✓')) ?
 
     console.log('=== ADMIN PANEL DEBUG START ===');
   console.log('env.js loaded:', typeof window.env !== 'undefined');
-  console.log('jQuery loaded:', !!window.jQuery);
-  console.log('Bootstrap loaded:', !!(window.jQuery && window.jQuery.fn && window.jQuery.fn.modal));
+  console.log('jQuery inicial:', !!window.jQuery);
+  console.log('Bootstrap inicial:', !!(window.jQuery && window.jQuery.fn && window.jQuery.fn.modal));
     
     document.addEventListener("DOMContentLoaded", function () {
       console.log('=== DOMContentLoaded START ===');
@@ -3447,6 +3447,24 @@ function getClientesHTML() {
 
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <script>
+    // Verificar que jQuery y Bootstrap se cargaron correctamente
+    $(document).ready(function() {
+      console.log('✅ jQuery cargado correctamente:', typeof $ !== 'undefined');
+      console.log('✅ Bootstrap cargado correctamente:', typeof $.fn.modal !== 'undefined');
+      
+      // Verificar que todos los elementos están listos
+      console.log('✅ DOM completamente cargado');
+      
+      // Forzar re-inicialización si es necesario
+      if (typeof window.initComponenteProductos === 'function') {
+        console.log('🔄 Re-inicializando componente productos...');
+        // No llamar automáticamente, dejar que el hash lo maneje
+      }
+    });
+  </script>
+  
   <!-- Script para asegurar que el campo Estado funcione correctamente -->
   <script src="js/campo-estado.js?v=20250807_1245"></script>
 </body>
