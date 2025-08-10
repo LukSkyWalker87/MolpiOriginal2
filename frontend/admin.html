@@ -322,9 +322,9 @@
   
   <script>
     console.log('=== ADMIN PANEL DEBUG START ===');
-    console.log('env.js loaded:', typeof window.env !== 'undefined');
-    console.log('jQuery loaded:', typeof $ !== 'undefined');
-    console.log('Bootstrap loaded:', typeof $.fn.modal !== 'undefined');
+  console.log('env.js loaded:', typeof window.env !== 'undefined');
+  console.log('jQuery loaded:', !!window.jQuery);
+  console.log('Bootstrap loaded:', !!(window.jQuery && window.jQuery.fn && window.jQuery.fn.modal));
     
     document.addEventListener("DOMContentLoaded", function () {
       console.log('=== DOMContentLoaded START ===');
