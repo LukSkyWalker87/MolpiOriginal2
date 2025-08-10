@@ -386,6 +386,50 @@ def api_health():
 def api_get_productos():
     return get_productos()
 
+@app.route('/api/diagnostico', methods=['GET'])
+def api_diagnostico():
+    """Diagnóstico rápido del estado de la base y selects básicos"""
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        c = conn.cursor()
+        c.execute("SELECT name FROM sqlite_master WHERE type='table' ORDER BY name")
+        tablas = [r[0] for r in c.fetchall()]
+
+        def columnas(tabla: str):
+            c.execute(f"PRAGMA table_info({tabla})")
+            return [
+                {
+                    'cid': r[0], 'name': r[1], 'type': r[2], 'notnull': r[3], 'default': r[4], 'pk': r[5]
+                } for r in c.fetchall()
+            ]
+
+        diag = {
+            'db_path': DB_PATH,
+            'tablas': tablas,
+        }
+        for t in ['productos', 'categorias', 'subcategorias', 'promociones', 'testimonios']:
+            diag[f'{t}_columns'] = columnas(t) if t in tablas else None
+
+        tests = {}
+        try:
+            c.execute("SELECT id, nombre, descripcion, pdf_url, imagen_url, imagen_mosaico_url, categoria, subcategoria, precio, precio_usd, activo, fecha_creacion, fecha_modificacion FROM productos LIMIT 1")
+            _ = c.fetchall()
+            tests['productos_select'] = 'ok'
+        except Exception as e:
+            tests['productos_select'] = f'error: {e}'
+        try:
+            c.execute("SELECT * FROM categorias LIMIT 1")
+            _ = c.fetchall()
+            tests['categorias_select'] = 'ok'
+        except Exception as e:
+            tests['categorias_select'] = f'error: {e}'
+
+        diag['select_tests'] = tests
+        conn.close()
+        return jsonify(diag)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 @app.route('/productos', methods=['POST'])
 def add_producto():
     data = request.get_json()
