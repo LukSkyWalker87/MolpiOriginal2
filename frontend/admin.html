@@ -302,7 +302,7 @@
     <a href="#" data-section="promociones">📢 Promociones</a>
     <a href="#" data-section="testimonios">💬 Testimonios</a>
       <!-- Botón de salir -->
-  <a href="index.html" class="exit-button">🚪 SALIR</a>
+  <a href="/" class="exit-button">🚪 SALIR</a>
   </div>
 
 
@@ -617,6 +617,9 @@ function getClientesHTML() {
         try {
           console.log('Cargando categorías...');
           const response = await fetch(`${window.env.API_URL}/categorias`);
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status} ${response.statusText}`);
+          }
           categorias = await response.json();
           
           // Rellenar select de categorías
@@ -639,12 +642,16 @@ function getClientesHTML() {
           actualizarFiltroSubcategorias();
         } catch (error) {
           console.error('Error cargando categorías:', error);
+          // No interrumpir UI si solo fallan categorías; el usuario aún puede ver el resto
         }
         
         // 2. Cargar productos
         try {
           console.log('Cargando productos...');
           const response = await fetch(`${window.env.API_URL}/productos?incluir_inactivos=true`);
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status} ${response.statusText}`);
+          }
           productos = await response.json();
           mostrarProductos(productos);
           console.log('Productos cargados:', productos.length);
@@ -652,7 +659,8 @@ function getClientesHTML() {
           console.error('Error cargando productos:', error);
           const tbody = document.getElementById('tablaProductos');
           if (tbody) {
-            tbody.innerHTML = '<tr><td colspan="9" class="text-center text-danger">Error al cargar productos</td></tr>';
+            const msg = (error && error.message) ? `Error al cargar productos (${error.message})` : 'Error al cargar productos';
+            tbody.innerHTML = `<tr><td colspan="9" class="text-center text-danger">${msg}</td></tr>`;
           }
         }
         
