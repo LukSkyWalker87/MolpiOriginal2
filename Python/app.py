@@ -160,12 +160,81 @@ def init_db():
             subcategoria TEXT NOT NULL,
             pdf_url TEXT,
             imagen_url TEXT,
+            imagen_mosaico_url TEXT,
             precio REAL,
+            precio_usd REAL,
             activo INTEGER DEFAULT 1,
             fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             fecha_modificacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     """)
+    
+    # Migración defensiva: agregar columnas si faltan en DB existente
+    def _ensure_column(table, column, col_type):
+        c.execute(f"PRAGMA table_info({table})")
+        cols = [row[1] for row in c.fetchall()]
+        if column not in cols:
+            c.execute(f"ALTER TABLE {table} ADD COLUMN {column} {col_type}")
+    
+    # Asegurar columnas nuevas en 'productos'
+    _ensure_column('productos', 'imagen_mosaico_url', 'TEXT')
+    _ensure_column('productos', 'precio_usd', 'REAL')
+    _ensure_column('productos', 'fecha_creacion', 'TIMESTAMP')
+    _ensure_column('productos', 'fecha_modificacion', 'TIMESTAMP')
+
+    # Asegurar columnas esperadas en 'categorias' y 'subcategorias'
+    _ensure_column('categorias', 'descripcion', 'TEXT')
+    _ensure_column('categorias', 'activo', 'INTEGER')
+    _ensure_column('subcategorias', 'descripcion', 'TEXT')
+    _ensure_column('subcategorias', 'activo', 'INTEGER')
+    
+    # Tabla de testimonios
+    c.execute("""
+        CREATE TABLE IF NOT EXISTS testimonios (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            nombre TEXT NOT NULL,
+            empresa TEXT,
+            testimonio TEXT,
+            imagen TEXT,
+            orden INTEGER DEFAULT 0,
+            activo INTEGER DEFAULT 1,
+            fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            fecha_modificacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+    # Asegurar columnas esperadas en 'testimonios'
+    _ensure_column('testimonios', 'empresa', 'TEXT')
+    _ensure_column('testimonios', 'imagen', 'TEXT')
+    _ensure_column('testimonios', 'orden', 'INTEGER')
+    _ensure_column('testimonios', 'activo', 'INTEGER')
+    _ensure_column('testimonios', 'fecha_creacion', 'TIMESTAMP')
+    _ensure_column('testimonios', 'fecha_modificacion', 'TIMESTAMP')
+
+    # Tabla de promociones
+    c.execute("""
+        CREATE TABLE IF NOT EXISTS promociones (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            titulo TEXT,
+            imagen TEXT,
+            cartilla_pdf TEXT,
+            orden INTEGER DEFAULT 0,
+            activo INTEGER DEFAULT 1,
+            fecha_inicio TIMESTAMP,
+            fecha_fin TIMESTAMP,
+            fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            fecha_modificacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+    # Asegurar columnas esperadas en 'promociones'
+    _ensure_column('promociones', 'titulo', 'TEXT')
+    _ensure_column('promociones', 'imagen', 'TEXT')
+    _ensure_column('promociones', 'cartilla_pdf', 'TEXT')
+    _ensure_column('promociones', 'orden', 'INTEGER')
+    _ensure_column('promociones', 'activo', 'INTEGER')
+    _ensure_column('promociones', 'fecha_inicio', 'TIMESTAMP')
+    _ensure_column('promociones', 'fecha_fin', 'TIMESTAMP')
+    _ensure_column('promociones', 'fecha_creacion', 'TIMESTAMP')
+    _ensure_column('promociones', 'fecha_modificacion', 'TIMESTAMP')
     
     # Tabla de imágenes adicionales para productos
     c.execute("""
@@ -238,6 +307,18 @@ def init_db():
 
 init_db()
 
+@app.route('/health', methods=['GET'])
+def health():
+    try:
+        # Verificar DB mínima
+        conn = sqlite3.connect(DB_PATH)
+        c = conn.cursor()
+        c.execute("SELECT 1")
+        conn.close()
+        return jsonify({"status": "ok"})
+    except Exception as e:
+        return jsonify({"status": "error", "detail": str(e)}), 500
+
 @app.route('/productos', methods=['GET'])
 def get_productos():
     categoria = request.args.get('categoria')
@@ -257,7 +338,7 @@ def get_productos():
     
     # Si no se especifica incluir_inactivos, filtrar solo activos (comportamiento por defecto)
     if not incluir_inactivos:
-        query += "WHERE activo = 1"
+        query += "WHERE IFNULL(activo, 1) = 1"
     else:
         query += "WHERE 1=1"  # Incluir todos los productos
     
@@ -295,6 +376,15 @@ def get_productos():
         })
     
     return jsonify(productos)
+
+# Aliases con prefijo /api
+@app.route('/api/health', methods=['GET'])
+def api_health():
+    return health()
+
+@app.route('/api/productos', methods=['GET'])
+def api_get_productos():
+    return get_productos()
 
 @app.route('/productos', methods=['POST'])
 def add_producto():
@@ -688,7 +778,7 @@ def get_categorias():
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     
-    c.execute("SELECT * FROM categorias WHERE activo = 1 ORDER BY nombre")
+    c.execute("SELECT * FROM categorias WHERE IFNULL(activo, 1) = 1 ORDER BY nombre")
     rows = c.fetchall()
     conn.close()
     
@@ -702,6 +792,10 @@ def get_categorias():
         })
     
     return jsonify(categorias)
+
+@app.route('/api/categorias', methods=['GET'])
+def api_get_categorias():
+    return get_categorias()
 
 @app.route('/subcategorias', methods=['GET'])
 def get_subcategorias():
@@ -729,6 +823,10 @@ def get_subcategorias():
         })
     
     return jsonify(subcategorias)
+
+@app.route('/api/subcategorias', methods=['GET'])
+def api_get_subcategorias():
+    return get_subcategorias()
 
 
 @app.route('/admin/guardar_slide/<int:index>', methods=['POST'])
@@ -1041,35 +1139,39 @@ def get_promociones():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@app.route('/api/promociones', methods=['GET'])
+def api_get_promociones():
+    return get_promociones()
+
 @app.route('/promociones', methods=['POST'])
 def create_promocion():
     """Crear una nueva promoción"""
     try:
-        data = request.json
+        data = request.get_json(silent=True) or {}
         titulo = data.get('titulo', '')
         imagen = data.get('imagen', '')
         cartilla_pdf = data.get('cartilla_pdf', '')
-        
+
         if not imagen:
             return jsonify({'error': 'La imagen es requerida'}), 400
-        
+
         conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
-        
+
         cursor.execute('''
             INSERT INTO promociones (titulo, imagen, cartilla_pdf, orden, activo, fecha_creacion, fecha_modificacion)
             VALUES (?, ?, ?, 0, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
         ''', (titulo, imagen, cartilla_pdf))
-        
+
         promocion_id = cursor.lastrowid
         conn.commit()
         conn.close()
-        
+
         return jsonify({
             'message': 'Promoción creada exitosamente',
             'id': promocion_id
         }), 201
-        
+
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
@@ -1077,34 +1179,34 @@ def create_promocion():
 def update_promocion(promocion_id):
     """Actualizar una promoción existente"""
     try:
-        data = request.json
+        data = request.get_json(silent=True) or {}
         titulo = data.get('titulo', '')
         imagen = data.get('imagen', '')
         cartilla_pdf = data.get('cartilla_pdf', '')
         activo = data.get('activo', 1)
-        
+
         if not imagen:
             return jsonify({'error': 'La imagen es requerida'}), 400
-        
+
         conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
-        
+
         # Verificar si la promoción existe
         cursor.execute('SELECT id FROM promociones WHERE id = ?', (promocion_id,))
         if not cursor.fetchone():
             return jsonify({'error': 'Promoción no encontrada'}), 404
-        
+
         cursor.execute('''
             UPDATE promociones 
             SET titulo = ?, imagen = ?, cartilla_pdf = ?, activo = ?, fecha_modificacion = CURRENT_TIMESTAMP
             WHERE id = ?
         ''', (titulo, imagen, cartilla_pdf, activo, promocion_id))
-        
+
         conn.commit()
         conn.close()
-        
+
         return jsonify({'message': 'Promoción actualizada exitosamente'})
-        
+
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
@@ -1168,6 +1270,10 @@ def get_promociones_admin():
         
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+@app.route('/api/promociones/admin', methods=['GET'])
+def api_get_promociones_admin():
+    return get_promociones_admin()
 
 @app.route('/upload/promocion', methods=['POST'])
 def upload_promocion_file():
