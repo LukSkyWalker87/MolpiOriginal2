@@ -1,6 +1,6 @@
-// Configuración para producción - Vercel + PythonAnywhere
+// Configuración para Docker - Frontend y Backend en mismo dominio
 window.env = {
-    API_URL: 'https://sgit.pythonanywhere.com/api',
+    API_URL: '/api',  // URL relativa - sin CORS
     DEBUG: false,
     VERSION: '1.0.0'
 };

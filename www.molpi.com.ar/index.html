@@ -230,8 +230,8 @@ loginForm.addEventListener('submit', async function(e) {
 																</a>
 															</li>
 															<li>
-																<a href="insumos.html">
-																	Insumos
+																<a href="listones.html">
+																	Listones
 																</a>
 															</li>
 														</ul>
@@ -833,7 +833,7 @@ loginForm.addEventListener('submit', async function(e) {
 							<span class="phone">(54) 11-3556-8417</span>
 							<span class="phone">(54) 11-2331-5331</span>
 							<p class="mb-none">Oficinas y Planta de producción:<br>
-							Cafferata 3210 ex 3210 (1852) - Burzaco. <br>
+							Cafferata 3110 ex 3210 (1852) - Burzaco. <br>
 							Parque Industrial de Almirante Brown<br/>
 							Provincia de Buenos Aires. Argentina.<br/>
 							</p>
@@ -887,7 +887,7 @@ loginForm.addEventListener('submit', async function(e) {
 						<div class="row">
 						    <div class="col-md-12">
 								<p>© Copyright 2025. Todos los derechos reservados.<br>
-								<a href="../www.seonet.com.ar/blog/marketing-para-pymes/index.html" style="color: #555555;">Marketing para Pymes</a>
+								<a href="https://www.servicesglobal-it.com/" style="color: #555555;">Soluciones Técnologicas</a>
 								</p>
 							</div>
 						</div>
@@ -929,7 +929,7 @@ loginForm.addEventListener('submit', async function(e) {
 				try {
 					// Hacer la petición AJAX para obtener promociones activas
 					$.ajax({
-						url: 'http://localhost:5000/promociones',
+						url: '/promociones',
 						method: 'GET',
 						timeout: 5000,
 						success: function(response) {
@@ -1178,7 +1178,7 @@ loginForm.addEventListener('submit', async function(e) {
 				try {
 					// Hacer la petición AJAX para obtener testimonios activos
 					$.ajax({
-						url: 'http://localhost:5000/testimonios',
+						url: '/testimonios',
 						method: 'GET',
 						timeout: 5000,
 						success: function(response) {

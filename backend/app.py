@@ -497,6 +497,40 @@ def get_productos_insumos():
     
     return jsonify(productos_por_subcategoria)
 
+# Endpoint para productos Listones
+@app.route('/api/productos/listones', methods=['GET'])
+def get_productos_listones():
+    """Productos de Listones"""
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    c.execute("""
+        SELECT id, nombre, descripcion, pdf_url, imagen_url, imagen_mosaico_url, categoria, subcategoria, 
+               precio, precio_usd, activo, fecha_creacion, fecha_modificacion
+        FROM productos 
+        WHERE activo = 1 AND categoria = 'Listones'
+        ORDER BY nombre
+    """)
+    rows = c.fetchall()
+    conn.close()
+    productos = []
+    for row in rows:
+        productos.append({
+            'id': row[0],
+            'nombre': row[1],
+            'descripcion': row[2],
+            'pdf_url': row[3],
+            'imagen_url': row[4],
+            'imagen_mosaico_url': row[5],
+            'categoria': row[6],
+            'subcategoria': row[7],
+            'precio': row[8],
+            'precio_usd': row[9],
+            'activo': row[10],
+            'fecha_creacion': row[11],
+            'fecha_modificacion': row[12]
+        })
+    return jsonify(productos)
+
 # ========= Testimonios =========
 @app.route('/api/testimonios', methods=['GET'])
 def get_testimonios():

@@ -14,23 +14,34 @@
   <script src="env.js"></script>
 
   <style>
+    /* Reset y asegurar que el layout funcione */
+    * {
+      box-sizing: border-box;
+    }
+    
     body {
       font-family: 'Open Sans', sans-serif;
       margin: 0;
-      display: flex;
+      padding: 0;
+      display: flex !important;
       background-color: #f8f9fa;
       min-height: 100vh;
+      overflow: hidden;
     }
 
-    /* Sidebar básico */
+    /* Sidebar con posición fija */
     .sidebar {
-      width: 250px;
+      width: 250px !important;
       background: linear-gradient(135deg, #2c3e50, #34495e);
       color: white;
       min-height: 100vh;
       padding: 20px 0;
       box-shadow: 2px 0 10px rgba(0,0,0,0.1);
-      position: relative;
+      position: fixed !important;
+      left: 0;
+      top: 0;
+      z-index: 1000;
+      overflow-y: auto;
     }
 
     .sidebar h2 {
@@ -69,11 +80,14 @@
       text-decoration: none;
     }
 
-    /* Main content */
+    /* Main content con margen para el sidebar */
     .main-content {
-      flex: 1;
+      margin-left: 250px !important;
+      width: calc(100% - 250px) !important;
       padding: 20px;
       overflow-y: auto;
+      min-height: 100vh;
+      background-color: #f8f9fa;
     }
 
     /* Header */

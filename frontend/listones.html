@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Listones | Molpi</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon" />
+    <link rel="stylesheet" href="vendor/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="vendor/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="vendor/animate/animate.min.css">
+    <link rel="stylesheet" href="vendor/simple-line-icons/css/simple-line-icons.min.css">
+    <link rel="stylesheet" href="vendor/owl.carousel/assets/owl.carousel.min.css">
+    <link rel="stylesheet" href="vendor/owl.carousel/assets/owl.theme.default.min.css">
+    <link rel="stylesheet" href="vendor/magnific-popup/magnific-popup.min.css">
+    <link rel="stylesheet" href="css/general.css">
+    <link rel="stylesheet" href="css/elementos-generales.css">
+</head>
+<body>
+    <header class="container-fluid p-0">
+    <img src="/img/slides/slide-piscina1.png" alt="Portada Listones" class="img-fluid w-100" style="max-height:400px;object-fit:cover;">
+    </header>
+    <main class="container mt-4">
+        <h1 class="mb-4">Listones</h1>
+        <div id="productos-listones" class="row"></div>
+    </main>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        fetch('/api/productos/listones')
+            .then(response => response.json())
+            .then(data => {
+                const cont = document.getElementById('productos-listones');
+                if (Array.isArray(data) && data.length > 0) {
+                    data.forEach(prod => {
+                        const col = document.createElement('div');
+                        col.className = 'col-md-4 mb-4';
+                        col.innerHTML = `
+                            <div class="card h-100">
+                                <img src="${prod.imagen_url}" class="card-img-top" alt="${prod.nombre}">
+                                <div class="card-body">
+                                    <h5 class="card-title">${prod.nombre}</h5>
+                                    <p class="card-text">${prod.descripcion || ''}</p>
+                                </div>
+                            </div>
+                        `;
+                        cont.appendChild(col);
+                    });
+                } else {
+                    cont.innerHTML = '<div class="col-12"><p>No hay productos disponibles.</p></div>';
+                }
+            })
+            .catch(() => {
+                document.getElementById('productos-listones').innerHTML = '<div class="col-12"><p>Error al cargar productos.</p></div>';
+            });
+    });
+    </script>
+</body>
+</html>

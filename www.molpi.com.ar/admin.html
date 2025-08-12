@@ -1,7 +1,82 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+
+  <!-- Reglas globales para botones outline (homogeneidad en todas las secciones) -->
+  <style>
+    .btn-outline-primary {
+      color: #007bff;
+      background-color: #fff;
+      border: 1.5px solid #007bff;
+      box-shadow: none;
+      transition: background 0.15s, color 0.15s, box-shadow 0.15s;
+    }
+    .btn-outline-primary:hover,
+    .btn-outline-primary:focus,
+    .btn-outline-primary:active {
+      color: #fff;
+      background-color: #007bff;
+      border-color: #007bff;
+      box-shadow: 0 4px 12px rgba(0,123,255,0.15);
+    }
+    .btn-outline-danger {
+      color: #dc3545;
+      background-color: #fff;
+      border: 1.5px solid #dc3545;
+      box-shadow: none;
+      transition: background 0.15s, color 0.15s, box-shadow 0.15s;
+    }
+    .btn-outline-danger:hover,
+    .btn-outline-danger:focus,
+    .btn-outline-danger:active {
+      color: #fff;
+      background-color: #dc3545;
+      border-color: #dc3545;
+      box-shadow: 0 4px 12px rgba(220,53,69,0.15);
+    }
+  </style>
+
+  <!-- Estilos para botones outline de acciones de testimonios (igual a promociones) -->
+  <style>
+    .testimonios-component .acciones .btn {
+      border-radius: .375rem;
+      min-width: 96px;
+      padding: .45rem .7rem;
+      font-size: .9rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,.08);
+      transition: background 0.15s, color 0.15s, box-shadow 0.15s;
+    }
+    .testimonios-component .btn-outline-primary {
+      color: #007bff;
+      background-color: #fff;
+      border: 1.5px solid #007bff;
+      box-shadow: none;
+    }
+    .testimonios-component .btn-outline-primary:hover,
+    .testimonios-component .btn-outline-primary:focus,
+    .testimonios-component .btn-outline-primary:active {
+      color: #fff;
+      background-color: #007bff;
+      border-color: #007bff;
+      box-shadow: 0 4px 12px rgba(0,123,255,0.15);
+    }
+    .testimonios-component .btn-outline-danger {
+      color: #dc3545;
+      background-color: #fff;
+      border: 1.5px solid #dc3545;
+      box-shadow: none;
+    }
+    .testimonios-component .btn-outline-danger:hover,
+    .testimonios-component .btn-outline-danger:focus,
+    .testimonios-component .btn-outline-danger:active {
+      color: #fff;
+      background-color: #dc3545;
+      border-color: #dc3545;
+      box-shadow: 0 4px 12px rgba(220,53,69,0.15);
+    }
+  </style>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Panel de Administración | Molpi</title>
   <!-- Cache buster: ACTUALIZADO 7 Agosto 2025 12:45 - Campo Estado VISIBLE al lado de subcategoría -->
   <link rel="icon" href="img/favicon.ico" type="image/x-icon">
@@ -16,17 +91,23 @@
     body {
       font-family: 'Open Sans', sans-serif;
       margin: 0;
-      display: flex;
+  display: flex;
     }
 
     /* Estilos para botones de acciones minimalistas */
     .btn-group .btn {
-      font-size: 0.75rem;
-      padding: 0.25rem 0.5rem;
-      border-radius: 4px;
+      font-size: 0.78rem;
+      padding: 0.18rem 0.55rem;
+      border-radius: 3px;
       margin-right: 2px;
       transition: all 0.2s ease;
       border-width: 1px;
+      min-width: 36px;
+      max-width: 90px;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     
     .btn-group .btn:hover {
@@ -35,7 +116,8 @@
     }
     
     .btn-group .btn i {
-      font-size: 0.7rem;
+      font-size: 0.95em;
+      margin-right: 4px;
     }
     
     .btn-outline-primary:hover {
@@ -184,8 +266,32 @@
     .main-content {
       margin-left: 280px;
       padding: 40px;
-      width: 100%;
+      /* Asegurar que el contenido no se corte en el borde derecho */
+      width: auto;
+      max-width: calc(100vw - 280px);
+      box-sizing: border-box;
+      overflow-x: auto;
+      min-width: 0;
       background-color: #f8f9fa;
+    }
+
+    /* Hacer responsivo el encabezado de tarjetas con título + botón */
+    .card .card-header.d-flex {
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    .card .card-header.d-flex .btn {
+      white-space: nowrap;
+    }
+
+    /* Ajustar layout cuando la pantalla es más angosta */
+    @media (max-width: 1200px) {
+      .sidebar { width: 240px; }
+      .main-content { margin-left: 240px; max-width: calc(100vw - 240px); }
+    }
+    @media (max-width: 992px) {
+      .sidebar { width: 220px; }
+      .main-content { margin-left: 220px; max-width: calc(100vw - 220px); padding: 24px; }
     }
   </style>
 </head>
@@ -529,17 +635,17 @@ function getClientesHTML() {
               <td>
                 <div class="btn-group" role="group">
                   ${esPodotactil ? 
-                    `<button class="btn btn-outline-primary btn-sm btn-editar-podotactil" data-id="${producto.id}" title="Editar producto podotáctil">
-                      <i class="fa fa-edit mr-1"></i>Editar
+                    `<button class="btn btn-outline-primary btn-sm btn-editar-podotactil" data-id="${producto.id}" title="Editar">
+                      <i class="fa fa-edit"></i> Editar
                     </button>
-                    <button class="btn btn-outline-danger btn-sm btn-eliminar" data-id="${producto.id}" title="Eliminar producto podotáctil">
-                      <i class="fa fa-trash mr-1"></i>Eliminar
+                    <button class="btn btn-outline-danger btn-sm btn-eliminar" data-id="${producto.id}" title="Eliminar">
+                      <i class="fa fa-trash"></i> Eliminar
                     </button>` :
-                    `<button class="btn btn-outline-primary btn-sm btn-editar" data-id="${producto.id}" title="Editar producto">
-                      <i class="fa fa-edit mr-1"></i>Editar
+                    `<button class="btn btn-outline-primary btn-sm btn-editar" data-id="${producto.id}" title="Editar">
+                      <i class="fa fa-edit"></i> Editar
                     </button>
-                    <button class="btn btn-outline-danger btn-sm btn-eliminar" data-id="${producto.id}" title="Eliminar producto">
-                <i class="fa fa-trash mr-1"></i>Eliminar
+                    <button class="btn btn-outline-danger btn-sm btn-eliminar" data-id="${producto.id}" title="Eliminar">
+                      <i class="fa fa-trash"></i> Eliminar
                     </button>`
                   }
                   ${producto.pdf_url ? 
@@ -2062,7 +2168,7 @@ function getClientesHTML() {
                 <!-- Tabla de productos -->
                 <div class="card">
                   <div class="card-body">
-                    <div class="table-responsive">
+                    <div class="table-responsive" style="overflow-x: auto;">
                       <table class="table table-striped">
                         <thead>
                           <tr>
@@ -2364,7 +2470,7 @@ function getClientesHTML() {
       async function loadPromocionesComponent() {
         try {
           console.log('Fetching promociones component...');
-          const response = await fetch('http://localhost:5000/admin/component/promociones');
+          const response = await fetch('/admin/component/promociones');
           
           if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);

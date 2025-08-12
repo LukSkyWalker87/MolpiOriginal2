@@ -1,3 +1,4 @@
+
 from flask import Flask, render_template_string, request, jsonify, send_from_directory, send_file, redirect, render_template, url_for, make_response, make_response
 from flask_cors import CORS
 from werkzeug.utils import secure_filename
@@ -19,6 +20,12 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 # Configuración para archivos permitidos
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp', 'pdf'}
 
+# ========= Servir archivos de componentes (promociones, etc) =========
+@app.route('/components/<path:filename>')
+def serve_components(filename):
+    folder = os.path.abspath(os.path.join(app.root_path, '..', 'www.molpi.com.ar', 'components'))
+    return send_from_directory(folder, filename)
+
 def allowed_file(filename):
     """Verificar si el archivo tiene una extensión permitida"""
     return '.' in filename and \
@@ -36,8 +43,29 @@ def is_pdf_file(filename):
            filename.rsplit('.', 1)[1].lower() == 'pdf'
 CORS(app)
 
-# ========= Ruta de la base de datos =========
-DB_PATH = os.path.join(os.path.dirname(__file__), 'molpi.db')
+# ========= Ruta de la base de datos (segura para contenedores/Cloud Run) =========
+# - La DB empaquetada viaja en la imagen (solo lectura en Cloud Run)
+# - En runtime, usamos /tmp/molpi.db (escritura permitida) y copiamos la DB empaquetada si existe
+PACKAGED_DB = os.path.join(os.path.dirname(__file__), 'molpi.db')
+RUNTIME_DB = os.environ.get('MOLPI_DB_PATH', '/tmp/molpi.db')
+
+# Preparar DB runtime copiando desde la empaquetada si hace falta
+try:
+    if not os.path.exists(RUNTIME_DB):
+        os.makedirs(os.path.dirname(RUNTIME_DB), exist_ok=True)
+        if os.path.exists(PACKAGED_DB):
+            import shutil
+            shutil.copy2(PACKAGED_DB, RUNTIME_DB)
+        else:
+            # Crear archivo vacío si no existe una DB anterior
+            open(RUNTIME_DB, 'a').close()
+except Exception as e:
+    print(f"[DB INIT] Error preparando DB en {RUNTIME_DB}: {e}")
+
+# Ruta efectiva usada por sqlite3 y SQLAlchemy
+DB_PATH = RUNTIME_DB
+# Alinear SQLAlchemy para que use la misma ruta
+app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DB_PATH}'
 
 # ========= Configuración de SQLAlchemy =========
 db = SQLAlchemy(app)
@@ -108,6 +136,62 @@ def login():
         else:
             return "Credenciales inválidas", 401
 
+# ========= Login API (JSON) =========
+# Alineado con frontend que llama a `${window.env.API_URL}/login`
+@app.route('/api/login', methods=['POST', 'OPTIONS'])
+def api_login():
+    # Responder preflight CORS
+    if request.method == 'OPTIONS':
+        resp = jsonify({'status': 'ok'})
+        resp.headers['Access-Control-Allow-Origin'] = '*'
+        resp.headers['Access-Control-Allow-Methods'] = 'POST, OPTIONS'
+        resp.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
+        return resp, 200
+    try:
+        # Aceptar JSON, formulario o raw body
+        data = request.get_json(silent=True) or {}
+        if not data:
+            # Intentar parsear raw body como JSON si viene sin header correcto
+            try:
+                raw = request.get_data(as_text=True)
+                if raw:
+                    data = json.loads(raw)
+            except Exception:
+                data = {}
+        if not data:
+            data = {
+                'username': request.form.get('username'),
+                'password': request.form.get('password') or request.form.get('contrasena')
+            }
+
+        # Leer posibles variantes de claves
+        username = (
+            data.get('username') or data.get('user') or data.get('email') or ''
+        ).strip()
+        password = (
+            data.get('password') or data.get('contrasena') or data.get('pass') or ''
+        ).strip()
+
+        # Soportar Basic Auth (Authorization: Basic base64)
+        if not username or not password:
+            auth = request.authorization
+            if auth and not username and not password:
+                username = auth.username or username
+                password = auth.password or password
+
+        print(f"[LOGIN DEBUG] data={data} username='{username}' password_len={len(password)} is_json={request.is_json}")
+        if username == 'admin' and password == '1234':
+            return jsonify({'token': 'valid-token'}), 200
+        else:
+            return jsonify({'message': 'Credenciales inválidas'}), 401
+    except Exception as e:
+        return jsonify({'message': 'Error en login', 'error': str(e)}), 400
+
+# Endpoint GET para depuración del enrutamiento
+@app.route('/api/login', methods=['GET'])
+def api_login_debug_get():
+    return jsonify({'status': 'ok', 'endpoint': '/api/login', 'method': 'GET'})
+
 # ========= Página principal y archivos estáticos =========
 @app.route('/')
 def index():
@@ -117,8 +201,23 @@ def index():
 
 @app.route('/<path:filename>')
 def serve_static(filename):
+    # Prioridad: devolver env.js dinámico en vez del archivo estático
+    if filename == 'env.js':
+        return env_js()
     folder = os.path.abspath(os.path.join(app.root_path, '..', 'www.molpi.com.ar'))
     return send_from_directory(folder, filename)
+
+# ========= env.js dinámico para frontend dentro de contenedor =========
+@app.route('/env.js')
+def env_js():
+    # Dentro del contenedor, el frontend debe llamar a la misma URL de origen
+    js = """
+// Generado dinámicamente por app.py
+window.env = { API_URL: '/api' };
+"""
+    resp = make_response(js)
+    resp.headers['Content-Type'] = 'application/javascript'
+    return resp
 
 # ========= Sección SLIDER =========
 @app.route('/datos_slider')
@@ -1546,6 +1645,22 @@ def test_productos():
 def test_simple():
     return "Hola mundo"
 
+# ========= Rutas registradas (debug) =========
+@app.route('/routes', methods=['GET'])
+def list_routes():
+    routes = []
+    for rule in app.url_map.iter_rules():
+        rule_methods = rule.methods or set()
+        methods = sorted(m for m in rule_methods if m not in ('HEAD', 'OPTIONS'))
+        routes.append({
+            'rule': str(rule),
+            'endpoint': rule.endpoint,
+            'methods': methods
+        })
+    return jsonify(sorted(routes, key=lambda r: r['rule']))
+
 # ========= Main =========
 if __name__ == '__main__':
-    app.run(debug=False, host='127.0.0.1', port=5000)
+    host = os.environ.get('HOST', '127.0.0.1')
+    port = int(os.environ.get('PORT', '5000'))
+    app.run(debug=False, host=host, port=port)
