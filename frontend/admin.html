@@ -885,29 +885,24 @@ function getClientesHTML() {
                   ${producto.activo ? 'Activo' : 'Inactivo'}
                 </span>
               </td>
-              <td>
+                <td>
                 <div class="btn-group" role="group">
                   ${esPodotactil ? 
-                    `<button class="btn btn-outline-primary btn-sm btn-editar-podotactil" data-id="${producto.id}" title="Editar producto podotáctil">
-                      <i class="fa fa-edit mr-1"></i>Editar
-                    </button>
-                    <button class="btn btn-outline-danger btn-sm btn-eliminar" data-id="${producto.id}" title="Eliminar producto podotáctil">
-                      <i class="fa fa-trash mr-1"></i>Eliminar
-                    </button>` :
-                    `<button class="btn btn-outline-primary btn-sm btn-editar" data-id="${producto.id}" title="Editar producto">
-                      <i class="fa fa-edit mr-1"></i>Editar
-                    </button>
-                    <button class="btn btn-outline-danger btn-sm btn-eliminar" data-id="${producto.id}" title="Eliminar producto">
-                <i class="fa fa-trash mr-1"></i>Eliminar
-                    </button>`
-                  }
-                  ${producto.pdf_url ? 
-                    `<a href="${producto.pdf_url}" target="_blank" class="btn btn-outline-info btn-sm" title="Ver catálogo PDF">
-                      <i class="fa fa-file-pdf-o mr-1"></i>PDF
-                    </a>` : ''
+                  `<button class="btn btn-outline-primary btn-sm btn-editar-podotactil" data-id="${producto.id}" title="Editar producto podotáctil">
+                    <i class="fa fa-edit mr-1"></i>Editar
+                  </button>
+                  <button class="btn btn-outline-danger btn-sm btn-eliminar" data-id="${producto.id}" title="Eliminar producto podotáctil">
+                    <i class="fa fa-trash mr-1"></i>Eliminar
+                  </button>` :
+                  `<button class="btn btn-outline-primary btn-sm btn-editar" data-id="${producto.id}" title="Editar producto">
+                    <i class="fa fa-edit mr-1"></i>Editar
+                  </button>
+                  <button class="btn btn-outline-danger btn-sm btn-eliminar" data-id="${producto.id}" title="Eliminar producto">
+                    <i class="fa fa-trash mr-1"></i>Eliminar
+                  </button>`
                   }
                 </div>
-              </td>
+                </td>
             `;
             tbody.appendChild(fila);
           });

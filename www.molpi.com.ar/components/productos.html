@@ -10,6 +10,8 @@
 
 .productos-component .btn-sm {
   margin-right: 3px;
+  min-width: 70px;
+  max-width: none;
 }
 
 .productos-component .modal-lg {
@@ -35,6 +37,7 @@
   font-size: 0.875rem;
 }
 
+
 .productos-component .table th,
 .productos-component .table td {
   padding: 0.3rem 0.5rem;
@@ -42,7 +45,22 @@
   border-top: 1px solid #dee2e6;
   white-space: nowrap;
   font-size: 0.8rem;
+  max-width: 260px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
+
+/* Solo expandir columna Acciones para los botones */
+.productos-component .table th:nth-child(9),
+.productos-component .table td:nth-child(9) {
+  min-width: 180px;
+  width: 210px;
+  max-width: 240px;
+  text-align: center;
+}
+
+
 
 .productos-component .table th {
   background-color: #f8f9fa;
@@ -425,9 +443,16 @@
                   <i class="fa fa-folder"></i>Categoría *
                 </label>
                 <select class="form-control" id="productoCategoria" name="categoria" required>
-                  <option value="">Selecciona una categoría</option>
+                    <option value="">Selecciona una categoría</option>
+                  </select>
+                  <style>
+                    #productoCategoria {
+                      max-width: 250px;
+                      min-width: 120px;
+                    }
+                  </style>
                 </select>
-              </div>
+                </div>
             </div>
           </div>
           
@@ -524,15 +549,7 @@
           </div>
           
           <div class="row">
-            <div class="col-md-12">
-              <div class="form-group">
-                <label for="productoPdf">
-                  <i class="fa fa-file-pdf-o"></i>URL del PDF
-                </label>
-                <input type="text" class="form-control" id="productoPdf" name="pdf_url" 
-                       placeholder="https://ejemplo.com/catalogo.pdf">
-              </div>
-            </div>
+            <!-- Eliminado campo de URL del PDF -->
           </div>
           
           <!-- Vista previa de imagen -->

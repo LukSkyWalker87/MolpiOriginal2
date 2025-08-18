@@ -1,3 +1,4 @@
+# ========= IMPORTS Y CONFIGURACIÓN INICIAL =========
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import os
@@ -11,6 +12,22 @@ app.config['SECRET_KEY'] = 'molpi-secret-key-2025'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///molpi.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+# ========= Upload de imágenes de productos =========
+@app.route('/upload/producto', methods=['POST'])
+def upload_producto():
+    if 'file' not in request.files:
+        return jsonify({'error': 'No file part'}), 400
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({'error': 'No selected file'}), 400
+    # Guardar archivo
+    upload_folder = os.path.join(os.path.dirname(__file__), '..', 'static', 'uploads')
+    os.makedirs(upload_folder, exist_ok=True)
+    file_path = os.path.join(upload_folder, file.filename)
+    file.save(file_path)
+    # Devolver ruta relativa para el frontend
+    relative_path = os.path.relpath(file_path, os.path.dirname(__file__))
+    return jsonify({'path': relative_path.replace('\\', '/')})
 # ========= CORS - Configuración para PythonAnywhere =========
 # CORS configurado correctamente
 CORS(app, resources={r"/api/*": {
@@ -139,7 +156,10 @@ def get_productos():
             'fecha_modificacion': row[12]
         })
     
-    return jsonify(productos)
+    return jsonify({
+        'productos': productos,
+        'db_path': os.path.abspath(DB_PATH)
+    })
 
 @app.route('/api/productos', methods=['POST'])
 def add_producto():

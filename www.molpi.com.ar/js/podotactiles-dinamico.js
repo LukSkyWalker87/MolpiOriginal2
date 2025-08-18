@@ -7,21 +7,18 @@ async function cargarProductosPodotactiles() {
     try {
         console.log('Cargando productos podotáctiles desde API...');
         
-        // Cargar productos desde la API
-        const response = await fetch('/productos');
-        const productos = await response.json();
-        
-        // Obtener todos los productos podotáctiles (activos e inactivos)
-        const todosPodotactiles = productos.filter(p => p.categoria === 'Podotáctiles');
-        
-        // Filtrar solo productos podotáctiles activos
-        const podotactilesActivos = todosPodotactiles.filter(p => p.activo === 1);
-        
-        console.log('Productos podotáctiles encontrados:', todosPodotactiles);
-        console.log('Productos podotáctiles activos:', podotactilesActivos);
-        
-        // Actualizar contenido basado en productos activos e inactivos
-        actualizarContenidoPodotactiles(podotactilesActivos, todosPodotactiles);
+    // Cargar productos desde la API
+    const response = await fetch('/api/productos');
+    const data = await response.json();
+    const productos = data.productos || [];
+    // Obtener todos los productos podotáctiles (activos e inactivos)
+    const todosPodotactiles = productos.filter(p => p.categoria === 'Podotáctiles');
+    // Filtrar solo productos podotáctiles activos
+    const podotactilesActivos = todosPodotactiles.filter(p => p.activo === 1);
+    console.log('Productos podotáctiles encontrados:', todosPodotactiles);
+    console.log('Productos podotáctiles activos:', podotactilesActivos);
+    // Actualizar contenido basado en productos activos e inactivos
+    actualizarContenidoPodotactiles(podotactilesActivos, todosPodotactiles);
         
     } catch (error) {
         console.error('Error cargando productos podotáctiles:', error);

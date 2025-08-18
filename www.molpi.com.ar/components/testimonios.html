@@ -76,19 +76,19 @@
         <table class="table">
           <thead>
             <tr>
-              <th>Foto</th>
+              <th>#</th>
               <th>Nombre</th>
               <th>Empresa</th>
               <th>Testimonio</th>
               <th>Estado</th>
               <th>Fecha</th>
-              <th class="text-right">Acciones</th>
+              <th class="text-center">Acciones</th>
             </tr>
           </thead>
           <tbody id="tablaTestimonios">
             <!-- filas dinámicas -->
             <tr>
-              <td colspan="7" class="text-center text-muted">
+                <td colspan="7" class="text-center text-muted">
                 <div class="spinner-border" role="status"><span class="sr-only">Cargando...</span></div>
               </td>
             </tr>
@@ -296,13 +296,11 @@ function renderTestimonioRow(t){
     ? new Date(t.fecha_creacion).toLocaleDateString('es-AR')
     : '-';
 
-  const img = t.imagen ? `<img class="avatar" src="${t.imagen}" alt="" onerror="this.src=''; this.outerHTML='<span class=&quot;text-muted&quot;>—</span>';">` : '—';
-
   return `
     <tr data-row="t" data-nombre="${t.nombre||''}" data-empresa="${t.empresa||''}">
-      <td>${img}</td>
-      <td>${t.nombre || '-'}</td>
-      <td>${t.empresa || '-'}</td>
+      <td><span class="font-weight-bold">${t.orden || '-'}</span></td>
+      <td><span class="font-weight-bold">${t.nombre || '-'}</span></td>
+      <td><i class="fa fa-building text-muted mr-1"></i>${t.empresa || '-'}</td>
       <td class="testimonio-texto" title="${(t.texto||'').replace(/"/g,'&quot;')}">${t.texto || '-'}</td>
       <td>${estado}</td>
       <td>${fecha}</td>

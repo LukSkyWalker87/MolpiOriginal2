@@ -1,5 +1,5 @@
 
-from flask import Flask, render_template_string, request, jsonify, send_from_directory, send_file, redirect, render_template, url_for, make_response, make_response
+from flask import Flask, render_template_string, request, jsonify, send_from_directory, send_file, redirect, render_template, url_for, make_response
 from flask_cors import CORS
 from werkzeug.utils import secure_filename
 import os
@@ -79,6 +79,23 @@ class Testimonio(db.Model):
 # ========= Inicialización de la base de datos =========
 with app.app_context():
     db.create_all()
+
+# ========= Upload de imágenes de productos =========
+@app.route('/upload/producto', methods=['POST'])
+def upload_producto():
+    if 'file' not in request.files:
+        return jsonify({'error': 'No file part'}), 400
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({'error': 'No selected file'}), 400
+    # Guardar archivo en la carpeta estática accesible por el frontend
+    static_uploads_folder = os.path.abspath(os.path.join(app.root_path, '..', 'www.molpi.com.ar', 'static', 'uploads'))
+    os.makedirs(static_uploads_folder, exist_ok=True)
+    file_path = os.path.join(static_uploads_folder, file.filename)
+    file.save(file_path)
+    # Devolver ruta accesible por el frontend
+    url_path = f"/static/uploads/{file.filename}"
+    return jsonify({'path': url_path})
 
 # ========= Página de prueba de login =========
 @app.route('/login-test')
@@ -474,7 +491,10 @@ def get_productos():
             'fecha_modificacion': row[12]
         })
     
-    return jsonify(productos)
+    return jsonify({
+        'productos': productos,
+        'db_path': os.path.abspath(DB_PATH)
+    })
 
 # Aliases con prefijo /api
 @app.route('/api/health', methods=['GET'])

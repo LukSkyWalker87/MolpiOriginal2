@@ -2,23 +2,21 @@
 function cargarProductosGreen() {
     console.log('🟢 Cargando productos Green desde la API...');
     
-    fetch('/productos')
+    fetch('/api/productos')
         .then(response => {
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             return response.json();
         })
-        .then(productos => {
+        .then(data => {
+            const productos = data.productos || [];
             console.log('📦 Productos recibidos:', productos.length);
-            
             // Filtrar solo productos Green y activos
             const productosGreen = productos.filter(producto => 
                 producto.categoria === 'Green' && producto.activo === 1
             );
-            
             console.log('🟢 Productos Green encontrados:', productosGreen.length);
-            
             // Renderizar productos con el formato original
             renderizarProductosGreenOriginal(productosGreen);
         })
@@ -85,14 +83,11 @@ function renderizarProductosGreenOriginal(productos) {
     productosOrdenados.forEach((producto, index) => {
         // Imagen de molde (usar imagen principal)
         const imagenMolde = producto.imagen_url || '';
-        
         // Imagen de mosaico
         const imagenMosaico = producto.imagen_mosaico_url || '';
-        
         // Generar descripción específica según el producto
         let descripcion = '';
         let tipoProducto = '';
-        
         switch(producto.nombre) {
             case 'Green Rombos':
                 tipoProducto = 'Romboidal.';
@@ -118,10 +113,8 @@ function renderizarProductosGreenOriginal(productos) {
                 tipoProducto = '';
                 descripcion = producto.descripcion || 'Molde especializado para la línea Green. Ideal para jardines y exteriores con un diseño funcional y estético.';
         }
-        
         // Agregar efecto de animación con delay escalonado
         const delay = index * 200; // 200ms de delay entre cada producto
-        
         html += `
             <div class="col-md-4 producto-animate" data-delay="${delay}">
                 ${imagenMolde ? `
@@ -133,7 +126,6 @@ function renderizarProductosGreenOriginal(productos) {
                      class="custom-product-image-pos-1 _relative img-responsive producto-imagen" 
                      data-delay="${delay + 100}" />
                 ` : ''}
-                
                 ${imagenMosaico ? `
                 <img src="${imagenMosaico}" 
                      data-appear-animation="fadeInLeft" 
@@ -144,19 +136,14 @@ function renderizarProductosGreenOriginal(productos) {
                      data-delay="${delay + 200}" />
                 ` : ''}
             </div>
-            <div class="col-md-1">
-            </div>
+            <div class="col-md-1"></div>
             <div class="col-md-5 producto-animate" data-delay="${delay}">
                 <h4 class="mb-xl mt-xlg producto-titulo" data-delay="${delay + 50}">${producto.nombre}</h4>
-                <div class="divider divider-primary divider-small mb-xl producto-titulo" data-delay="${delay + 100}"> 
-                    <hr>
-                </div>
+                <div class="divider divider-primary divider-small mb-xl producto-titulo" data-delay="${delay + 100}"><hr></div>
                 <h4 class="heading-primary">Especificaciones:</h4>
                 <p><strong>${tipoProducto}</strong> ${descripcion}</p>
             </div>
-            <div class="col-md-12">
-                <hr>
-            </div>
+            <div class="col-md-12"><hr></div>
         `;
     });
     

@@ -580,8 +580,9 @@ function getClientesHTML() {
         // 2. Cargar productos
         try {
           console.log('Cargando productos...');
-          const response = await fetch('/productos?incluir_inactivos=true');
-          productos = await response.json();
+          const response = await fetch('/api/productos?incluir_inactivos=true');
+          const data = await response.json();
+          productos = data.productos; // Asegura que el array global se actualiza
           mostrarProductos(productos);
           console.log('Productos cargados:', productos.length);
         } catch (error) {
@@ -606,10 +607,8 @@ function getClientesHTML() {
           
           productosAMostrar.forEach(producto => {
             const fila = document.createElement('tr');
-            
             // Detectar si es un producto podotáctil
             const esPodotactil = producto.categoria === 'Podotáctiles' || producto.id.toString().includes('podotactil');
-            
             fila.innerHTML = `
               <td>${producto.id}</td>
               <td>
@@ -647,11 +646,6 @@ function getClientesHTML() {
                     <button class="btn btn-outline-danger btn-sm btn-eliminar" data-id="${producto.id}" title="Eliminar">
                       <i class="fa fa-trash"></i> Eliminar
                     </button>`
-                  }
-                  ${producto.pdf_url ? 
-                    `<a href="${producto.pdf_url}" target="_blank" class="btn btn-outline-info btn-sm" title="Ver catálogo PDF">
-                      <i class="fa fa-file-pdf-o mr-1"></i>PDF
-                    </a>` : ''
                   }
                 </div>
               </td>
@@ -697,7 +691,7 @@ function getClientesHTML() {
           if (categoria === 'Podotáctiles') {
             try {
               // Cargar productos podotáctiles desde la base de datos (incluyendo inactivos)
-              const response = await fetch('/productos?incluir_inactivos=true');
+              const response = await fetch('/api/productos?incluir_inactivos=true');
               const todosProductos = await response.json();
               
               // Filtrar solo productos podotáctiles
@@ -751,7 +745,7 @@ function getClientesHTML() {
                 await sincronizarPodotactilesConBD(productosPredefinidos);
                 
                 // Volver a cargar desde la BD para obtener los estados actuales
-                const responseRefresh = await fetch('/productos?incluir_inactivos=true');
+                const responseRefresh = await fetch('/api/productos?incluir_inactivos=true');
                 const productosRefresh = await responseRefresh.json();
                 productosPodotactiles = productosRefresh.filter(p => p.categoria === 'Podotáctiles');
               }
@@ -1197,9 +1191,12 @@ function getClientesHTML() {
                 $('#modalProducto').modal('hide');
               }
               // Recargar productos
-              const response2 = await fetch('/productos');
-              productos = await response2.json();
-              mostrarProductos(productos);
+              // Siempre recargar todos los productos (activos + inactivos) y actualizar el array global
+              const response2 = await fetch('/api/productos?incluir_inactivos=true');
+              const data2 = await response2.json();
+              productos = data2.productos || data2;
+              // Aplicar el filtrado actual para mantener la vista
+              await filtrarProductos();
               showSuccessToast('🎉 Producto guardado exitosamente');
             } else {
               showErrorToast('Error al guardar: ' + result.message);
@@ -1218,8 +1215,13 @@ function getClientesHTML() {
         // 9. Función para editar producto
         // 9. Función para editar producto
         function editarProducto(id) {
+          console.log('[DEBUG editarProducto] id recibido:', id);
+          console.log('[DEBUG editarProducto] productos disponibles:', productos);
           const producto = productos.find(p => p.id === id);
-          if (!producto) return;
+          if (!producto) {
+            console.error('[DEBUG editarProducto] Producto no encontrado para id:', id);
+            return;
+          }
           
           productoEditando = id;
           
@@ -1340,7 +1342,7 @@ function getClientesHTML() {
                     console.log('🔄 Recargando vista de podotáctiles...');
                     
                     // Forzar recarga desde servidor para podotáctiles (incluyendo inactivos)
-                    const response2 = await fetch('/productos?incluir_inactivos=true');
+                    const response2 = await fetch('/api/productos?incluir_inactivos=true');
                     const todosProductos = await response2.json();
                     const productosPodotactiles = todosProductos.filter(p => p.categoria === 'Podotáctiles');
                     
@@ -1355,7 +1357,7 @@ function getClientesHTML() {
                   } else {
                     // Para otras categorías o vista general, recargar normalmente
                     console.log('🔄 Recargando productos para categoría:', categoriaActual || 'todas');
-                    const response2 = await fetch('/productos?incluir_inactivos=true');
+                    const response2 = await fetch('/api/productos?incluir_inactivos=true');
                     productos = await response2.json();
                     
                     if (categoriaActual && categoriaActual !== '') {
@@ -1625,7 +1627,7 @@ function getClientesHTML() {
             
             if (response.ok) {
               // Recargar productos desde la base de datos para reflejar el cambio
-              const response2 = await fetch('/productos?incluir_inactivos=true');
+              const response2 = await fetch('/api/productos?incluir_inactivos=true');
               const todosProductos = await response2.json();
               
               // Actualizar el producto en el array local
@@ -2180,7 +2182,14 @@ function getClientesHTML() {
                             <th>Precio en Pesos</th>
                             <th>Precio en Dólares</th>
                             <th>Estado</th>
-                            <th>Acciones</th>
+                            <th style="min-width: 270px; max-width: 320px;">Acciones</th>
+  <style>
+    /* Aprovechar al máximo el espacio de la celda de acciones */
+    td:last-child, th:last-child {
+      padding-left: 2px !important;
+      padding-right: 2px !important;
+    }
+  </style>
                           </tr>
                         </thead>
                         <tbody id="tablaProductos">
@@ -3100,4 +3109,75 @@ function getClientesHTML() {
   <!-- Script para asegurar que el campo Estado funcione correctamente -->
   <script src="js/campo-estado.js?v=20250807_1245"></script>
 </body>
+<!-- Modal de Producto (siempre presente en el DOM) -->
+<div class="modal fade" id="modalProducto" tabindex="-1" role="dialog" aria-labelledby="modalProductoTitle" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalProductoTitle">Producto</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="formProducto">
+          <input type="hidden" id="productoId" name="id">
+          <div class="form-group">
+            <label for="productoNombre">Nombre</label>
+            <input type="text" class="form-control" id="productoNombre" name="nombre" required>
+          </div>
+          <div class="form-group">
+            <label for="productoDescripcion">Descripción</label>
+            <textarea class="form-control" id="productoDescripcion" name="descripcion"></textarea>
+          </div>
+          <div class="form-row">
+            <div class="form-group col-md-6">
+              <label for="productoCategoria">Categoría</label>
+              <select class="form-control" id="productoCategoria" name="categoria" required></select>
+            </div>
+            <div class="form-group col-md-6">
+              <label for="productoSubcategoria">Subcategoría</label>
+              <select class="form-control" id="productoSubcategoria" name="subcategoria"></select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group col-md-6">
+              <label for="productoPrecio">Precio (ARS)</label>
+              <input type="number" class="form-control" id="productoPrecio" name="precio" step="0.01">
+            </div>
+            <div class="form-group col-md-6">
+              <label for="productoPrecioUsd">Precio (USD)</label>
+              <input type="number" class="form-control" id="productoPrecioUsd" name="precio_usd" step="0.01">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="productoImagen">URL Imagen Molde</label>
+            <input type="text" class="form-control" id="productoImagen" name="imagen_url">
+            <input type="file" class="form-control-file mt-1" id="productoImagenFile" accept="image/*">
+          </div>
+          <div class="form-group">
+            <label for="productoImagenMosaico">URL Imagen Mosaico</label>
+            <input type="text" class="form-control" id="productoImagenMosaico" name="imagen_mosaico_url">
+            <input type="file" class="form-control-file mt-1" id="productoImagenMosaicoFile" accept="image/*">
+          </div>
+          <div class="form-group">
+            <label for="productoPdf">URL PDF</label>
+            <input type="text" class="form-control" id="productoPdf" name="pdf_url">
+          </div>
+          <div class="form-group">
+            <label for="productoEstado">Estado</label>
+            <select class="form-control" id="productoEstado" name="activo">
+              <option value="1">Activo</option>
+              <option value="0">Inactivo</option>
+            </select>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+        <button type="submit" class="btn btn-primary" form="formProducto">Guardar Producto</button>
+      </div>
+    </div>
+  </div>
+</div>
 </html>

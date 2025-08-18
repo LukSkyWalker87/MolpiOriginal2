@@ -230,6 +230,11 @@ loginForm.addEventListener('submit', async function(e) {
 																</a>
 															</li>
 															<li>
+																<a href="insumos.html">
+																	Insumos
+																</a>
+															</li>
+															<li>
 																<a href="listones.html">
 																	Listones
 																</a>
@@ -770,56 +775,139 @@ loginForm.addEventListener('submit', async function(e) {
 			</section>
 
 <!-- Sección de Testimonios de Clientes -->
-<section class="section" style="background-color: #2c3e50; color: white;">
-    <div class="container">
-        <div class="row">
-            <div class="col-md-12 center">
-                <h2 class="mb-sm text-light">Lo que dicen nuestros clientes</h2>
-            </div>
-        </div>
-        <div class="row" id="testimonios-container">
-            <!-- Testimonios por defecto -->
-            <div class="col-md-4">
-                <div class="testimonial testimonial-style-3">
-                    <blockquote>
-                        <p>"Excelente calidad en todos los productos. Los moldes han superado nuestras expectativas en durabilidad y precisión."</p>
-                    </blockquote>
-                    <div class="testimonial-author">
-                        <div class="testimonial-author-thumbnail">
-                            <img src="img/clients/client-1.png" class="img-responsive img-circle" alt="">
-                        </div>
-                        <p><strong>Carlos Rodríguez</strong><span>Constructora Edificar</span></p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="testimonial testimonial-style-3">
-                    <blockquote>
-                        <p>"Comenzamos con un pequeño emprendimiento y el asesoramiento de Molpi fue clave para nuestro crecimiento. La durabilidad de sus moldes es incomparable en el mercado."</p>
-                    </blockquote>
-                    <div class="testimonial-author">
-                        <div class="testimonial-author-thumbnail">
-                            <img src="img/clients/client-1.png" class="img-responsive img-circle" alt="">
-                        </div>
-                        <p><strong>Juan López</strong><span>Pisos & Revestimientos SRL</span></p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="testimonial testimonial-style-3">
-                    <blockquote>
-                        <p>"La línea de moldes podotáctiles nos permitió expandir nuestro negocio hacia proyectos municipales. La calidad y precisión del producto final es excelente."</p>
-                    </blockquote>
-                    <div class="testimonial-author">
-                        <div class="testimonial-author-thumbnail">
-                            <img src="img/clients/client-1.png" class="img-responsive img-circle" alt="">
-                        </div>
-                        <p><strong>Gabriel Méndez</strong><span>Urbana Construcciones</span></p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+<section class="section" style="background: #223046; color: #fff; padding: 60px 0 40px 0;">
+	<style>
+		.testimonios-cards-container {
+			display: flex;
+			flex-wrap: wrap;
+			justify-content: center;
+			gap: 32px 24px;
+			margin-top: 32px;
+		}
+		.testimonio-card {
+			background: #fff;
+			color: #223046;
+			border-radius: 16px;
+			box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+			padding: 32px 28px 24px 28px;
+			max-width: 420px;
+			min-width: 320px;
+			flex: 1 1 320px;
+			display: flex;
+			flex-direction: column;
+			justify-content: space-between;
+			position: relative;
+			margin-bottom: 16px;
+		}
+		.testimonio-card blockquote {
+			font-size: 1.18rem;
+			font-style: italic;
+			margin: 0 0 18px 0;
+			color: #223046;
+			line-height: 1.5;
+			position: relative;
+		}
+		.testimonio-card blockquote:before {
+			content: '“';
+			font-size: 2.2rem;
+			color: #b0b8c9;
+			position: absolute;
+			left: -18px;
+			top: -10px;
+		}
+		.testimonio-card blockquote:after {
+			content: '”';
+			font-size: 2.2rem;
+			color: #b0b8c9;
+			position: absolute;
+			right: -18px;
+			bottom: -10px;
+		}
+		.testimonio-card .autor {
+			display: flex;
+			align-items: center;
+			margin-top: 10px;
+		}
+		.testimonio-card .avatar-iniciales {
+			width: 54px;
+			height: 54px;
+			border-radius: 50%;
+			background: #4e6fae;
+			color: #fff;
+			font-size: 1.5rem;
+			font-weight: bold;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			margin-right: 18px;
+			flex-shrink: 0;
+			box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+		}
+		.testimonio-card .autor-info strong {
+			font-size: 1.1rem;
+			color: #223046;
+			display: block;
+		}
+		.testimonio-card .autor-info span {
+			font-size: 1rem;
+			color: #6c7a92;
+			display: block;
+			margin-top: 2px;
+		}
+		@media (max-width: 991px) {
+			.testimonios-cards-container { flex-direction: column; align-items: center; }
+			.testimonio-card { min-width: 0; width: 100%; max-width: 98vw; }
+		}
+	</style>
+	<div class="container">
+		<div class="row">
+			<div class="col-md-12 center">
+				<h2 class="mb-sm text-light" style="font-size:2.4rem;">Lo que dicen nuestros clientes</h2>
+			</div>
+		</div>
+		<div class="testimonios-cards-container">
+			<div class="testimonio-card">
+				<blockquote>"Los moldes para baldosas de Molpi superaron ampliamente nuestras expectativas. El diseño autoestiltable nos permitió optimizar considerablemente el espacio en nuestro taller."</blockquote>
+				<div class="autor">
+					<div class="avatar-iniciales" style="background:#3db6c6;">CR</div>
+					<div class="autor-info">
+						<strong>Carlos Rodríguez</strong>
+						<span>Constructora Edificar</span>
+					</div>
+				</div>
+			</div>
+			<div class="testimonio-card">
+				<blockquote>"Comenzamos con un pequeño emprendimiento y el asesoramiento dolpi fue clave para nuestro crecimiento. La durabilidad de sus moldes es incomparable en el mercado."</blockquote>
+				<div class="autor">
+					<div class="avatar-iniciales" style="background:#8d8be6;">JL</div>
+					<div class="autor-info">
+						<strong>Juan López</strong>
+						<span>Pisos & Revestimientos SRL</span>
+					</div>
+				</div>
+			</div>
+			<div class="testimonio-card">
+				<blockquote>"La línea de moldes podotáctiles nos permitió expandir nuestro negocio hacia proyectos municipales."</blockquote>
+				<div class="autor">
+					<div class="avatar-iniciales" style="background:#7e57c2;">GM</div>
+					<div class="autor-info">
+						<strong>Gabriel Méndez</strong>
+						<span>Urbana Construcciones</span>
+					</div>
+				</div>
+			</div>
+			<div class="testimonio-card">
+				<blockquote>"Excelentes moldes, me ayudaron a poder implementarlo, tienen muy buen asesoramiento."</blockquote>
+				<div class="autor">
+					<div class="avatar-iniciales" style="background:#bca16b;">LD</div>
+					<div class="autor-info">
+						<strong>Lucas Daniel</strong>
+						<span>Service Global IT</span>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 </section>
 <!-- Fin Sección Testimonios -->
 			
