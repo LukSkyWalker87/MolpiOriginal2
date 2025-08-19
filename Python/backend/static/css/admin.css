@@ -1,0 +1,180 @@
+/* ====================
+   Estilos generales
+==================== */
+body {
+    margin: 0;
+    font-family: 'Segoe UI', 'Open Sans', sans-serif;
+    background-color: #f8f9fa;
+}
+
+/* ====================
+   Layout principal
+==================== */
+.admin-container {
+    display: flex;
+    height: 100vh;
+}
+
+/* ====================
+   Sidebar
+==================== */
+.sidebar {
+    width: 300px; /* Más ancho */
+    height: 100vh;
+    background-color: #202020;
+    color: white;
+    position: fixed;
+    left: 0;
+    top: 0;
+    padding: 30px 20px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 2px 0 10px rgba(0,0,0,0.3);
+    overflow-y: auto;
+}
+
+.sidebar .logo,
+.sidebar h2 {
+    text-align: center;
+    font-size: 2em;
+    font-weight: bold;
+    margin-bottom: 30px;
+    color: #f8f9fa;
+}
+
+.sidebar nav ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
+
+.sidebar nav ul li {
+    font-size: 18px;
+    padding: 14px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    transition: background 0.3s ease;
+    color: white;
+}
+
+.sidebar nav ul li .icon {
+    font-size: 24px;
+    margin-right: 15px;
+    display: inline-block;
+    width: 30px;
+    text-align: center;
+}
+
+.sidebar nav ul li:hover {
+    background-color: #333;
+}
+
+.sidebar nav ul li.active {
+    background-color: #e74c3c;
+    color: white;
+}
+
+/* ====================
+   Contenido principal
+==================== */
+.main-content {
+    flex: 1;
+    margin-left: 300px; /* Coincidir con el ancho del sidebar */
+    padding: 40px;
+    background-color: #f8f9fa;
+}
+
+/* ====================
+   Caja principal
+==================== */
+.container {
+    max-width: 1000px;
+    margin: 0 auto;
+    background: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.05);
+}
+
+/* ====================
+   Tipografía y títulos
+==================== */
+h1 {
+    color: #c40000;
+    font-size: 28px;
+    margin-bottom: 10px;
+}
+
+h2 {
+    font-size: 22px;
+    margin-bottom: 15px;
+}
+
+h5 {
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+p {
+    color: #555;
+    font-size: 14px;
+}
+
+/* ====================
+   Formularios
+==================== */
+form {
+    margin-top: 20px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+    color: #333;
+}
+
+input[type="text"],
+input[type="file"],
+textarea {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+}
+
+/* ====================
+   Botones
+==================== */
+button,
+.btn-primary,
+.btn-secondary {
+    padding: 10px 20px;
+    background-color: #c40000;
+    color: white !important;
+    border: none;
+    border-radius: 4px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+button:hover,
+.btn-primary:hover,
+.btn-secondary:hover {
+    background-color: #a80000;
+}
+
+/* ====================
+   Vista previa
+==================== */
+.bg-light {
+    background-color: #f2f2f2 !important;
+}
+
+.border {
+    border: 1px solid #ddd !important;
+}

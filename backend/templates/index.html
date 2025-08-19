@@ -1,0 +1,1359 @@
+<!DOCTYPE html>
+<html>
+	
+<!-- Mirrored from www.molpi.com.ar/index.html by HTTrack Website Copier/3.x [XR&CO'2014], Sat, 12 Apr 2025 18:24:54 GMT -->
+<head>
+
+		<!-- Basic -->
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">	
+
+		<title>Molpi | Moldes inyectados autoestibables</title>	
+
+		<meta name="keywords" content="Moldes inyectados para mosaicos, Moldes de plastico para mosaicos, Moldes para baldozas, revestimientos, molduras, mosaicos rusticos, mosaico de adoquines, simil piedra, inyeccion de moldes, moldes, molde, mosaicos, mosaico, moldes autoapilables, moldes autoestibables, mosaicos podotactiles, mosaicos para jardin" />
+		<meta name="description" content="Moldes Autoestibables para la fabricación de mosaicos. Moldes inyectados en plástico de alta Resistencia y Durabilidad">
+		<meta name="author" content="molpi.com.ar">
+
+		<!-- Favicon -->
+		<link rel="shortcut icon" href="{{ url_for(\'static\', filename=\'img/favicon.ico\') }}" type="image/x-icon" />
+		<link rel="apple-touch-icon" href="{{ url_for(\'static\', filename=\'img/apple-touch-icon.png\') }}">
+
+		<!-- Mobile Metas -->
+		<meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<!-- Web Fonts  -->
+		<link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700,800%7CShadows+Into+Light" rel="stylesheet" type="text/css">
+
+		<!-- Vendor CSS -->
+		<link rel="stylesheet" href="vendor/bootstrap/css/bootstrap.min.css">
+		<link rel="stylesheet" href="vendor/font-awesome/css/font-awesome.min.css">
+		<link rel="stylesheet" href="vendor/animate/animate.min.css">
+		<link rel="stylesheet" href="vendor/simple-line-icons/css/simple-line-icons.min.css">
+		<link rel="stylesheet" href="vendor/owl.carousel/assets/owl.carousel.min.css">
+		<link rel="stylesheet" href="vendor/owl.carousel/assets/owl.theme.default.min.css">
+		<link rel="stylesheet" href="vendor/magnific-popup/magnific-popup.min.css">
+
+		<!-- Theme CSS -->
+		<link rel="stylesheet" href="{{ url_for(\'static\', filename=\'css/general.css\') }}">
+		<link rel="stylesheet" href="{{ url_for(\'static\', filename=\'css/elementos-generales.css\') }}">
+		<link rel="stylesheet" href="vendor/rs-plugin/css/layers.css">
+		
+
+		<!-- Current Page CSS -->
+		<link rel="stylesheet" href="vendor/rs-plugin/css/settings.css">
+		
+		<!-- Skin CSS -->
+		<link rel="stylesheet" href="{{ url_for(\'static\', filename=\'css/default.css\') }}">
+
+		<!-- Theme Custom CSS -->
+		<link rel="stylesheet" href="{{ url_for(\'static\', filename=\'css/custom.css\') }}">
+
+		<!-- Head Libs -->
+		<script src="vendor/modernizr/modernizr.min.js"></script>
+
+	</head>
+	<body>
+
+
+		<script src="env.js"></script>
+		<script>
+		  document.addEventListener('DOMContentLoaded', () => {
+			const loginForm = document.getElementById('loginForm');
+			if (!loginForm) return;
+		
+// En tu función de login:
+
+// En tu función de login:
+
+loginForm.addEventListener('submit', async function(e) {
+  e.preventDefault();
+  
+  const username = document.getElementById('username').value;
+  const password = document.getElementById('password').value;
+  
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 segundos de timeout
+    
+    const res = await fetch(`${window.env.API_URL}/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password }),
+      signal: controller.signal
+    });
+    
+    clearTimeout(timeoutId); // Limpia el timeout si la respuesta llega
+    
+    const data = await res.json();
+    
+    if (res.ok) {
+      localStorage.setItem('token', data.token);
+      window.location.href = "admin.html";
+    } else {
+      document.getElementById('loginStatus').innerText = data.message || 'Error de autenticación';
+      document.getElementById('loginStatus').style.color = "red";
+    }
+  } catch (error) {
+    if (error.name === 'AbortError') {
+      document.getElementById('loginStatus').innerText = 'La conexión ha tardado demasiado. Inténtalo de nuevo.';
+    } else {
+      document.getElementById('loginStatus').innerText = `Error: ${error.message}`;
+    }
+    document.getElementById('loginStatus').style.color = "red";
+    console.error('Error en el login:', error);
+  }
+});
+		  });
+		</script>
+		
+
+		  			<!-- LOGIN MODAL -->
+<div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="loginModalLabel">
+	<div class="modal-dialog" role="document">
+	  <div class="modal-content">
+		<form id="loginForm">
+		  <div class="modal-header">
+			<h4 class="modal-title" id="loginModalLabel">Login de Administrador</h4>
+			<button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+			  <span aria-hidden="true">&times;</span>
+			</button>
+		  </div>
+		  <div class="modal-body">
+			<div class="form-group">
+				<label for="username">Usuario</label>
+				<input type="text" class="form-control" id="username" name="username" required placeholder="Ingresá tu usuario">
+			  </div>
+			  <div class="form-group">
+				<label for="password">Contraseña</label>
+				<input type="password" class="form-control" id="password" name="password" required placeholder="Ingresá tu contraseña" autocomplete="current-password"> 
+				<p id="loginStatus" style="text-align: center;"></p>
+			  </div>
+		  </div>
+		  <div class="modal-footer">
+			<button type="submit" class="btn btn-primary">Ingresar</button>
+			<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+		  </div>
+		</form>
+	  </div>
+	</div>
+  </div>
+<!-- END LOGIN MODAL -->  
+
+		<div class="body">
+			<header id="header" class="header-mobile-nav-only" data-plugin-options="{'stickyEnabled': true, 'stickyEnableOnBoxed': true, 'stickyEnableOnMobile': true, 'stickyStartAt': 90, 'stickySetTop': '-90px', 'stickyChangeLogo': true}">
+				<div class="header-body">
+				    <div class="header-top header-top-colored header-top-primary">
+						<div class="container">
+							<p>
+								<span class="ml-xs"><i class="fa fa-phone"></i> 11-3556-8417 / 11-2331-5331</span><span class="hidden-xs"> | <a href="#">info@molpi.com.ar</a></span>
+							</p>
+						</div>
+					</div>
+					<div class="header-container container">
+						<div class="header-row">
+							<div class="header-column">
+								<div class="header-logo">
+									<a href="index.html">
+										<img alt="Molpi" width="156" height="182" data-sticky-width="124" data-sticky-height="145" data-sticky-top="47" src="{{ url_for(\'static\', filename=\'img/logo.png\') }}">
+									</a>
+								</div>
+							</div>
+							<div class="header-column">
+								<div class="header-row">
+									<div class="header-nav header-nav-stripe">
+										<button class="btn header-btn-collapse-nav" data-toggle="collapse" data-target=".header-nav-main">
+											<i class="fa fa-bars"></i>
+										</button>
+										<!-- <ul class="header-social-icons social-icons hidden-xs">
+											<li class="social-icons-facebook"><a href="https://www.facebook.com/Molpi-171678872861954/" target="_blank" title="Facebook"><i class="fa fa-facebook"></i></a></li>
+											<li class=""></li>
+											<li class="social-icons-instagram"><a href="http://www.instagram.com/" target="_blank" title="instagram"><i class="fa fa-instagram"></i></a></li>
+											<li class=""></li>
+											<li class="social-icons-linkedin"><a href="http://www.linkedin.com/" target="_blank" title="Linkedin"><i class="fa fa-linkedin"></i></a></li>
+
+										</ul> -->
+										<div class="header-nav-main header-nav-main-square header-nav-main-effect-1 header-nav-main-sub-effect-1 collapse">
+											<nav>
+												<ul class="nav nav-pills" id="mainNav">
+													<!-- Borrado por cris
+													<li class="active">
+														<a href="distribuidores.html">
+															<em> Conviértase en distribuidor!</em>
+														</a>
+													</li>-->
+
+													<li class="">
+														<a href="quienes_somos.html">
+															Quiénes somos?
+														</a>
+													</li>
+													<li class="dropdown ">
+														<a class="dropdown-toggle" href="#">Productos</a>
+														<ul class="dropdown-menu">
+														    <!--<li class=""><a href="novedades-molpi.html">Novedades <span class="tip tip-dark">+</span></a></li>-->
+
+															<li class="dropdown-submenu"><a href="#">Pisos y Zócalos</a>
+															    <ul class="dropdown-menu">
+															         <li class""><a href="linea_moldes_para_pisos_20x20.html">Línea 20x20</a>
+															         </li>
+															         <li class""><a href="linea_moldes_para_pisos_40x40.html">Línea 40x40</a>
+															         </li>
+															         <li class""><a href="linea_moldes_para_pisos_50x50.html">Línea 50x50</a>
+															         </li>
+															         
+                                                                </ul>
+
+															</li>
+															<li>
+																<a href="podotactiles.html">
+																	Podotáctiles - Discapacidad
+																</a>
+															</li>
+															<li>
+																<a href="green.html">
+																	Green
+																</a>
+															</li>
+															<li>
+																<a href="piscinas.html">
+																	Piscinas
+																</a>
+															</li>
+															<li>
+																<a href="revestimientos.html">
+																	Revestimientos
+																</a>
+															</li>
+															<li>
+																<a href="placas_antihumedad.html">
+																	Placas Antihumedad
+																</a>
+															</li>
+															<li>
+																<a href="insumos.html">
+																	Insumos
+																</a>
+															</li>
+															<li>
+																<a href="listones.html">
+																	Listones
+																</a>
+															</li>
+														</ul>
+													</li>
+													<li class="">
+														<a href="contacto.html">
+															Contáctenos
+														</a>
+													</li>
+													<li>
+														<a href="#loginModal" data-toggle="modal" class="login-button">
+														  LOGIN
+														</a>
+													  </li>	
+												</ul>
+											</nav>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</header>
+
+			<div role="main" class="main">
+				<div class="slider-container rev_slider_wrapper">
+					<div id="revolutionSlider" class="slider rev_slider" data-plugin-revolution-slider data-plugin-options="{'delay': 9000, 'gridwidth': 1170, 'gridheight': 550, 'disableProgressBar': 'on'}">
+						<ul>
+							<li data-transition="fade">
+								<img src="{{ url_for(\'static\', filename=\'img/slides/slide-bg.jpg\') }}"  
+									alt=""
+									data-bgposition="center center" 
+									data-bgfit="cover" 
+									data-bgrepeat="no-repeat" 
+									class="rev-slidebg">
+
+								<div class="tp-caption"
+									data-x="550"
+									data-y="220"
+									data-start="250"
+									data-transform_in="y:[400%];opacity:0;s:2200;"><img src="{{ url_for(\'static\', filename=\'img/slides/slide-molde-ilus4.png\') }}" alt=""></div>	
+
+								<div class="tp-caption"
+									data-x="550"
+									data-y="165"
+									data-start="400"
+									data-transform_in="y:[400%];opacity:0;s:2000;"><img src="{{ url_for(\'static\', filename=\'img/slides/slide-molde-ilus2.png\') }}" alt=""></div>
+
+								<div class="tp-caption"
+									data-x="550"
+									data-y="100"
+									data-start="500"
+									data-transform_in="y:[-400%];opacity:0;s:2100;"><img src="{{ url_for(\'static\', filename=\'img/slides/slide-molde-ilus1.png\') }}" alt=""></div>	
+
+								<div class="tp-caption"
+									data-x="550"
+									data-y="15"
+									data-start="600"
+									data-transform_in="y:[-400%];opacity:0;s:2500;"><img src="{{ url_for(\'static\', filename=\'img/slides/slide-molde-ilus1.png\') }}" alt=""></div>	
+				
+								<div class="tp-caption"
+									data-x="35"
+									data-y="154"
+									data-start="1000"
+									data-transform_in="x:[-300%];opacity:0;s:500;"><img src="{{ url_for(\'static\', filename=\'img/slides/slide-title-border-linear.png\') }}" alt=""></div>
+				
+								<div class="tp-caption top-label"
+									data-x="130"
+									data-y="150"
+									data-start="500"
+									data-transform_in="y:[-300%];opacity:0;s:500;">PIONEROS EN EL DISEÑO DE</div>
+				
+								<div class="tp-caption"
+									data-x="470"
+									data-y="154"
+									data-start="1000"
+									data-transform_in="x:[300%];opacity:0;s:500;"><img src="{{ url_for(\'static\', filename=\'img/slides/slide-title-border-linear.png\') }}" alt=""></div>
+				
+								<div class="tp-caption main-label"
+									data-x="161"
+									data-y="190"
+									data-start="1200"
+									data-whitespace="nowrap"						 
+									data-transform_in="y:[100%];s:500;"
+									data-transform_out="opacity:0;s:500;"
+									data-mask_in="x:0px;y:0px;">MOLDES</div>
+
+								<div class="tp-caption main-label"
+									data-x="25"
+									data-y="250"
+									data-start="1600"
+									data-whitespace="nowrap"						 
+									data-transform_in="y:[100%];s:500;"
+									data-transform_out="opacity:0;s:500;"
+									data-mask_in="x:0px;y:0px;">AUTOAPILABLES!</div>
+				
+								<div class="tp-caption bottom-label"
+									data-x="75"
+									data-y="340"
+									data-start="2000"
+									data-transform_in="y:[100%];opacity:0;s:500;">QUE AHORRAN ESPACIO Y DINERO. . </div>
+				
+							</li>
+							<li data-transition="fade">
+								<img src="{{ url_for(\'static\', filename=\'img/slides/slide-bg2.jpg\') }}"  
+									alt=""
+									data-bgposition="center center" 
+									data-bgfit="cover" 
+									data-bgrepeat="no-repeat" 
+									class="rev-slidebg" data-no-retina>
+				
+								<div class="tp-caption"
+									data-x="-45"
+									data-y="130"
+									data-start="200"
+									data-transform_in="y:[-250%];opacity:0;s:900;"><img src="{{ url_for(\'static\', filename=\'img/slides/molde1b.png\') }}" alt=""></div>
+
+								<div class="tp-caption"
+									data-x="265"
+									data-y="130"
+									data-start="350"
+									data-transform_in="y:[-250%];opacity:0;s:1000;"><img src="{{ url_for(\'static\', filename=\'img/slides/molde2b.png\') }}" alt=""></div>
+
+								<div class="tp-caption"
+									data-x="525"
+									data-y="125"
+									data-start="500"
+									data-transform_in="y:[-250%];opacity:0;s:1000;"><img src="{{ url_for(\'static\', filename=\'img/slides/molde3b.png\') }}" alt=""></div>	
+
+								<div class="tp-caption"
+									data-x="792"
+									data-y="113"
+									data-start="700"
+									data-transform_in="y:[-250%];opacity:0;s:1000;"><img src="{{ url_for(\'static\', filename=\'img/slides/molde4b.png\') }}" alt=""></div>		
+
+								<div class="tp-caption"
+									data-x="80"
+									data-y="170"
+									data-start="1200"
+									data-transform_in="z:0;rX:0;rY:0;rZ:0;sX:1;sY:1;skX:0;skY:0;opacity:0;s:1000;e:Power2.easeOut;"><img src="{{ url_for(\'static\', filename=\'img/slides/mosaico1b.png\') }}" alt=""></div>
+
+								<div class="tp-caption"
+									data-x="360"
+									data-y="154"
+									data-start="1400"
+									data-transform_in="z:0;rX:0;rY:0;rZ:0;sX:1;sY:1;skX:0;skY:0;opacity:0;s:1000;e:Power2.easeOut;"><img src="{{ url_for(\'static\', filename=\'img/slides/mosaico2b.png\') }}" alt=""></div>
+
+								<div class="tp-caption"
+									data-x="625"
+									data-y="140"
+									data-start="1600"
+									data-transform_in="z:0;rX:0;rY:0;rZ:0;sX:1;sY:1;skX:0;skY:0;opacity:0;s:1000;e:Power2.easeOut;"><img src="{{ url_for(\'static\', filename=\'img/slides/mosaico3b.png\') }}" alt=""></div>
+
+								<div class="tp-caption"
+									data-x="850"
+									data-y="135"
+									data-start="1800"
+									data-transform_in="z:0;rX:0;rY:0;rZ:0;sX:1;sY:1;skX:0;skY:0;opacity:0;s:1000;e:Power2.easeOut;"><img src="{{ url_for(\'static\', filename=\'img/slides/mosaico4b.png\') }}" alt=""></div>
+
+								<div class="tp-caption blackboard-text"
+									data-x="35"
+									data-y="80"
+									data-start="1600"
+									data-transform_in="y:[100%];opacity:0;s:500;">Podemos ayudarlo en su emprendimiento, con asesoramiento de acuerdo a su necesidad! </div>	
+
+								
+				
+							</li> 
+						</ul>
+					</div>
+				</div>
+				<div class="home-intro" id="home-intro">
+					<div class="container">
+				
+						<div class="row">
+							<div class="col-md-9">
+								<p>
+									Nuestro equipo de Diseño puede desarrollar una solución a la medida de su necesidad. . <em>Puede comprobarlo!!</em>
+								</p>
+							</div>
+							<div class="col-md-3">
+								<div class="get-started">
+									<a href="contacto.html" class="btn btn-lg btn-primary">CONTÁCTENOS AHORA!</a>
+									
+								</div>
+							</div>
+						</div>
+				
+					</div>
+				</div>
+
+				<!-- Sección de Moldes Autoapilables -->
+				<section class="section section-moldes-autoapilables" style="background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); padding: 80px 0; position: relative; display: none;">
+					<div class="container">
+						<div class="row align-items-center">
+							<div class="col-lg-6">
+								<div class="text-content pr-lg-4">
+									<div class="mb-4">
+										<span class="text-primary font-weight-bold" style="font-size: 14px; letter-spacing: 2px;">PIONEROS EN EL DISEÑO DE</span>
+									</div>
+									<h2 class="display-4 font-weight-bold text-dark mb-3">
+										MOLDES<br>
+										<span style="color: #e74c3c;">AUTOAPILABLES!</span>
+									</h2>
+									<p class="lead text-muted mb-4" style="font-size: 18px;">
+										QUE AHORRAN ESPACIO Y DINERO
+									</p>
+									<p class="text-muted mb-5" style="line-height: 1.6;">
+										Innovación en diseño que permite <strong>apilar los moldes</strong> ocupando menos espacio en su taller. 
+										Reducen los costos de transporte y almacenamiento hasta un <strong>70%</strong>.
+									</p>
+									
+									<div class="row text-center mb-4" style="margin-top: 30px;">
+										<div class="col-md-6">
+											<div class="feature-highlight d-flex align-items-center justify-content-center" style="padding: 15px 20px; border-radius: 10px; background: rgba(39, 174, 96, 0.1); margin-bottom: 15px;">
+												<i class="fa fa-compress" style="font-size: 2em; color: #27ae60; margin-right: 15px;"></i>
+												<div class="text-left">
+													<h6 class="font-weight-bold text-dark mb-1">MENOS ESPACIO</h6>
+													<small class="text-muted">Hasta 70% menos volumen</small>
+												</div>
+											</div>
+										</div>
+										<div class="col-md-6">
+											<div class="feature-highlight d-flex align-items-center justify-content-center" style="padding: 15px 20px; border-radius: 10px; background: rgba(243, 156, 18, 0.1); margin-bottom: 15px;">
+												<i class="fa fa-dollar" style="font-size: 2em; color: #f39c12; margin-right: 15px;"></i>
+												<div class="text-left">
+													<h6 class="font-weight-bold text-dark mb-1">MENOS COSTOS</h6>
+													<small class="text-muted">Transporte más económico</small>
+												</div>
+											</div>
+										</div>
+									</div>
+									
+									<div style="margin-top: 30px;">
+										<!-- Contenedor dinámico para botones de PDFs -->
+										<div id="botones-promociones-container">
+											<!-- Botón único dinámico para promoción individual -->
+											<div id="boton-conocer-mas" style="display: none;">
+												<a href="#" id="enlace-conocer-mas" class="btn btn-success btn-lg" style="border-radius: 30px; padding: 18px 40px; font-weight: bold; box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3); font-size: 16px; margin: 5px;" target="_blank">
+													<i class="fa fa-info-circle mr-2"></i> CONOCER MÁS DETALLES
+												</a>
+											</div>
+											
+											<!-- Contenedor para múltiples botones cuando hay carousel -->
+											<div id="botones-multiples" style="display: none; text-align: center;">
+												<!-- Los botones se generan dinámicamente aquí -->
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="col-lg-6">
+								<div class="moldes-visual text-center">
+									<!-- Contenedor dinámico de promociones -->
+									<div id="promociones-moldes-container">
+										<!-- Imagen por defecto mientras cargan las promociones -->
+										<img src="{{ url_for(\'static\', filename=\'img/promociones/PromoMolpi1.png\') }}" 
+										     alt="Moldes Autoapilables - Ahorran Espacio y Dinero" 
+										     class="img-fluid promocion-default" 
+										     style="max-width: 100%; height: auto; filter: drop-shadow(0 10px 30px rgba(0,0,0,0.2));"
+										     onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+										
+										<!-- Fallback visual si no se encuentra la imagen -->
+										<div class="fallback-visual" style="display: none; background: white; border-radius: 15px; padding: 40px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); max-width: 350px; margin: 0 auto;">
+											<div style="position: relative;">
+												<!-- Simulación de moldes apilados basada en PromoMolpi1.png -->
+												<div style="background: #f8f9fa; height: 45px; border-radius: 12px; margin-bottom: 8px; border: 1px solid #e9ecef; position: relative; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+													<div style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); font-size: 13px; color: #6c757d; font-weight: 500;">Molde 1</div>
+												</div>
+												<div style="background: #f8f9fa; height: 45px; border-radius: 12px; margin-bottom: 8px; border: 1px solid #e9ecef; position: relative; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+													<div style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); font-size: 13px; color: #6c757d; font-weight: 500;">Molde 2</div>
+												</div>
+												<div style="background: #f8f9fa; height: 45px; border-radius: 12px; margin-bottom: 8px; border: 1px solid #e9ecef; position: relative; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+													<div style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); font-size: 13px; color: #6c757d; font-weight: 500;">Molde 3</div>
+												</div>
+												<div style="background: #f8f9fa; height: 45px; border-radius: 12px; margin-bottom: 8px; border: 1px solid #e9ecef; position: relative; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+													<div style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); font-size: 13px; color: #6c757d; font-weight: 500;">Molde 4</div>
+												</div>
+												<div style="background: #f8f9fa; height: 45px; border-radius: 12px; margin-bottom: 25px; border: 1px solid #e9ecef; position: relative; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+													<div style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); font-size: 13px; color: #6c757d; font-weight: 500;">Molde 5</div>
+												</div>
+												
+												<!-- Etiquetas de beneficios como en PromoMolpi1.png -->
+												<div style="display: flex; justify-content: space-around; margin-top: 30px;">
+													<div style="text-align: center;">
+														<div style="background: #28a745; color: white; border-radius: 50%; width: 70px; height: 70px; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; box-shadow: 0 4px 10px rgba(40, 167, 69, 0.3);">
+															<i class="fa fa-compress" style="font-size: 28px;"></i>
+														</div>
+														<div style="font-size: 14px; color: #2c3e50; font-weight: bold; line-height: 1.2;">AHORRO<br>ESPACIO</div>
+													</div>
+													<div style="text-align: center;">
+														<div style="background: #fd7e14; color: white; border-radius: 50%; width: 70px; height: 70px; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; box-shadow: 0 4px 10px rgba(253, 126, 20, 0.3);">
+															<i class="fa fa-dollar" style="font-size: 28px;"></i>
+														</div>
+														<div style="font-size: 14px; color: #2c3e50; font-weight: bold; line-height: 1.2;">AHORRO<br>DINERO</div>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</section>
+
+				<!-- Estilos CSS para efecto hover de promociones -->
+				<style>
+					/* Efectos hover para promociones - igual que las imágenes del sitio */
+					.promocion-activa img, 
+					.promocion-default,
+					.promocion-imagen {
+						-webkit-transition: all 0.3s ease;
+						-moz-transition: all 0.3s ease;
+						transition: all 0.3s ease;
+						border-radius: 15px;
+						position: relative;
+						cursor: pointer;
+					}
+
+					.promocion-activa:hover img, 
+					.promocion-default:hover,
+					.promocion-imagen:hover {
+						-webkit-transform: scale(1.05, 1.05);
+						-moz-transform: scale(1.05, 1.05);
+						-ms-transform: scale(1.05, 1.05);
+						-o-transform: scale(1.05, 1.05);
+						transform: scale(1.05, 1.05);
+						filter: drop-shadow(0 15px 40px rgba(0,0,0,0.3));
+					}
+
+					/* Efecto adicional para el contenedor */
+					#promociones-moldes-container {
+						overflow: hidden;
+						border-radius: 15px;
+					}
+
+					/* Estilos para el carousel de promociones */
+					#promocionesCarousel {
+						position: relative;
+					}
+
+					#promocionesCarousel .carousel-indicators {
+						bottom: -40px;
+					}
+
+					#promocionesCarousel .carousel-indicators li {
+						background-color: #007bff;
+						width: 12px;
+						height: 12px;
+						border-radius: 50%;
+						margin: 0 5px;
+					}
+
+					#promocionesCarousel .carousel-indicators .active {
+						background-color: #e74c3c;
+						transform: scale(1.2);
+					}
+
+					#promocionesCarousel .carousel-control-prev,
+					#promocionesCarousel .carousel-control-next {
+						display: none; /* Ocultar controles ya que usamos botones organizados del lado */
+					}
+
+					#promocionesCarousel .carousel-control-prev-icon,
+					#promocionesCarousel .carousel-control-next-icon {
+						background-color: rgba(0, 123, 255, 0.1);
+						border-radius: 50%;
+						padding: 20px;
+						transition: all 0.3s ease;
+					}
+
+					#promocionesCarousel .carousel-control-prev:hover .carousel-control-prev-icon,
+					#promocionesCarousel .carousel-control-next:hover .carousel-control-next-icon {
+						background-color: rgba(0, 123, 255, 0.3);
+						transform: scale(1.1);
+					}
+
+					/* Animación sutil para el título si existe */
+					.promocion-activa h5,
+					.carousel-item h5 {
+						-webkit-transition: all 0.3s ease;
+						-moz-transition: all 0.3s ease;
+						transition: all 0.3s ease;
+					}
+
+					.promocion-activa:hover h5,
+					.carousel-item:hover h5 {
+						color: #e74c3c;
+						transform: translateY(-2px);
+					}
+
+					/* Estilos para múltiples botones de promociones */
+					#botones-multiples .btn {
+						transition: all 0.3s ease;
+						transform: scale(1);
+					}
+
+					#botones-multiples .btn:hover {
+						transform: scale(1.05);
+						box-shadow: 0 6px 20px rgba(39, 174, 96, 0.4) !important;
+					}
+
+					/* Estilos para promociones organizadas */
+					.promociones-botones-container {
+						max-width: 400px;
+					}
+
+					.promocion-boton-item {
+						transition: all 0.3s ease;
+					}
+
+					.promocion-boton-item:hover {
+						transform: translateX(5px);
+						box-shadow: 0 4px 15px rgba(0,0,0,0.15) !important;
+					}
+
+					/* Responsive para botones múltiples */
+					@media (max-width: 768px) {
+						#botones-multiples .btn {
+							display: block !important;
+							margin: 10px auto !important;
+							max-width: 280px;
+						}
+						
+						.promociones-botones-container {
+							max-width: 100%;
+						}
+						
+						.promocion-boton-item {
+							margin-bottom: 10px !important;
+							padding: 12px !important;
+						}
+					}
+				</style>
+
+				<section class="section">
+				<div class="container">
+					<div class="row mt-md">
+					</div>
+					<div class="row">
+						<div class="col-sm-4 col-md-4">
+							<a href="linea_moldes_para_pisos_20x20.html" class="text-decoration-none">
+								<span class="thumb-info thumb-info-side-image thumb-info-side-image-custom thumb-info-no-zoom thumb-info-no-zoom thumb-info-side-image-custom-highlight">
+									<span class="thumb-info-side-image-wrapper">
+										<img alt="" class="img-responsive" src="{{ url_for(\'static\', filename=\'img/destacado_pisos.png\') }}">
+									</span>
+									<span class="thumb-info-caption">
+										<span class="thumb-info-caption-text p-xl">
+											<h4 class="font-weight-semibold mb-xs">PISOS Y ZÓCALOS</h4>
+											<p>Moldes para baldosas lisas o rústicas para interiores y exteriores. </p>
+										</span>
+									</span>
+								</span>
+							</a>
+						</div>
+						<div class="col-sm-4 col-md-4">
+							<a href="revestimientos.html" class="text-decoration-none">
+								<span class="thumb-info thumb-info-side-image thumb-info-side-image-custom thumb-info-no-zoom thumb-info-no-zoom thumb-info-side-image-custom-highlight">
+									<span class="thumb-info-side-image-wrapper">
+										<img alt="" class="img-responsive" src="{{ url_for(\'static\', filename=\'img/destacado_revestimientos.png\') }}">
+									</span>
+									<span class="thumb-info-caption">
+										<span class="thumb-info-caption-text p-xl">
+											<h4 class="font-weight-semibold mb-xs">REVESTIMIENTOS</h4>
+											<p>Moldes para revestimientos símil piedra o madera, para concreto o yeso.</p>
+										</span>
+									</span>
+								</span>
+							</a>
+						</div>
+						<div class="col-sm-4 col-md-4">
+							<a href="podotactiles.html" class="text-decoration-none">
+								<span class="thumb-info thumb-info-side-image thumb-info-side-image-custom thumb-info-no-zoom thumb-info-no-zoom thumb-info-side-image-custom-highlight">
+									<span class="thumb-info-side-image-wrapper">
+										<img alt="" class="img-responsive" src="{{ url_for(\'static\', filename=\'img/destacado_podotactiles.png\') }}">
+									</span>
+									<span class="thumb-info-caption">
+										<span class="thumb-info-caption-text p-xl">
+											<h4 class="font-weight-semibold mb-xs">PODOTÁCTILES - DISCAPACIDAD</h4>
+											<p>Moldes para baldosas, destinados a señalización urbana.</p>
+										</span>
+									</span>
+								</span>
+							</a>
+						</div>
+						<div class="col-sm-4 col-md-4">
+							<a href="green.html" class="text-decoration-none">
+								<span class="thumb-info thumb-info-side-image thumb-info-side-image-custom thumb-info-no-zoom thumb-info-no-zoom thumb-info-side-image-custom-highlight">
+									<span class="thumb-info-side-image-wrapper">
+										<img alt="" class="img-responsive" src="{{ url_for(\'static\', filename=\'img/destacado_green.png\') }}">
+									</span>
+									<span class="thumb-info-caption">
+										<span class="thumb-info-caption-text p-xl">
+											<h4 class="font-weight-semibold mb-xs">GREEN</h4>
+											<p>Moldes para pisos exteriores como caminos, estacionamientos, plazas.</p>
+										</span>
+									</span>
+								</span>
+							</a>
+						</div>
+						<div class="col-sm-4 col-md-4">
+							<a href="piscinas.html" class="text-decoration-none">
+								<span class="thumb-info thumb-info-side-image thumb-info-side-image-custom thumb-info-no-zoom thumb-info-no-zoom thumb-info-side-image-custom-highlight">
+									<span class="thumb-info-side-image-wrapper">
+										<img alt="" class="img-responsive" src="{{ url_for(\'static\', filename=\'img/destacado_piscinas.png\') }}">
+									</span>
+									<span class="thumb-info-caption">
+										<span class="thumb-info-caption-text p-xl">
+											<h4 class="font-weight-semibold mb-xs">PISCINAS</h4>
+											<p>Moldes para pisos atérmicos para bordes de piscinas y soláriums con diseño propio y textura antideslizante.</p>
+										</span>
+									</span>
+								</span>
+							</a>
+						</div>
+						<div class="col-sm-4 col-md-4">
+							<a href="insumos.html" class="text-decoration-none">
+								<span class="thumb-info thumb-info-side-image thumb-info-side-image-custom thumb-info-no-zoom thumb-info-no-zoom thumb-info-side-image-custom-highlight">
+									<span class="thumb-info-side-image-wrapper">
+										<img alt="" class="img-responsive" src="{{ url_for(\'static\', filename=\'img/destacado_insumos.png\') }}">
+									</span>
+									<span class="thumb-info-caption">
+										<span class="thumb-info-caption-text p-xl">
+											<h4 class="font-weight-semibold mb-xs">INSUMOS</h4>
+											<p>Pigmentos, curadores y otros elementos para la fabricación de las baldosas.</p>
+										</span>
+									</span>
+								</span>
+							</a>
+						</div>
+						
+					</div>
+				</div>
+			</section>
+
+<!-- Sección de Testimonios de Clientes -->
+<section class="section" style="background: #223046; color: #fff; padding: 60px 0 40px 0;">
+	<style>
+		.testimonios-cards-container {
+			display: flex;
+			flex-wrap: wrap;
+			justify-content: center;
+			gap: 32px 24px;
+			margin-top: 32px;
+		}
+		.testimonio-card {
+			background: #fff;
+			color: #223046;
+			border-radius: 16px;
+			box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+			padding: 32px 28px 24px 28px;
+			max-width: 420px;
+			min-width: 320px;
+			flex: 1 1 320px;
+			display: flex;
+			flex-direction: column;
+			justify-content: space-between;
+			position: relative;
+			margin-bottom: 16px;
+		}
+		.testimonio-card blockquote {
+			font-size: 1.18rem;
+			font-style: italic;
+			margin: 0 0 18px 0;
+			color: #223046;
+			line-height: 1.5;
+			position: relative;
+		}
+		.testimonio-card blockquote:before {
+			content: '“';
+			font-size: 2.2rem;
+			color: #b0b8c9;
+			position: absolute;
+			left: -18px;
+			top: -10px;
+		}
+		.testimonio-card blockquote:after {
+			content: '”';
+			font-size: 2.2rem;
+			color: #b0b8c9;
+			position: absolute;
+			right: -18px;
+			bottom: -10px;
+		}
+		.testimonio-card .autor {
+			display: flex;
+			align-items: center;
+			margin-top: 10px;
+		}
+		.testimonio-card .avatar-iniciales {
+			width: 54px;
+			height: 54px;
+			border-radius: 50%;
+			background: #4e6fae;
+			color: #fff;
+			font-size: 1.5rem;
+			font-weight: bold;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			margin-right: 18px;
+			flex-shrink: 0;
+			box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+		}
+		.testimonio-card .autor-info strong {
+			font-size: 1.1rem;
+			color: #223046;
+			display: block;
+		}
+		.testimonio-card .autor-info span {
+			font-size: 1rem;
+			color: #6c7a92;
+			display: block;
+			margin-top: 2px;
+		}
+		@media (max-width: 991px) {
+			.testimonios-cards-container { flex-direction: column; align-items: center; }
+			.testimonio-card { min-width: 0; width: 100%; max-width: 98vw; }
+		}
+	</style>
+	<div class="container">
+		<div class="row">
+			<div class="col-md-12 center">
+				<h2 class="mb-sm text-light" style="font-size:2.4rem;">Lo que dicen nuestros clientes</h2>
+			</div>
+		</div>
+		<div class="testimonios-cards-container">
+			<div class="testimonio-card">
+				<blockquote>"Los moldes para baldosas de Molpi superaron ampliamente nuestras expectativas. El diseño autoestiltable nos permitió optimizar considerablemente el espacio en nuestro taller."</blockquote>
+				<div class="autor">
+					<div class="avatar-iniciales" style="background:#3db6c6;">CR</div>
+					<div class="autor-info">
+						<strong>Carlos Rodríguez</strong>
+						<span>Constructora Edificar</span>
+					</div>
+				</div>
+			</div>
+			<div class="testimonio-card">
+				<blockquote>"Comenzamos con un pequeño emprendimiento y el asesoramiento dolpi fue clave para nuestro crecimiento. La durabilidad de sus moldes es incomparable en el mercado."</blockquote>
+				<div class="autor">
+					<div class="avatar-iniciales" style="background:#8d8be6;">JL</div>
+					<div class="autor-info">
+						<strong>Juan López</strong>
+						<span>Pisos & Revestimientos SRL</span>
+					</div>
+				</div>
+			</div>
+			<div class="testimonio-card">
+				<blockquote>"La línea de moldes podotáctiles nos permitió expandir nuestro negocio hacia proyectos municipales."</blockquote>
+				<div class="autor">
+					<div class="avatar-iniciales" style="background:#7e57c2;">GM</div>
+					<div class="autor-info">
+						<strong>Gabriel Méndez</strong>
+						<span>Urbana Construcciones</span>
+					</div>
+				</div>
+			</div>
+			<div class="testimonio-card">
+				<blockquote>"Excelentes moldes, me ayudaron a poder implementarlo, tienen muy buen asesoramiento."</blockquote>
+				<div class="autor">
+					<div class="avatar-iniciales" style="background:#bca16b;">LD</div>
+					<div class="autor-info">
+						<strong>Lucas Daniel</strong>
+						<span>Service Global IT</span>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+<!-- Fin Sección Testimonios -->
+			
+			<!--Inicio del Footer-->
+			</div>
+			<footer class="short" id="footer">
+				<div class="container">
+					<div class="row">
+						<div class="col-md-6">
+							<h5 class="mb-sm">Llámenos</h5>
+							<span class="phone">(54) 11-3556-8417</span>
+							<span class="phone">(54) 11-2331-5331</span>
+							<p class="mb-none">Oficinas y Planta de producción:<br>
+							Cafferata 3110 ex 3210 (1852) - Burzaco. <br>
+							Parque Industrial de Almirante Brown<br/>
+							Provincia de Buenos Aires. Argentina.<br/>
+							</p>
+							<ul class="list list-icons list-icons-sm">
+								<li><i class="fa fa-envelope"></i> <a href="mailto:info@molpi.com.ar">info@molpi.com.ar</a></li>
+							</ul>
+							<ul class="social-icons">
+								<li class="social-icons-facebook"><a href="../www.facebook.com/Molpi-171678872861954/index.html" target="_blank" title="Facebook"><i class="fa fa-facebook"></i></a></li>
+								<li class="social-icons-instagram"><a href="../www.instagram.com/molpi.moldes/index.html" target="_blank" title="Instagram"><i class="fa fa-instagram"></i></a></li>
+								<!--<li class="social-icons-linkedin"><a href="http://www.linkedin.com/" target="_blank" title="Linkedin"><i class="fa fa-linkedin"></i></a></li>-->
+							</ul>
+						</div>
+						<div class="col-md-6">
+							<h5 class="mb-sm">Contáctenos</h5>
+							<p>Contáctenos o llámenos para descubrir cómo podemos ayudarle.</p>
+							<form id="contact" action="https://www.molpi.com.ar/contacto_rapido.php" method="post">
+								<div class="row">
+									<div class="form-group">
+										<div class="col-md-6">
+											<label>Nombre *</label>
+										    <input type="text" value="" data-msg-required="Por favor ingrese su nombre." maxlength="100" class="form-control" name="nombre" id="Nombre" tabindex="1" required>
+										</div>
+										<div class="col-md-6">
+											<label>E-mail *</label>
+                                            <input type="email" value="" data-msg-required="Por favor, escriba su dirección de mail." data-msg-email="Por favor, ingrese una dirección de e-mail válida." maxlength="100" class="form-control" name="email" id="Email" tabindex="2" required>
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="form-group">
+										<div class="col-md-12">
+											<label>Mensaje *</label>
+											<textarea maxlength="5000" data-msg-required="Por favor no olvide dejarnos su mensaje." rows="2" class="form-control" name="mensaje" id="Mensaje" tabindex="3" required></textarea>
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-md-4">
+										<input type="submit" name="submit" id="contact-submit"  value="Enviar Mensaje" class="btn btn-primary btn-lg mb-xlg" data-submit="...Enviar">
+									</div>
+									
+								</div>
+							</form>
+						</div>
+
+
+					</div>
+				</div>
+				<div class="footer-copyright">
+					<div class="container">
+						<div class="row">
+						    <div class="col-md-12">
+								<p>© Copyright 2025. Todos los derechos reservados.<br>
+								<a href="https://www.servicesglobal-it.com/" style="color: #555555;">Soluciones Técnologicas</a>
+								</p>
+							</div>
+						</div>
+					</div>
+				</div>
+			</footer>
+		</div>
+
+		<!-- Vendor -->
+		<script src="vendor/jquery/jquery.min.js"></script>
+		<script src="vendor/jquery.appear/jquery.appear.min.js"></script>
+		<script src="vendor/jquery.easing/jquery.easing.min.js"></script>
+		<script src="vendor/jquery-cookie/jquery-cookie.min.js"></script>
+		<script src="vendor/bootstrap/js/bootstrap.min.js"></script>
+		<script src="vendor/common/common.min.js"></script>
+		<script src="vendor/jquery.validation/jquery.validation.min.js"></script>
+		<script src="vendor/jquery.gmap/jquery.gmap.min.js"></script>
+		<script src="vendor/owl.carousel/owl.carousel.min.js"></script>
+		
+		<!-- Theme Base, Components and Settings -->
+		<script src="{{ url_for(\'static\', filename=\'js/theme.js\') }}"></script>
+		
+		<!-- Current Page Vendor and Views -->
+		<script src="vendor/rs-plugin/js/jquery.themepunch.tools.min.js"></script>
+		<script src="vendor/rs-plugin/js/jquery.themepunch.revolution.min.js"></script>
+		
+		
+		<!-- Theme Custom -->
+		<script src="{{ url_for(\'static\', filename=\'js/custom.js\') }}"></script>
+		
+		<!-- Theme Initialization Files -->
+		<script src="{{ url_for(\'static\', filename=\'js/theme.init.js\') }}"></script>
+
+		<!-- Script para manejo de promociones -->
+		<script>
+		$(document).ready(function() {
+			// Función para cargar promociones en la sección de moldes autoapilables
+			function cargarPromocionesEnMoldes() {
+				try {
+					// Hacer la petición AJAX para obtener promociones activas
+					$.ajax({
+						url: '/promociones',
+						method: 'GET',
+						timeout: 5000,
+						success: function(response) {
+							console.log('Promociones recibidas:', response);
+							
+							const contenedor = $('#promociones-moldes-container');
+							const seccionCompleta = $('.section-moldes-autoapilables');
+							const botonConocerMas = $('#boton-conocer-mas');
+							const enlaceConocerMas = $('#enlace-conocer-mas');
+							const botonesMultiples = $('#botones-multiples');
+							const botonesContainer = $('#botones-promociones-container');
+							
+							if (response && response.length > 0) {
+								// Mostrar todas las promociones activas
+								console.log(`Mostrando ${response.length} promoción(es) activa(s)`);
+								
+								if (contenedor.length > 0) {
+									// Mostrar la sección completa
+									seccionCompleta.css('display', 'block');
+									
+									// Si hay una sola promoción, mostrar centrada
+									if (response.length === 1) {
+										const promocion = response[0];
+										
+										contenedor.html(`
+											<div class="promocion-unica text-center">
+												<img src="${promocion.imagen}" 
+												     alt="${promocion.titulo || 'Promoción Moldes Autoapilables'}" 
+												     class="img-fluid promocion-imagen" 
+												     style="max-width: 100%; height: auto; filter: drop-shadow(0 10px 30px rgba(0,0,0,0.2)); border-radius: 15px; transition: all 0.3s ease; cursor: pointer;"
+												     onerror="this.src='img/promociones/PromoMolpi1.png';">
+												     
+												${promocion.titulo ? '<div class="mt-3"><h5 class="text-primary font-weight-bold">' + promocion.titulo + '</h5></div>' : ''}
+											</div>
+										`);
+										
+										// Para promoción única, también usar el formato de botones organizados
+										let botonesHtml = '';
+										const titulo = promocion.titulo || 'Promoción Especial';
+										
+										if (promocion.cartilla_pdf) {
+											botonesHtml = `
+												<div class="promociones-botones-container" style="margin-top: 20px;">
+													<div class="promocion-boton-item" style="margin-bottom: 25px; padding: 18px; background: rgba(255,255,255,0.9); border-radius: 12px; border-left: 4px solid #28a745; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+														<div style="display: flex; align-items: center; justify-content: space-between;">
+															<div style="flex: 1;">
+																<div style="font-weight: bold; color: #2c3e50; margin-bottom: 5px; display: flex; align-items: center;">
+																	<span style="background: #28a745; color: white; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 12px; margin-right: 10px;">1</span>
+																	${titulo}
+																</div>
+																<div style="font-size: 12px; color: #6c757d;">
+																	<i class="fa fa-file-pdf-o mr-1"></i> Cartilla con información detallada
+																</div>
+															</div>
+															<div>
+																<a href="${promocion.cartilla_pdf}" 
+																   class="btn btn-success btn-sm" 
+																   style="border-radius: 20px; padding: 8px 20px; font-weight: bold; font-size: 12px; white-space: nowrap;" 
+																   target="_blank"
+																   title="Ver detalles de ${titulo}">
+																	<i class="fa fa-download mr-1"></i> VER DETALLES
+																</a>
+															</div>
+														</div>
+													</div>
+												</div>
+											`;
+										}
+										
+										// Ocultar botón global y mostrar botones organizados
+										botonConocerMas.hide();
+										if (botonesHtml) {
+											botonesMultiples.html(botonesHtml);
+											botonesMultiples.show();
+										} else {
+											botonesMultiples.hide();
+										}
+									} else {
+										// Si hay múltiples promociones, crear un carousel
+										let carouselItems = '';
+										let carouselIndicators = '';
+										
+										response.forEach((promocion, index) => {
+											const activeClass = index === 0 ? 'active' : '';
+											
+											carouselItems += `
+												<div class="carousel-item ${activeClass}" data-pdf="${promocion.cartilla_pdf || ''}">
+													<div class="text-center">
+														<img src="${promocion.imagen}" 
+														     alt="${promocion.titulo || 'Promoción Moldes Autoapilables'}" 
+														     class="img-fluid promocion-imagen" 
+														     style="max-width: 100%; height: auto; filter: drop-shadow(0 10px 30px rgba(0,0,0,0.2)); border-radius: 15px; transition: all 0.3s ease; cursor: pointer;"
+														     onerror="this.src='img/promociones/PromoMolpi1.png';">
+														     
+														${promocion.titulo ? '<div class="mt-3"><h5 class="text-primary font-weight-bold">' + promocion.titulo + '</h5></div>' : ''}
+													</div>
+												</div>
+											`;
+											
+											carouselIndicators += `
+												<li data-target="#promocionesCarousel" data-slide-to="${index}" class="${activeClass}"></li>
+											`;
+										});
+										
+										contenedor.html(`
+											<div id="promocionesCarousel" class="carousel slide" data-ride="carousel" data-interval="4000">
+												<!-- Indicadores -->
+												<ol class="carousel-indicators">
+													${carouselIndicators}
+												</ol>
+												
+												<!-- Slides -->
+												<div class="carousel-inner">
+													${carouselItems}
+												</div>
+												
+												<!-- Controles -->
+												<a class="carousel-control-prev" href="#promocionesCarousel" role="button" data-slide="prev">
+													<span class="carousel-control-prev-icon" aria-hidden="true"></span>
+													<span class="sr-only">Anterior</span>
+												</a>
+												<a class="carousel-control-next" href="#promocionesCarousel" role="button" data-slide="next">
+													<span class="carousel-control-next-icon" aria-hidden="true"></span>
+													<span class="sr-only">Siguiente</span>
+												</a>
+											</div>
+										`);
+										
+										// Para múltiples promociones, ocultar el botón global
+										botonConocerMas.hide();
+										
+										// Generar botones para todas las promociones con PDF
+										let botonesHtml = '';
+										
+										if (response.length > 1) {
+											// Para múltiples promociones, crear botones claramente identificados
+											botonesHtml = '<div class="promociones-botones-container" style="margin-top: 20px;">';
+											
+											response.forEach((promocion, index) => {
+												const titulo = promocion.titulo || `Promoción ${index + 1}`;
+												const numeroSlide = index + 1;
+												
+												if (promocion.cartilla_pdf) {
+													botonesHtml += `
+														<div class="promocion-boton-item" style="margin-bottom: 25px; padding: 18px; background: rgba(255,255,255,0.9); border-radius: 12px; border-left: 4px solid #28a745; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+															<div style="display: flex; align-items: center; justify-content: space-between;">
+																<div style="flex: 1;">
+																	<div style="font-weight: bold; color: #2c3e50; margin-bottom: 5px; display: flex; align-items: center;">
+																		<span style="background: #28a745; color: white; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 12px; margin-right: 10px;">${numeroSlide}</span>
+																		${titulo}
+																	</div>
+																	<div style="font-size: 12px; color: #6c757d;">
+																		<i class="fa fa-file-pdf-o mr-1"></i> Cartilla con información detallada
+																	</div>
+																</div>
+																<div>
+																	<a href="${promocion.cartilla_pdf}" 
+																	   class="btn btn-success btn-sm" 
+																	   style="border-radius: 20px; padding: 8px 20px; font-weight: bold; font-size: 12px; white-space: nowrap;" 
+																	   target="_blank"
+																	   title="Ver detalles de ${titulo}">
+																		<i class="fa fa-download mr-1"></i> VER DETALLES
+																	</a>
+																</div>
+															</div>
+														</div>
+													`;
+												} else {
+													botonesHtml += `
+														<div class="promocion-boton-item" style="margin-bottom: 25px; padding: 18px; background: rgba(248,249,250,0.7); border-radius: 12px; border-left: 4px solid #dee2e6; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+															<div style="display: flex; align-items: center;">
+																<div>
+																	<div style="font-weight: bold; color: #6c757d; margin-bottom: 5px; display: flex; align-items: center;">
+																		<span style="background: #dee2e6; color: #6c757d; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 12px; margin-right: 10px;">${numeroSlide}</span>
+																		${titulo}
+																	</div>
+																	<div style="font-size: 12px; color: #adb5bd;">
+																		<i class="fa fa-info-circle mr-1"></i> Sin información adicional disponible
+																	</div>
+																</div>
+															</div>
+														</div>
+													`;
+												}
+											});
+											
+											botonesHtml += '</div>';
+											
+											// Ocultar botón único y mostrar botones organizados
+											botonConocerMas.hide();
+											botonesMultiples.html(botonesHtml);
+											botonesMultiples.show();
+										}
+									}
+									
+									console.log('Promociones cargadas en la sección de moldes');
+								}
+							} else {
+								// No hay promociones activas - mantener la sección oculta
+								if (seccionCompleta.length > 0) {
+									seccionCompleta.css('display', 'none');
+									botonConocerMas.hide();
+									botonesMultiples.hide();
+									console.log('No hay promociones activas, sección de moldes autoapilables permanece oculta');
+								}
+							}
+						},
+						error: function(xhr, status, error) {
+							console.log('Error al cargar promociones:', error);
+							// En caso de error, mantener la sección oculta para evitar mostrar contenido desactualizado
+							const seccionCompleta = $('.section-moldes-autoapilables');
+							if (seccionCompleta.length > 0) {
+								seccionCompleta.css('display', 'none');
+								console.log('Error de conectividad, sección de moldes autoapilables permanece oculta');
+							}
+						}
+					});
+				} catch (error) {
+					console.log('Error en cargarPromocionesEnMoldes:', error);
+				}
+			}
+
+			// Cargar promociones después de que la página esté completamente lista
+			setTimeout(cargarPromocionesEnMoldes, 100);
+			
+			// También ejecutar inmediatamente para reducir cualquier parpadeo
+			cargarPromocionesEnMoldes();
+			
+			// Listener para recibir notificaciones del admin sobre cambios en promociones
+			window.addEventListener('message', function(event) {
+				// Verificar que el mensaje sea sobre promociones
+				if (event.data && event.data.action === 'promocion_actualizada') {
+					console.log('Recibida notificación de cambio en promoción:', event.data.tipo);
+					// Recargar promociones con un pequeño delay para asegurar que la BD se haya actualizado
+					setTimeout(cargarPromocionesEnMoldes, 500);
+				}
+			});
+		});
+		</script>
+
+		<!-- Script para cargar testimonios dinámicamente -->
+		<script>
+		$(document).ready(function() {
+			// Función para cargar testimonios desde la API
+			function cargarTestimoniosEnPagina() {
+				try {
+					// Hacer la petición AJAX para obtener testimonios activos
+					$.ajax({
+						url: '/testimonios',
+						method: 'GET',
+						timeout: 5000,
+						success: function(response) {
+							console.log('Testimonios recibidos:', response);
+							
+							const contenedor = $('#testimonios-container');
+							
+							if (response && response.length > 0) {
+								// Filtrar solo testimonios activos y ordenar por campo 'orden'
+								const testimoniosActivos = response
+									.filter(testimonio => testimonio.activo === 1)
+									.sort((a, b) => a.orden - b.orden);
+								
+								if (testimoniosActivos.length > 0) {
+									let testimoniosHtml = '';
+									
+									testimoniosActivos.forEach(testimonio => {
+										const imagenSrc = testimonio.imagen || 'img/clients/client-1.png';
+										
+										testimoniosHtml += `
+											<div class="col-md-4">
+												<div class="testimonial testimonial-style-3">
+													<blockquote>
+														<p>"${testimonio.testimonio}"</p>
+													</blockquote>
+													<div class="testimonial-author">
+														<div class="testimonial-author-thumbnail">
+															<img src="${imagenSrc}" class="img-responsive img-circle" alt="${testimonio.nombre}" onerror="this.src='img/clients/client-1.png';">
+														</div>
+														<p><strong>${testimonio.nombre}</strong><span>${testimonio.empresa}</span></p>
+													</div>
+												</div>
+											</div>
+										`;
+									});
+									
+									// Reemplazar el contenido del contenedor con los testimonios dinámicos
+									contenedor.html(testimoniosHtml);
+									console.log(`Testimonios cargados: ${testimoniosActivos.length} testimonios activos`);
+								} else {
+									console.log('No hay testimonios activos, manteniendo testimonios por defecto');
+									// Mantener testimonios por defecto si no hay activos
+								}
+							} else {
+								console.log('No se recibieron testimonios, manteniendo testimonios por defecto');
+								// Mantener testimonios por defecto si no hay datos
+							}
+						},
+						error: function(xhr, status, error) {
+							console.log('Error al cargar testimonios:', error);
+							// En caso de error, mantener los testimonios por defecto
+							console.log('Error de conectividad, manteniendo testimonios por defecto');
+						}
+					});
+				} catch (error) {
+					console.log('Error en cargarTestimoniosEnPagina:', error);
+				}
+			}
+
+			// Cargar testimonios después de que la página esté completamente lista
+			setTimeout(cargarTestimoniosEnPagina, 200);
+			
+			// También ejecutar inmediatamente para reducir cualquier parpadeo
+			cargarTestimoniosEnPagina();
+			
+			// Listener para recibir notificaciones del admin sobre cambios en testimonios
+			window.addEventListener('message', function(event) {
+				// Verificar que el mensaje sea sobre testimonios
+				if (event.data && event.data.action === 'testimonio_actualizado') {
+					console.log('Recibida notificación de cambio en testimonio:', event.data.tipo);
+					// Recargar testimonios con un pequeño delay para asegurar que la BD se haya actualizado
+					setTimeout(cargarTestimoniosEnPagina, 500);
+				}
+			});
+		});
+		</script>
+
+		 <!-- Botón flotante de WhatsApp -->
+		 <a href="https://wa.me/541135568417?text=Hola%20como%20est%C3%A1s%3F%20Me%20gustar%C3%ADa%20realizar%20una%20consulta" 
+		 class="whatsapp-float" 
+		 target="_blank" 
+		 title="Chatear por WhatsApp con Molpi">
+		 <img src="https://icongr.am/fontawesome/whatsapp.svg?size=40&color=ffffff" alt="WhatsApp">
+		 </a>
+		 <!-- Fin del botón flotante de WhatsApp -->
+
+	</body>
+
+<!-- Mirrored from www.molpi.com.ar/index.html by HTTrack Website Copier/3.x [XR&CO'2014], Sat, 12 Apr 2025 18:24:54 GMT -->
+</html> 

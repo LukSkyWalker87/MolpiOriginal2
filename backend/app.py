@@ -7,7 +7,57 @@ import json
 from datetime import datetime
 
 # ========= Configuración de Flask =========
-app = Flask(__name__)
+app = Flask(__name__, template_folder="templates", static_folder="static")
+# ========= RUTAS DE PÁGINAS PRINCIPALES (FRONTEND) =========
+from flask import render_template
+
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+@app.route('/admin')
+def admin():
+    return render_template('admin.html')
+
+@app.route('/contacto')
+def contacto():
+    return render_template('contacto.html')
+
+@app.route('/distribuidores')
+def distribuidores():
+    return render_template('distribuidores.html')
+
+@app.route('/quienes_somos')
+def quienes_somos():
+    return render_template('quienes_somos.html')
+
+@app.route('/insumos')
+def insumos():
+    return render_template('insumos.html')
+
+@app.route('/revestimientos')
+def revestimientos():
+    return render_template('revestimientos.html')
+
+@app.route('/piscinas')
+def piscinas():
+    return render_template('piscinas.html')
+
+@app.route('/podotactiles')
+def podotactiles():
+    return render_template('podotactiles.html')
+
+@app.route('/placas_antihumedad')
+def placas_antihumedad():
+    return render_template('placas_antihumedad.html')
+
+@app.route('/listones')
+def listones():
+    return render_template('listones.html')
+
+@app.route('/green')
+def green():
+    return render_template('green.html')
 app.config['SECRET_KEY'] = 'molpi-secret-key-2025'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///molpi.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False

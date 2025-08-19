@@ -1,0 +1,33 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Verificar categorías en molpi.db",
+			"type": "shell",
+			"command": "python backend/inspeccionar_bases.py",
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "Copiar C:/tmp/molpi.db a backend/molpi.db",
+			"type": "shell",
+			"command": "copy /Y C:\\tmp\\molpi.db backend\\molpi.db",
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "Copiar C:/tmp/molpi.db a backend/molpi.db (PowerShell)",
+			"type": "shell",
+			"command": "Copy-Item -Path C:\\tmp\\molpi.db -Destination backend\\molpi.db -Force",
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "Forzar copia de listones.html en build",
+			"type": "shell",
+			"command": "Copy-Item -Path www.molpi.com.ar\\listones.html -Destination www.molpi.com.ar\\listones.html -Force",
+			"problemMatcher": [],
+			"group": "build"
+		}
+	]
+}
