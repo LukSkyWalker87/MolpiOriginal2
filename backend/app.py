@@ -213,12 +213,23 @@ def get_productos():
 
 @app.route('/api/productos', methods=['POST'])
 def add_producto():
-    """Agregar producto"""
+    """Agregar producto, evitando duplicados por nombre, categoría y subcategoría"""
     data = request.get_json()
-    
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
-    
+    # Validar si ya existe un producto igual
+    c.execute("""
+        SELECT id FROM productos WHERE nombre = ? AND categoria = ? AND subcategoria = ?
+    """, (
+        data.get('nombre'),
+        data.get('categoria'),
+        data.get('subcategoria')
+    ))
+    existe = c.fetchone()
+    if existe:
+        conn.close()
+        return jsonify({'error': 'Ya existe un producto con ese nombre, categoría y subcategoría.'}), 409
+
     c.execute("""
         INSERT INTO productos (nombre, descripcion, categoria, subcategoria, pdf_url, imagen_url, imagen_mosaico_url, precio, precio_usd)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -233,11 +244,9 @@ def add_producto():
         data.get('precio', 0),
         data.get('precio_usd', 0)
     ))
-    
     producto_id = c.lastrowid
     conn.commit()
     conn.close()
-    
     return jsonify({'message': 'Producto agregado correctamente', 'id': producto_id}), 201
 
 @app.route('/api/productos/<int:producto_id>', methods=['PUT'])

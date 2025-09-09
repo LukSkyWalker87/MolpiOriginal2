@@ -2717,123 +2717,162 @@ function getClientesHTML() {
       // ========= Componente de Promociones =========
       async function loadPromocionesComponent() {
         try {
-          console.log('Loading promociones admin interface...');
+          console.log('Loading promociones component...');
+          
           contentArea.innerHTML = `
             <div class="admin-header">
               <h1><i class="fa fa-bullhorn"></i> Gestión de Promociones</h1>
               <p class="mb-0 text-muted">Administra las promociones y ofertas especiales</p>
             </div>
             
-            <div class="row mb-3">
-              <div class="col-md-6">
-                <button id="agregarPromocion" class="btn btn-primary">
-                  <i class="fa fa-plus"></i> Agregar Nueva Promoción
-                </button>
-              </div>
-              <div class="col-md-6">
-                <button id="recargarPromociones" class="btn btn-outline-secondary">
-                  <i class="fa fa-refresh"></i> Recargar Promociones
-                </button>
-              </div>
-            </div>
-            
-            <div class="card">
-              <div class="card-header">
-                <h5 class="mb-0">Lista de Promociones</h5>
-              </div>
-              <div class="card-body">
-                <div class="table-responsive">
-                  <table class="table table-striped table-hover">
-                    <thead>
-                      <tr>
-                        <th>Imagen</th>
-                        <th>Título</th>
-                        <th>Estado</th>
-                        <th>Fecha Creación</th>
-                        <th>Acciones</th>
-                      </tr>
-                    </thead>
-                    <tbody id="tablaPromociones">
-                      <tr>
-                        <td colspan="5" class="text-center">
-                          <div class="spinner-border" role="status">
-                            <span class="sr-only">Cargando...</span>
-                          </div>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
+            <style>
+            .promociones-component .card { box-shadow: 0 2px 4px rgba(0,0,0,.08); border: 0; }
+            .promociones-component .card-header { background:#fff; border-bottom:1px solid #e9ecef; padding:.75rem 1rem; }
+            .promociones-component .toolbar .form-control { height:42px; font-size:.95rem; }
+            .promociones-component .btn { border-radius:.375rem; }
+            .promociones-component .btn-sm { padding:.45rem .75rem; font-size:.9rem; }
+            .promociones-component .table { margin:0; font-size:.95rem; }
+            .promociones-component .table thead th{
+              background:#f8f9fa; border-bottom:2px solid #dee2e6; color:#495057;
+              font-weight:600; font-size:.85rem; padding:.65rem .85rem; white-space:nowrap;
+            }
+            .promociones-component .table td{
+              padding:.65rem .85rem; vertical-align:middle; border-top:1px solid #eef1f4; white-space:nowrap;
+            }
+            .promociones-component .table tbody tr:hover { background:#f3f6fb; }
+            .promociones-component .thumb {
+              width:110px; height:66px; object-fit:cover; border-radius:8px; border:1px solid #e9ecef;
+            }
+            .promociones-component .badge { font-weight:600; font-size:.75rem; padding:.4em .6em; }
+            .promociones-component .badge-soft { background:#eef2f7; color:#5b6b7a; border:1px solid #e2e7ee; }
+            .promociones-component .badge-img { background:#e6f4ea; color:#207245; border:1px solid #cfead7; }
+            .promociones-component .badge-pdf { background:#e8f1fb; color:#1f5faa; border:1px solid #d6e6fa; }
+            .promociones-component .estado-activo { background:#28a745; color:white; }
+            .promociones-component .estado-inactivo { background:#dc3545; color:white; }
+            .promociones-component .acciones .btn { min-width:96px; padding:.45rem .7rem; font-size:.9rem; }
+            .promociones-component .acciones .btn i{ margin-right:.25rem; }
+            </style>
+
+            <div class="promociones-component">
+              <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                  <h6 class="mb-0"><i class="fa fa-bullhorn mr-2"></i>Gestión de Promociones</h6>
+                  <div class="toolbar d-flex align-items-center">
+                    <input id="buscarPromocion" class="form-control mr-2" placeholder="Buscar promociones...">
+                    <button class="btn btn-primary btn-sm" onclick="abrirModalNuevaPromocion()">
+                      <i class="fa fa-plus"></i> Nuevo
+                    </button>
+                  </div>
+                </div>
+
+                <div class="card-body p-2">
+                  <div class="table-responsive">
+                    <table class="table">
+                      <thead>
+                        <tr>
+                          <th>Imagen</th>
+                          <th>Título</th>
+                          <th>Archivos</th>
+                          <th>Estado</th>
+                          <th>Fecha</th>
+                          <th class="text-right">Acciones</th>
+                        </tr>
+                      </thead>
+                      <tbody id="promocionesTableBody">
+                        <tr><td colspan="6" class="text-center">Cargando promociones...</td></tr>
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               </div>
             </div>
           `;
           
-          console.log('Promociones interface loaded successfully');
-          // Implementación mínima local para cargar y mostrar promociones
-          const tbody = document.getElementById('tablaPromociones');
-          const btnRecargar = document.getElementById('recargarPromociones');
-          const btnAgregar = document.getElementById('agregarPromocion');
+          // Funciones de promociones integradas
+          window.renderPromocionRow = function(promocion) {
+            const estado = promocion.activo
+              ? '<span class="badge estado-activo">Activo</span>'
+              : '<span class="badge estado-inactivo">Inactivo</span>';
 
-          function renderPromociones(list) {
-            if (!tbody) return;
-            tbody.innerHTML = '';
-            if (!list || list.length === 0) {
-              tbody.innerHTML = '<tr><td colspan="5" class="text-center">No hay promociones para mostrar</td></tr>';
-              return;
-            }
-            list.forEach(p => {
-              const tr = document.createElement('tr');
-              tr.innerHTML = `
-                <td><img src="${p.imagen || ''}" alt="${p.titulo}" style="width:64px;height:64px;object-fit:cover" onerror="this.style.display='none'" /></td>
-                <td>${p.titulo || ''}</td>
-                <td><span class="badge ${p.activo ? 'badge-activo' : 'badge-inactivo'}">${p.activo ? 'Activa' : 'Inactiva'}</span></td>
-                <td><small class="text-muted">${p.fecha_creacion ? new Date(p.fecha_creacion).toLocaleDateString() : '-'}</small></td>
+            const archivos = \`
+              <span class="badge \${promocion.imagen ? 'badge-img' : 'badge-soft'} mr-1"><i class="fa fa-image"></i> IMG</span>
+              <span class="badge \${promocion.cartilla_pdf ? 'badge-pdf' : 'badge-soft'}"><i class="fa fa-file-pdf-o"></i> PDF</span>
+            \`;
+
+            const fecha = promocion.fecha_creacion
+              ? new Date(promocion.fecha_creacion).toLocaleDateString('es-AR')
+              : '-';
+
+            return \`
+              <tr>
                 <td>
-                  <div class="btn-group btn-group-sm" role="group">
-                    <button type="button" class="btn btn-primary" title="Editar" disabled>
-                      <i class="fa fa-edit"></i>
+                  <img class="thumb" src="\${promocion.imagen || ''}" alt=""
+                       onerror="this.src=''; this.outerHTML='<span class=&quot;text-muted&quot;>Sin imagen</span>';">
+                </td>
+                <td>\${promocion.titulo || '<em>Sin título</em>'}</td>
+                <td>\${archivos}</td>
+                <td>\${estado}</td>
+                <td>\${fecha}</td>
+                <td class="text-right acciones">
+                  <div class="btn-group">
+                    <button class="btn btn-sm btn-outline-primary" onclick="editarPromocion(\${promocion.id})">
+                      <i class="fa fa-edit"></i> Editar
                     </button>
-                    <button type="button" class="btn btn-danger ml-1" title="Eliminar" disabled>
-                      <i class="fa fa-trash"></i>
+                    <button class="btn btn-sm btn-outline-danger" onclick="eliminarPromocion(\${promocion.id})">
+                      <i class="fa fa-trash"></i> Eliminar
                     </button>
                   </div>
                 </td>
-              `;
-              tbody.appendChild(tr);
-            });
-          }
+              </tr>\`;
+          };
 
-          async function cargarPromociones() {
+          window.cargarPromociones = async function() {
             try {
-              const url = `${window.env.API_URL}/promociones/admin`;
-              console.log('Fetching promociones from:', url);
-              const resp = await fetch(url);
-              if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-              const data = await resp.json();
-              console.log('Promociones recibidas:', data?.length ?? 0);
-              renderPromociones(Array.isArray(data) ? data : []);
-            } catch (e) {
-              console.error('Error cargando promociones:', e);
-              if (tbody) {
-                tbody.innerHTML = '<tr><td colspan="5" class="text-center text-danger">Error al cargar promociones</td></tr>';
-              }
+              const tbody = document.getElementById('promocionesTableBody');
+              if (!tbody) return;
+              const response = await fetch('/promociones/admin');
+              if (!response.ok) throw new Error(\`HTTP \${response.status}\`);
+              const promociones = await response.json();
+              tbody.innerHTML = (promociones && promociones.length)
+                ? promociones.map(renderPromocionRow).join('')
+                : '<tr><td colspan="6" class="text-center text-muted">No hay promociones registradas</td></tr>';
+            } catch (error) {
+              const tbody = document.getElementById('promocionesTableBody');
+              if (tbody) tbody.innerHTML = '<tr><td colspan="6" class="text-center text-danger">Error: ' + error.message + '</td></tr>';
             }
-          }
+          };
 
-          btnRecargar?.addEventListener('click', () => cargarPromociones());
-          btnAgregar?.addEventListener('click', () => alert('Agregar promoción - Por implementar'));
+          window.editarPromocion = function(id) {
+            alert('Función editar promoción - ID: ' + id + ' (Por implementar)');
+          };
 
-          // Carga inicial
+          window.eliminarPromocion = function(id) {
+            if (confirm('¿Estás seguro de eliminar esta promoción?')) {
+              alert('Función eliminar promoción - ID: ' + id + ' (Por implementar)');
+            }
+          };
+
+          window.abrirModalNuevaPromocion = function() {
+            alert('Función nueva promoción (Por implementar)');
+          };
+          
+          // Cargar promociones inmediatamente
           cargarPromociones();
+          
+          console.log('Promociones component loaded successfully');
           
         } catch (error) {
           console.error('Error loading promociones component:', error);
-          contentArea.innerHTML = `
-            <div class="alert alert-danger">
-              <h4>Error al cargar el componente de promociones</h4>
-              <p>Error: ${error.message}</p>
+          contentArea.innerHTML = \`
+            <div class="admin-header">
+              <h1><i class="fa fa-bullhorn"></i> Gestión de Promociones</h1>
+              <p class="mb-0 text-muted">Error al cargar el componente</p>
             </div>
-          `;
+            <div class="alert alert-danger">
+              <h4>Error</h4>
+              <p>No se pudo cargar el componente de promociones: \${error.message}</p>
+            </div>
+          \`;
         }
       }
       

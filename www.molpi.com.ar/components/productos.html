@@ -381,18 +381,9 @@
           <div class="table-responsive" style="overflow-x: auto;">
             <table class="table table-striped">
               <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Imagen</th>
-                  <th>Producto</th>
-                  <th>Categoría</th>
-                  <th>Subcategoría</th>
-                  <th>Precio en Pesos</th>
-                  <th>Precio en Dólares</th>
-                  <th>Estado</th>
-                  <th>Acciones</th>
-                </tr>
-              </thead>
+        </div>
+        <script src="/js/producto-guardado.js"></script>
+      </form>
               <tbody id="tablaProductos">
                 <tr>
                   <td colspan="9" class="text-center">
@@ -431,7 +422,7 @@
             <div class="col-md-6">
               <div class="form-group">
                 <label for="productoNombre">
-                  <i class="fa fa-tag"></i>Nombre del Producto *
+                  <i class="fa fa-tag"></i> Nombre del Producto *
                 </label>
                 <input type="text" class="form-control" id="productoNombre" name="nombre" required 
                        placeholder="Ej: Adoquín Hexagonal 20x20">
@@ -440,10 +431,10 @@
             <div class="col-md-6">
               <div class="form-group">
                 <label for="productoCategoria">
-                  <i class="fa fa-folder"></i>Categoría *
+                  <i class="fa fa-folder"></i> Categoría *
                 </label>
                 <select class="form-control" id="productoCategoria" name="categoria" required>
-                    <option value="">Selecciona una categoría</option>
+                    <option value=""> Selecciona una categoría</option>
                   </select>
                   <style>
                     #productoCategoria {
@@ -459,29 +450,8 @@
           <div class="row">
             <div class="col-md-6">
               <div class="form-group">
-                <label for="productoPrecio">
-                  <i class="fa fa-dollar"></i>Precio en Pesos
-                </label>
-                <input type="number" class="form-control" id="productoPrecio" name="precio" 
-                       step="0.01" min="0" placeholder="3500.00">
-              </div>
-            </div>
-            <div class="col-md-6">
-              <div class="form-group">
-                <label for="productoPrecioUsd">
-                  <i class="fa fa-usd"></i>Precio en Dólares
-                </label>
-                <input type="number" class="form-control" id="productoPrecioUsd" name="precio_usd" 
-                       step="0.01" min="0" placeholder="35.00">
-              </div>
-            </div>
-          </div>
-          
-          <div class="row">
-            <div class="col-md-6">
-              <div class="form-group">
                 <label for="productoSubcategoria">
-                  <i class="fa fa-tags"></i>Subcategoría *
+                  <i class="fa fa-tags"></i> Subcategoría *
                 </label>
                 <select class="form-control" id="productoSubcategoria" name="subcategoria" required>
                   <option value="">Selecciona una subcategoría</option>
@@ -491,7 +461,7 @@
             <div class="col-md-6">
               <div class="form-group">
                 <label for="productoEstado">
-                  <i class="fa fa-toggle-on"></i>Estado
+                  <i class="fa fa-toggle-on"></i> Estado
                 </label>
                 <select class="form-control" id="productoEstado" name="activo">
                   <option value="1">✅ Activo</option>
@@ -503,7 +473,7 @@
           
           <div class="form-group">
             <label for="productoDescripcion">
-              <i class="fa fa-align-left"></i>Descripción
+              <i class="fa fa-align-left"></i> Descripción
             </label>
             <textarea class="form-control" id="productoDescripcion" name="descripcion" rows="3" 
                       placeholder="Describe las características principales del producto..."></textarea>
@@ -513,7 +483,7 @@
             <div class="col-md-6">
               <div class="form-group">
                 <label for="productoImagen">
-                  <i class="fa fa-image"></i>Imagen del Molde *
+                  <i class="fa fa-image"></i> Imagen del Molde *
                 </label>
                 <input type="file" class="form-control-file" id="productoImagenFile" accept="image/*">
                 <input type="text" class="form-control mt-2" id="productoImagen" name="imagen_url" 
@@ -531,7 +501,7 @@
             <div class="col-md-6">
               <div class="form-group">
                 <label for="productoImagenMosaico">
-                  <i class="fa fa-picture-o"></i>Imagen del Mosaico (Opcional)
+                  <i class="fa fa-picture-o"></i> Imagen del Mosaico (Opcional)
                 </label>
                 <input type="file" class="form-control-file" id="productoImagenMosaicoFile" accept="image/*">
                 <input type="text" class="form-control mt-2" id="productoImagenMosaico" name="imagen_mosaico_url" 
@@ -555,7 +525,7 @@
           <!-- Vista previa de imagen -->
           <div class="form-group">
             <label class="preview-title">
-              <i class="fa fa-eye"></i>Vista Previa de Imágenes
+              <i class="fa fa-eye"></i> Vista Previa de Imágenes
             </label>
             <div id="vistaPrevia" style="min-height: 350px;">
               

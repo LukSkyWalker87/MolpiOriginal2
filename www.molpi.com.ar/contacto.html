@@ -254,7 +254,7 @@
 						<li><i class="fa fa-map-marker"></i> <strong>Pque. Industrial Alte. Brown:</strong> Cafferata
 							3210 - Burzaco - Bs. As. - Argentina.</li>
 
-						<li><i class="fa fa-whatsapp"></i> <strong>11 3556-8417</strong></li>
+						<li><i class="fa fa-whatsapp"></i> <strong>11 3556-8417 | 11-2331-5331 </strong></li>
 						<li><i class="fa fa-envelope"></i> <a href="mailto:info@molpi.com.ar">info@molpi.com.ar</a></li>
 					</ul>
 
@@ -262,7 +262,7 @@
 
 					<h4 class="heading-primary">Horarios <strong>de Atención</strong></h4>
 					<ul class="list list-icons list-dark mt-xlg">
-						<li><i class="fa fa-clock-o"></i> Lunes a Viernes de 9 a 17 hs.</li>
+						<li><i class="fa fa-clock-o"></i> Lunes a Viernes de 9 a 16:30 hs.</li>
 
 					</ul>
 
@@ -408,19 +408,19 @@
 
 	// Map Markers
 	var mapMarkers = [{
-		latitude: -34.839115,
-		longitude: -58.424006,
-		content: "<strong>Industrias MOLPI </strong><br>P.I. Alte. Brown:</strong> Cafferata 3210 - Burzaco - Buenos Aires - Argentina.<br><a href='#' onclick='mapCenterAt({latitude: -34.839115, longitude: -58.424006, zoom: 15}, event)'>[+] zoom here</a>",
-		icon: {
-			image: "img/pin.png",
-			iconsize: [26, 46],
-			iconanchor: [12, 46]
-		}
+	       latitude: -34.839115,
+	       longitude: -58.424006,
+	       content: "<strong>Industrias MOLPI</strong><br>P.I. Alte. Brown:<br><b>Cafferata 3110/3210 (1852) - Burzaco</b> - Buenos Aires - Argentina.<br><a href='#' onclick='mapCenterAt({latitude: -34.839115, longitude: -58.424006, zoom: 16}, event)'>[+] zoom aquí</a>",
+	       icon: {
+		       image: "https://maps.google.com/mapfiles/ms/icons/red-pushpin.png",
+		       iconsize: [32, 32],
+		       iconanchor: [16, 32]
+	       }
 	}];
 
 	// Map Initial Location
-	var initLatitude = -34.7900000;
-	var initLongitude = -58.455500;
+	var initLatitude = -34.839115;
+	var initLongitude = -58.424006;
 
 	// Map Extended Settings
 	var mapSettings = {
@@ -435,7 +435,7 @@
 		scrollwheel: false,
 		latitude: initLatitude,
 		longitude: initLongitude,
-		zoom: 11
+		zoom: 16
 	};
 
 	var map = $("#googlemaps").gMap(mapSettings);

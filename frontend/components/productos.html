@@ -387,6 +387,104 @@
               </tbody>
             </table>
           </div>
+          <!-- Script de filtros y ejemplo de renderizado de productos -->
+          <script>
+// --- Ejemplo de datos de productos (reemplaza esto por tu fetch real) ---
+const productosEjemplo = [
+  { id: 1, nombre: 'Pigmento Fluor verde', categoria: 'Green', subcategoria: 'Línea 20x20', precio: 'No definido', precio_usd: 'No definido', estado: 'Inactivo' },
+  { id: 2, nombre: 'Liston de ejemplo', categoria: 'Listones', subcategoria: 'General', precio: '35000.00', precio_usd: 'No definido', estado: 'Activo' },
+  { id: 3, nombre: 'Curador Color Negro', categoria: 'Insumos', subcategoria: 'Curadores', precio: '8500.00', precio_usd: '8.50', estado: 'Inactivo' },
+  // ... más productos ...
+];
+
+// --- Renderizar productos en la tabla con los data-atributos necesarios ---
+function renderizarProductos(productos) {
+  const tbody = document.getElementById('tablaProductos');
+  if (!tbody) return;
+  if (!productos || productos.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="9" class="text-center text-danger">No hay productos para mostrar</td></tr>';
+    return;
+  }
+  tbody.innerHTML = productos.map(p => `
+    <tr data-producto data-categoria="${p.categoria}" data-subcategoria="${p.subcategoria}" data-nombre="${p.nombre}">
+      <td>${p.id}</td>
+      <td><!-- Imagen --></td>
+      <td><b>${p.nombre}</b></td>
+      <td>${p.categoria}</td>
+      <td>${p.subcategoria}</td>
+      <td>${p.precio}</td>
+      <td>${p.precio_usd}</td>
+      <td>${p.estado}</td>
+      <td><!-- Acciones --></td>
+    </tr>
+  `).join('');
+}
+
+// --- Filtros funcionales para la tabla de productos ---
+let productosOriginales = [];
+
+document.addEventListener('DOMContentLoaded', function () {
+  // Renderizar productos de ejemplo (reemplaza por tu fetch y render real)
+  renderizarProductos(productosEjemplo);
+  productosOriginales = productosEjemplo.slice();
+
+  // Construir mapa de categorías -> subcategorías
+  const mapaCatSubcat = {};
+  productosOriginales.forEach(p => {
+    const cat = p.categoria;
+    const subcat = p.subcategoria;
+    if (!mapaCatSubcat[cat]) mapaCatSubcat[cat] = new Set();
+    if (subcat) mapaCatSubcat[cat].add(subcat);
+  });
+
+  // Llenar select de categorías
+  const filtroCategoria = document.getElementById('filtroCategoria');
+  filtroCategoria.innerHTML = '<option value="">Todas las categorías</option>' +
+    Object.keys(mapaCatSubcat).sort().map(cat => `<option value="${cat}">${cat}</option>`).join('');
+
+  // Llenar select de subcategorías (todas al inicio)
+  const filtroSubcategoria = document.getElementById('filtroSubcategoria');
+  const todasSubcats = Array.from(new Set(productosOriginales.map(p => p.subcategoria).filter(Boolean)));
+  filtroSubcategoria.innerHTML = '<option value="">Todas las subcategorías</option>' +
+    todasSubcats.sort().map(subcat => `<option value="${subcat}">${subcat}</option>`).join('');
+
+  // Al cambiar categoría, actualizar subcategorías
+  filtroCategoria.addEventListener('change', function () {
+    const cat = filtroCategoria.value;
+    let subcats = [];
+    if (!cat) {
+      subcats = todasSubcats;
+    } else {
+      subcats = mapaCatSubcat[cat] ? Array.from(mapaCatSubcat[cat]) : [];
+    }
+    filtroSubcategoria.innerHTML = '<option value="">Todas las subcategorías</option>' +
+      subcats.sort().map(subcat => `<option value="${subcat}">${subcat}</option>`).join('');
+    filtroSubcategoria.value = '';
+    filtrarTablaProductos();
+  });
+
+  // Listeners de filtros
+  filtroSubcategoria.addEventListener('change', filtrarTablaProductos);
+  document.getElementById('buscarProducto').addEventListener('input', filtrarTablaProductos);
+  filtroCategoria.addEventListener('change', filtrarTablaProductos);
+});
+
+function filtrarTablaProductos() {
+  const categoria = document.getElementById('filtroCategoria').value;
+  const subcategoria = document.getElementById('filtroSubcategoria').value;
+  const busqueda = document.getElementById('buscarProducto').value.toLowerCase();
+
+  let filtrados = productosOriginales.filter(p => {
+    const matchCategoria = !categoria || p.categoria === categoria;
+    const matchSubcategoria = !subcategoria || p.subcategoria === subcategoria;
+    const matchBusqueda = !busqueda || p.nombre.toLowerCase().includes(busqueda);
+    return matchCategoria && matchSubcategoria && matchBusqueda;
+  });
+
+  renderizarProductos(filtrados);
+}
+// --- Fin filtros funcionales ---
+          </script>
         </div>
       </div>
     </div>

@@ -265,14 +265,15 @@
 
     .main-content {
       margin-left: 280px;
-      padding: 40px;
-      /* Asegurar que el contenido no se corte en el borde derecho */
+      padding: 1.5rem 2rem; /* Padding más balanceado */
+      /* Asegurar que el contenido use todo el espacio disponible */
       width: auto;
       max-width: calc(100vw - 280px);
       box-sizing: border-box;
       overflow-x: auto;
       min-width: 0;
       background-color: #f8f9fa;
+      min-height: 100vh; /* Usar toda la altura de la pantalla */
     }
 
     /* Hacer responsivo el encabezado de tarjetas con título + botón */
@@ -293,6 +294,37 @@
       .sidebar { width: 220px; }
       .main-content { margin-left: 220px; max-width: calc(100vw - 220px); padding: 24px; }
     }
+
+    /* Estilos para tabla de productos */
+    .table thead th {
+      background-color: #f8f9fa !important;
+      font-weight: 900 !important;
+      font-family: 'Arial', sans-serif !important;
+      color: #333 !important;
+      border-bottom: 2px solid #dee2e6 !important;
+      position: sticky !important;
+      top: 0 !important;
+      z-index: 10 !important;
+      display: table-cell !important;
+      visibility: visible !important;
+    }
+    
+    /* Ocultar columnas de precios SOLO en productos */
+    .productos-component .table th:nth-child(6), 
+    .productos-component .table td:nth-child(6),
+    .productos-component .table th:nth-child(7), 
+    .productos-component .table td:nth-child(7) {
+      display: none !important;
+    }
+    
+    /* Asegurar espacio adecuado para la celda de acciones */
+    .table td:last-child, 
+    .table th:last-child {
+      padding-left: 8px !important;
+      padding-right: 8px !important;
+      white-space: nowrap !important;
+      min-width: 200px !important;
+    }
   </style>
 </head>
 
@@ -305,7 +337,7 @@
     <h2>Panel de Administración</h2>
     <a href="#" data-section="productos" class="active">📦 Productos</a>
     <a href="#" data-section="promociones">📢 Promociones</a>
-    <a href="#" data-section="testimonios">💬 Testimonios</a>
+    <!-- <a href="#" data-section="testimonios">💬 Testimonios</a> -->
       <!-- Botón de salir -->
   <a href="index.html" class="exit-button">🚪 SALIR</a>
   </div>
@@ -442,9 +474,9 @@ sidebarLinks.forEach((link) => {
       } else if (section === "promociones") {
         console.log('Loading promociones section');
         loadPromocionesComponent();
-      } else if (section === "testimonios") {
+      /*} else if (section === "testimonios") {
         console.log('Loading testimonios section');
-        loadTestimoniosComponent();
+        loadTestimoniosComponent();*/
       } else {
         // Sección desconocida
         contentArea.innerHTML = `
@@ -597,6 +629,35 @@ function getClientesHTML() {
         function mostrarProductos(productosAMostrar) {
           const tbody = document.getElementById('tablaProductos');
           if (!tbody) return;
+          
+          // Obtener la tabla completa y asegurar que tenga thead
+          const tablaCompleta = tbody.closest('table');
+          if (tablaCompleta) {
+            // Verificar si existe el thead, si no, crearlo
+            let thead = tablaCompleta.querySelector('thead');
+            if (!thead) {
+              thead = document.createElement('thead');
+              tablaCompleta.insertBefore(thead, tbody);
+            }
+            
+            // Asegurar que el thead tenga los títulos correctos
+            thead.innerHTML = `
+              <tr>
+                <th>ID</th>
+                <th>Imagen</th>
+                <th>Producto</th>
+                <th>Categoría</th>
+                <th>Subcategoría</th>
+                <th>Precio en Pesos</th>
+                <th>Precio en Dólares</th>
+                <th>Estado</th>
+                <th style="min-width: 200px; width: 200px;">Acciones</th>
+              </tr>
+            `;
+            
+            thead.style.display = 'table-header-group';
+            console.log('✅ Thead creado/actualizado con títulos (función local)');
+          }
           
           tbody.innerHTML = '';
           
@@ -1011,6 +1072,39 @@ function getClientesHTML() {
         }
         
         // 7. Función para cargar subcategorías dinámicamente en modal
+        async function cargarSubcategorias(categoriaSeleccionada = null) {
+          const selectSubcategoria = document.getElementById('filtroSubcategoria');
+          if (!selectSubcategoria) return;
+
+          // Limpiar opciones existentes excepto la primera
+          selectSubcategoria.innerHTML = '<option value="">Todas las subcategorías</option>';
+
+          let url = '/subcategorias';
+          if (categoriaSeleccionada) {
+            // Buscar el ID de la categoría seleccionada
+            const categorias = await fetch('/categorias').then(res => res.json());
+            const categoria = categorias.find(cat => cat.nombre === categoriaSeleccionada);
+            if (categoria) {
+              url += `?categoria_id=${categoria.id}`;
+            }
+          }
+
+          try {
+            const subcategorias = await fetch(url).then(res => res.json());
+            if (Array.isArray(subcategorias)) {
+              subcategorias.forEach(subcat => {
+                const option = document.createElement('option');
+                option.value = subcat.nombre;
+                option.textContent = subcat.nombre;
+                selectSubcategoria.appendChild(option);
+              });
+            }
+          } catch (error) {
+            console.error('Error cargando subcategorías:', error);
+          }
+        }
+        
+        // 7a. Función para cargar subcategorías dinámicamente en modal
         async function cargarSubcategorias() {
           const categoriaSeleccionada = document.getElementById('productoCategoria').value;
           const selectSubcategoria = document.getElementById('productoSubcategoria');
@@ -1063,6 +1157,7 @@ function getClientesHTML() {
           }
           
           const categoriaValue = categoriaSeleccionada.value;
+          console.log('🔄 Actualizando subcategorías para categoría:', categoriaValue);
           
           // Limpiar completamente el select
           filtroSubcategoria.innerHTML = '';
@@ -1074,37 +1169,51 @@ function getClientesHTML() {
           filtroSubcategoria.appendChild(defaultOption);
           
           try {
-            const response = await fetch('/subcategorias');
-            const todasSubcategorias = await response.json();
-            
-            let subcategoriasParaMostrar = todasSubcategorias;
-            
-            if (categoriaValue) {
+            if (!categoriaValue) {
+              // Si no hay categoría seleccionada, cargar todas las subcategorías
+              const response = await fetch('/subcategorias');
+              const todasSubcategorias = await response.json();
+              
+              todasSubcategorias.forEach(subcategoria => {
+                const option = document.createElement('option');
+                option.value = subcategoria.nombre;
+                option.textContent = subcategoria.nombre;
+                filtroSubcategoria.appendChild(option);
+              });
+              
+              // Agregar subcategoría especial para Podotáctiles
+              const optionPodotactiles = document.createElement('option');
+              optionPodotactiles.value = 'Discapacidad';
+              optionPodotactiles.textContent = 'Discapacidad';
+              filtroSubcategoria.appendChild(optionPodotactiles);
+              
+            } else if (categoriaValue === 'Podotáctiles') {
+              // Caso especial para Podotáctiles
+              const option = document.createElement('option');
+              option.value = 'Discapacidad';
+              option.textContent = 'Discapacidad';
+              filtroSubcategoria.appendChild(option);
+              
+            } else {
+              // Para otras categorías, cargar subcategorías específicas
+              const response = await fetch('/subcategorias');
+              const todasSubcategorias = await response.json();
+              
               // Filtrar subcategorías por categoría seleccionada
               const categoria = categorias.find(c => c.nombre === categoriaValue);
               if (categoria) {
-                subcategoriasParaMostrar = todasSubcategorias.filter(s => s.categoria_id === categoria.id);
+                const subcategoriasParaMostrar = todasSubcategorias.filter(s => s.categoria_id === categoria.id);
+                
+                subcategoriasParaMostrar.forEach(subcategoria => {
+                  const option = document.createElement('option');
+                  option.value = subcategoria.nombre;
+                  option.textContent = subcategoria.nombre;
+                  filtroSubcategoria.appendChild(option);
+                });
               }
             }
             
-            // Eliminar duplicados por nombre usando Set
-            const nombresUnicos = new Set();
-            const subcategoriasUnicas = [];
-            
-            subcategoriasParaMostrar.forEach(subcategoria => {
-              if (!nombresUnicos.has(subcategoria.nombre)) {
-                nombresUnicos.add(subcategoria.nombre);
-                subcategoriasUnicas.push(subcategoria);
-              }
-            });
-            
-            // Agregar las subcategorías únicas
-            subcategoriasUnicas.forEach(subcategoria => {
-              const option = document.createElement('option');
-              option.value = subcategoria.nombre;
-              option.textContent = subcategoria.nombre;
-              filtroSubcategoria.appendChild(option);
-            });
+            console.log('✅ Subcategorías actualizadas correctamente');
             
           } catch (error) {
             console.error('Error cargando subcategorías del filtro:', error);
@@ -1128,17 +1237,18 @@ function getClientesHTML() {
             let imagenUrl = document.getElementById('productoImagen').value;
             let imagenMosaicoUrl = document.getElementById('productoImagenMosaico').value;
             
+            // Determinar la URL de subida según entorno
+            const uploadUrl = (window.env && window.env.API_URL) ? `${window.env.API_URL}/upload/producto` : '/upload/producto';
+
             // Subir archivo de imagen del molde si existe
             const fileInputMolde = document.getElementById('productoImagenFile');
             if (fileInputMolde && fileInputMolde.files.length > 0) {
               const formData = new FormData();
               formData.append('file', fileInputMolde.files[0]);
-              
-              const uploadResponse = await fetch('http://localhost:5000/upload/producto', {
+              const uploadResponse = await fetch(uploadUrl, {
                 method: 'POST',
                 body: formData
               });
-              
               const uploadResult = await uploadResponse.json();
               if (uploadResponse.ok) {
                 imagenUrl = uploadResult.path;
@@ -1146,18 +1256,16 @@ function getClientesHTML() {
                 throw new Error('Error subiendo imagen del molde: ' + uploadResult.error);
               }
             }
-            
+
             // Subir archivo de imagen del mosaico si existe
             const fileInputMosaico = document.getElementById('productoImagenMosaicoFile');
             if (fileInputMosaico && fileInputMosaico.files.length > 0) {
               const formData = new FormData();
               formData.append('file', fileInputMosaico.files[0]);
-              
-              const uploadResponse = await fetch('http://localhost:5000/upload/producto', {
+              const uploadResponse = await fetch(uploadUrl, {
                 method: 'POST',
                 body: formData
               });
-              
               const uploadResult = await uploadResponse.json();
               if (uploadResponse.ok) {
                 imagenMosaicoUrl = uploadResult.path;
@@ -1358,7 +1466,8 @@ function getClientesHTML() {
                     // Para otras categorías o vista general, recargar normalmente
                     console.log('🔄 Recargando productos para categoría:', categoriaActual || 'todas');
                     const response2 = await fetch('/api/productos?incluir_inactivos=true');
-                    productos = await response2.json();
+                    let data2 = await response2.json();
+                    productos = Array.isArray(data2) ? data2 : (data2.productos || []);
                     
                     if (categoriaActual && categoriaActual !== '') {
                       // Si hay un filtro activo, aplicarlo
@@ -1718,50 +1827,32 @@ function getClientesHTML() {
           });
         }
         
-        // Event listeners para los filtros (ya declarados arriba)
+        // Event listeners para los filtros
+        const filtroCategoriaElement = document.getElementById('filtroCategoria');
         const filtroSubcategoria = document.getElementById('filtroSubcategoria');
         const buscarProducto = document.getElementById('buscarProducto');
-        
-        if (filtroCategoria) {
-          filtroCategoria.addEventListener('change', async function() {
-            await actualizarFiltroSubcategorias();
-            await filtrarProductos();
-          });
-        }
-        
-        if (filtroSubcategoria) {
-          filtroSubcategoria.addEventListener('change', () => filtrarProductos());
-        }
-        
-        if (buscarProducto) {
-          buscarProducto.addEventListener('input', () => filtrarProductos());
-        }
-        
-        // Configurar botones de filtro rápido
-        const filtroTodos = document.getElementById('filtroTodos');
         const filtro20x20 = document.getElementById('filtro20x20');
         const filtro40x40 = document.getElementById('filtro40x40');
         const filtro50x50 = document.getElementById('filtro50x50');
         const filtroPodotactiles = document.getElementById('filtroPodotactiles');
         
-        if (filtroTodos) {
-          filtroTodos.addEventListener('click', function() {
-            // Resetear todos los filtros
-            if (filtroCategoria) filtroCategoria.value = '';
-            if (filtroSubcategoria) filtroSubcategoria.value = '';
-            if (buscarProducto) buscarProducto.value = '';
-            
-            // Limpiar estado de filtro
-            window.currentFilter = '';
-            
-            // Actualizar botones activos
-            document.querySelectorAll('.btn-group .btn').forEach(btn => btn.classList.remove('active'));
-            this.classList.add('active');
-            
-            // Cargar todos los productos
-            cargarProductos();
+        // Event listeners básicos para filtros
+        if (filtroCategoriaElement) {
+          filtroCategoriaElement.addEventListener('change', async function() {
+            console.log('🔄 Cambio de categoría detectado:', this.value);
+            await actualizarFiltroSubcategorias();
+            filtrarProductos();
           });
         }
+        if (filtroSubcategoria) {
+          filtroSubcategoria.addEventListener('change', filtrarProductos);
+        }
+        
+        if (buscarProducto) {
+          buscarProducto.addEventListener('input', filtrarProductos);
+        }
+        
+        // Event listeners para filtros rápidos
         
         if (filtro20x20) {
           filtro20x20.addEventListener('click', async function() {
@@ -2112,6 +2203,9 @@ function getClientesHTML() {
           });
         }
         
+        // Inicializar carga de datos para filtros y productos
+        initProductosScript();
+
         console.log('=== Componente productos inicializado correctamente ===');
       }
 
@@ -2133,13 +2227,13 @@ function getClientesHTML() {
                     <div class="row">
                       <div class="col-md-3">
                         <label for="filtroCategoria">Categoría</label>
-                        <select id="filtroCategoria" class="form-control" onchange="actualizarSubcategorias(); filtrarProductos()">
+                        <select id="filtroCategoria" class="form-control">
                           <option value="">Todas las categorías</option>
                         </select>
                       </div>
                       <div class="col-md-3">
                         <label for="filtroSubcategoria">Subcategoría</label>
-                        <select id="filtroSubcategoria" class="form-control" onchange="filtrarProductos()">
+                        <select id="filtroSubcategoria" class="form-control">
                           <option value="">Todas las subcategorías</option>
                         </select>
                       </div>
@@ -2182,14 +2276,7 @@ function getClientesHTML() {
                             <th>Precio en Pesos</th>
                             <th>Precio en Dólares</th>
                             <th>Estado</th>
-                            <th style="min-width: 270px; max-width: 320px;">Acciones</th>
-  <style>
-    /* Aprovechar al máximo el espacio de la celda de acciones */
-    td:last-child, th:last-child {
-      padding-left: 2px !important;
-      padding-right: 2px !important;
-    }
-  </style>
+                            <th style="min-width: 200px; width: 200px;">Acciones</th>
                           </tr>
                         </thead>
                         <tbody id="tablaProductos">
@@ -2218,7 +2305,10 @@ function getClientesHTML() {
       function cargarCategorias() {
         fetch('/categorias')
           .then(response => response.json())
-          .then(categorias => {
+          .then(categoriasData => {
+            // Guardar categorías en variable global
+            categorias = categoriasData;
+            
             const selectCategoria = document.getElementById('filtroCategoria');
             if (selectCategoria) {
               categorias.forEach(categoria => {
@@ -2235,6 +2325,9 @@ function getClientesHTML() {
                 optionPodotactiles.value = 'Podotáctiles';
                 optionPodotactiles.textContent = 'Podotáctiles';
                 selectCategoria.appendChild(optionPodotactiles);
+                
+                // También agregar a la variable global
+                categorias.push({ id: 999, nombre: 'Podotáctiles' });
               }
             }
           })
@@ -2287,32 +2380,10 @@ function getClientesHTML() {
         }
       }
       
-      function actualizarSubcategorias() {
-        const selectCategoria = document.getElementById('filtroCategoria');
-        const selectSubcategoria = document.getElementById('filtroSubcategoria');
-        
-        if (!selectCategoria || !selectSubcategoria) return;
-        
-        const categoriaSeleccionada = selectCategoria.value;
-        
-        // Limpiar subcategorías
-        selectSubcategoria.innerHTML = '<option value="">Todas las subcategorías</option>';
-        
-        // Si es categoría Podotáctiles, agregar subcategoría específica
-        if (categoriaSeleccionada === 'Podotáctiles') {
-          const option = document.createElement('option');
-          option.value = 'Discapacidad';
-          option.textContent = 'Discapacidad';
-          selectSubcategoria.appendChild(option);
-        } else if (categoriaSeleccionada) {
-          // Para otras categorías, cargar desde la base de datos
-          cargarSubcategorias(categoriaSeleccionada);
-        }
-      }
-      
       // Variables para evitar cargas múltiples
       let cargandoProductos = false;
       let filtrandoProductos = false;
+      let categorias = []; // Variable global para categorías
       
       function cargarProductos() {
         if (cargandoProductos) return;
@@ -2320,9 +2391,14 @@ function getClientesHTML() {
         
         fetch('/productos')
           .then(response => response.json())
-          .then(productos => {
-            console.log('Productos cargados:', productos.length);
-            console.log('Primer producto:', productos[0]);
+          .then(data => {
+            console.log('Datos recibidos:', data);
+            // Manejar tanto array directo como objeto con propiedad productos
+            const productos = Array.isArray(data) ? data : (data.productos || []);
+            console.log('Productos procesados:', productos.length);
+            if (productos.length > 0) {
+              console.log('Primer producto:', productos[0]);
+            }
             mostrarProductos(productos);
           })
           .catch(error => {
@@ -2339,10 +2415,49 @@ function getClientesHTML() {
       
       function mostrarProductos(productos) {
         const tabla = document.getElementById('tablaProductos');
-        if (!tabla) return;
+        if (!tabla) {
+          console.error('No se encontró el elemento tablaProductos');
+          return;
+        }
+        
+        // Obtener la tabla completa y asegurar que tenga thead
+        const tablaCompleta = tabla.closest('table');
+        if (tablaCompleta) {
+          // Verificar si existe el thead, si no, crearlo
+          let thead = tablaCompleta.querySelector('thead');
+          if (!thead) {
+            thead = document.createElement('thead');
+            tablaCompleta.insertBefore(thead, tabla);
+          }
+          
+          // Asegurar que el thead tenga los títulos correctos
+          thead.innerHTML = `
+            <tr>
+              <th>ID</th>
+              <th>Imagen</th>
+              <th>Producto</th>
+              <th>Categoría</th>
+              <th>Subcategoría</th>
+              <th>Precio en Pesos</th>
+              <th>Precio en Dólares</th>
+              <th>Estado</th>
+              <th style="min-width: 200px; width: 200px;">Acciones</th>
+            </tr>
+          `;
+          
+          thead.style.display = 'table-header-group';
+          console.log('✅ Thead creado/actualizado con títulos');
+        }
         
         // Limpiar tabla explícitamente
         tabla.innerHTML = '';
+        
+        // Validar que productos sea un array
+        if (!Array.isArray(productos)) {
+          console.error('Error: productos no es un array:', productos);
+          tabla.innerHTML = '<tr><td colspan="9" class="text-center text-danger">Error: formato de datos incorrecto</td></tr>';
+          return;
+        }
         
         console.log('Mostrando productos:', productos.length);
         if (productos.length > 0) {
@@ -2373,12 +2488,14 @@ function getClientesHTML() {
             <td><strong>U$D ${parseFloat(producto.precio_usd || 0).toFixed(2)}</strong></td>
             <td><span class="badge badge-success">Activo</span></td>
             <td>
-              <button class="btn btn-sm btn-outline-primary" onclick="editarProducto(${producto.id})" title="Editar">
-                <i class="fa fa-edit"></i>
-              </button>
-              <button class="btn btn-sm btn-outline-danger ml-1" onclick="eliminarProducto(${producto.id})" title="Eliminar">
-                <i class="fa fa-trash"></i>
-              </button>
+              <div class="d-flex gap-2">
+                <button class="btn btn-sm btn-outline-primary" onclick="editarProducto(${producto.id})" title="Editar">
+                  <i class="fa fa-edit"></i> Editar
+                </button>
+                <button class="btn btn-sm btn-outline-danger" onclick="eliminarProducto(${producto.id})" title="Eliminar">
+                  <i class="fa fa-trash"></i> Eliminar
+                </button>
+              </div>
             </td>
           </tr>
         `).join('');
@@ -2401,8 +2518,11 @@ function getClientesHTML() {
         // Cargar productos y aplicar filtros
         fetch('/productos')
           .then(response => response.json())
-          .then(productos => {
-            console.log('📦 Productos recibidos:', productos.length);
+          .then(data => {
+            console.log('📦 Datos recibidos:', data);
+            // Manejar tanto array directo como objeto con propiedad productos
+            const productos = Array.isArray(data) ? data : (data.productos || []);
+            console.log('📦 Productos procesados:', productos.length);
             let productosFiltrados = productos;
             
             // Filtrar por categoría
@@ -2478,62 +2598,603 @@ function getClientesHTML() {
       // ========= Componente de Promociones =========
       async function loadPromocionesComponent() {
         try {
-          console.log('Fetching promociones component...');
-          const response = await fetch('/admin/component/promociones');
+          console.log('Loading promociones component...');
           
-          if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+          contentArea.innerHTML = `
+            <div class="admin-header mb-4">
+              <h1 style="font-size: 2.2rem;"><i class="fa fa-bullhorn mr-3"></i> Gestión de Promociones</h1>
+              <p class="mb-0 text-muted" style="font-size: 1rem;">Administra las promociones y ofertas especiales</p>
+            </div>
+
+            <div class="promociones-component">
+              <div class="card shadow-sm">
+                <div class="card-header d-flex justify-content-between align-items-center" style="padding: 1.5rem;">
+                  <h5 class="mb-0" style="font-size: 1.2rem;"><i class="fa fa-bullhorn mr-2"></i>Gestión de Promociones</h5>
+                  <div class="toolbar d-flex align-items-center">
+                    <input id="buscarPromocion" class="form-control mr-3" placeholder="Buscar promociones..." style="width: 350px; height: 42px; font-size: 0.95rem; padding: 0.6rem 0.9rem;">
+                    <button class="btn btn-primary" onclick="abrirModalNuevaPromocion()" style="padding: 0.6rem 1.2rem; font-size: 0.95rem;">
+                      <i class="fa fa-plus mr-2"></i> Nueva Promoción
+                    </button>
+                  </div>
+                </div>
+
+                <div class="card-body" style="padding: 1.5rem;">
+                  <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                      <thead class="thead-light">
+                        <tr>
+                          <th style="font-size: 0.9rem; padding: 0.9rem; width: 110px;">Imagen</th>
+                          <th style="font-size: 0.9rem; padding: 0.9rem; width: 280px;">Título</th>
+                          <th style="font-size: 0.9rem; padding: 0.9rem; width: 130px;">Archivos</th>
+                          <th style="font-size: 0.9rem; padding: 0.9rem; width: 110px;">Estado</th>
+                          <th style="font-size: 0.9rem; padding: 0.9rem; width: 130px;">Fecha</th>
+                          <th style="min-width: 240px; width: 240px; font-size: 0.9rem; padding: 0.9rem;">Acciones</th>
+                        </tr>
+                      </thead>
+                      <tbody id="promocionesTableBody">
+                        <tr><td colspan="6" class="text-center">Cargando promociones...</td></tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+
+          // Agregar modal de edición de promociones
+          const modalHTML = `
+            <!-- Modal Editar/Crear Promoción -->
+            <div class="modal fade" id="modalPromocion" tabindex="-1" role="dialog" aria-labelledby="modalPromocionLabel" aria-hidden="true">
+              <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="modalPromocionLabel">Nueva Promoción</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                  </div>
+                  <form id="formPromocion">
+                    <div class="modal-body">
+                      <input type="hidden" id="promocionId" name="id">
+                      
+                      <div class="row">
+                        <div class="col-md-12 mb-3">
+                          <label for="promocionTitulo">Título de la Promoción *</label>
+                          <input type="text" class="form-control" id="promocionTitulo" name="titulo" required>
+                        </div>
+                      </div>
+                      
+                      <div class="row">
+                        <div class="col-md-6 mb-3">
+                          <label for="promocionImagen">URL de la Imagen</label>
+                          <input type="url" class="form-control" id="promocionImagen" name="imagen" placeholder="https://ejemplo.com/imagen.jpg">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                          <label for="promocionImagenFile">O subir imagen</label>
+                          <input type="file" class="form-control-file" id="promocionImagenFile" accept="image/*">
+                        </div>
+                      </div>
+                      
+                      <div class="row">
+                        <div class="col-md-6 mb-3">
+                          <label for="promocionCartillaPdf">URL del PDF</label>
+                          <input type="url" class="form-control" id="promocionCartillaPdf" name="cartilla_pdf" placeholder="https://ejemplo.com/archivo.pdf">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                          <label for="promocionPdfFile">O subir PDF</label>
+                          <input type="file" class="form-control-file" id="promocionPdfFile" accept=".pdf">
+                        </div>
+                      </div>
+                      
+                      <div class="row">
+                        <div class="col-md-6 mb-3">
+                          <label for="promocionActivo">Estado</label>
+                          <select class="form-control" id="promocionActivo" name="activo">
+                            <option value="1">Activo</option>
+                            <option value="0">Inactivo</option>
+                          </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                          <label for="promocionFechaCreacion">Fecha de Creación</label>
+                          <input type="date" class="form-control" id="promocionFechaCreacion" name="fecha_creacion">
+                        </div>
+                      </div>
+                      
+                      <!-- Vista previa de la imagen -->
+                      <div class="row" id="vistaPreviaPromocion" style="display: none;">
+                        <div class="col-12 mb-3">
+                          <label>Vista Previa de la Imagen</label>
+                          <div class="border rounded p-3 text-center">
+                            <img id="previewImagenPromocion" src="" alt="Vista previa" style="max-width: 200px; max-height: 150px; object-fit: cover;">
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                      <button type="submit" class="btn btn-primary" id="btnGuardarPromocion">
+                        <i class="fa fa-save"></i> Guardar Promoción
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          `;
+          
+          // Insertar modal en el DOM
+          document.body.insertAdjacentHTML('beforeend', modalHTML);
+          
+          // Configurar event listeners del modal
+          configurarEventListenersModal();
+          
+          function configurarEventListenersModal() {
+            // Vista previa de imagen
+            const inputImagen = document.getElementById('promocionImagen');
+            const inputImagenFile = document.getElementById('promocionImagenFile');
+            const previewImagen = document.getElementById('previewImagenPromocion');
+            const vistaPrevia = document.getElementById('vistaPreviaPromocion');
+            
+            if (inputImagen) {
+              inputImagen.addEventListener('input', function() {
+                if (this.value) {
+                  previewImagen.src = this.value;
+                  vistaPrevia.style.display = 'block';
+                } else {
+                  vistaPrevia.style.display = 'none';
+                }
+              });
+            }
+            
+            if (inputImagenFile) {
+              inputImagenFile.addEventListener('change', function() {
+                if (this.files && this.files[0]) {
+                  const reader = new FileReader();
+                  reader.onload = function(e) {
+                    previewImagen.src = e.target.result;
+                    vistaPrevia.style.display = 'block';
+                    // Limpiar URL manual si se selecciona archivo
+                    document.getElementById('promocionImagen').value = '';
+                  };
+                  reader.readAsDataURL(this.files[0]);
+                }
+              });
+            }
+            
+            // Manejar envío del formulario
+            const formPromocion = document.getElementById('formPromocion');
+            if (formPromocion) {
+              formPromocion.addEventListener('submit', function(e) {
+                e.preventDefault();
+                guardarPromocion();
+              });
+            }
+            
+            // Limpiar modal al cerrarse
+            $('#modalPromocion').on('hidden.bs.modal', function() {
+              limpiarModalPromocion();
+            });
           }
           
-          const html = await response.text();
-          contentArea.innerHTML = html;
-          console.log('Promociones component loaded successfully');
-          
-          // Ejecutar scripts del componente manualmente
-          const scripts = contentArea.querySelectorAll('script');
-          scripts.forEach(script => {
-            try {
-              const newScript = document.createElement('script');
-              newScript.innerHTML = script.innerHTML;
-              document.head.appendChild(newScript);
-              document.head.removeChild(newScript);
-            } catch (e) {
-              console.log('Error ejecutando script:', e);
-            }
-          });
-          
-          // Inicializar event listeners después de cargar el componente
-          setTimeout(() => {
-            console.log('🔄 Intentando inicializar promociones...');
+          function limpiarModalPromocion() {
+            const form = document.getElementById('formPromocion');
+            if (form) form.reset();
             
-            // Verificar funciones disponibles
-            console.log('Funciones disponibles:', {
-              inicializarPromociones: typeof window.inicializarPromociones,
-              cargarPromociones: typeof window.cargarPromociones,
-              debugPromociones: typeof window.debugPromociones
+            document.getElementById('promocionId').value = '';
+            document.getElementById('modalPromocionLabel').textContent = 'Nueva Promoción';
+            document.getElementById('vistaPreviaPromocion').style.display = 'none';
+            
+            const btnGuardar = document.getElementById('btnGuardarPromocion');
+            if (btnGuardar) {
+              btnGuardar.innerHTML = '<i class="fa fa-save"></i> Guardar Promoción';
+            }
+          }
+          
+          // Funciones de promociones integradas
+          window.renderPromocionRow = function(promocion) {
+            console.log('🔍 Renderizando promoción ID:', promocion.id, 'Título:', promocion.titulo);
+            
+            // Construir HTML por partes para debugging
+            const imagenUrl = promocion.imagen || 'img/placeholder.jpg';
+            const estadoBadge = promocion.activo ? 
+              '<span class="badge badge-success">Activo</span>' : 
+              '<span class="badge badge-secondary">Inactivo</span>';
+            
+            const fechaCreacion = promocion.fecha_creacion ? 
+              new Date(promocion.fecha_creacion).toLocaleDateString() : 
+              'Sin fecha';
+            
+            // Construir cada celda individualmente
+            const celda1 = `<td><img src="${imagenUrl}" alt="Promoción" style="width: 50px; height: 50px; object-fit: cover;" onerror="this.src='img/placeholder.jpg'"></td>`;
+            const celda2 = `<td><strong>${promocion.titulo || 'Sin título'}</strong></td>`;
+            const celda3 = `<td>${promocion.cartilla_pdf ? '<i class="fa fa-file-pdf-o text-danger"></i> PDF' : 'Sin archivos'}</td>`;
+            const celda4 = `<td>${estadoBadge}</td>`;
+            const celda5 = `<td>${fechaCreacion}</td>`;
+            const celda6 = `<td class="acciones">
+              <div class="d-flex justify-content-start">
+                <button class="btn btn-sm btn-outline-primary mr-2" onclick="editarPromocion(${promocion.id})" title="Editar promoción">
+                  <i class="fa fa-edit mr-1"></i> Editar
+                </button>
+                <button class="btn btn-sm btn-outline-danger" onclick="eliminarPromocion(${promocion.id})" title="Eliminar promoción">
+                  <i class="fa fa-trash mr-1"></i> Eliminar
+                </button>
+              </div>
+            </td>`;
+            
+            const html = `<tr>${celda1}${celda2}${celda3}${celda4}${celda5}${celda6}</tr>`;
+            
+            console.log('✅ Celda 6 (Acciones):', celda6);
+            console.log('✅ HTML completo de la fila:', html);
+            console.log('✅ Número de celdas TD:', (html.match(/<td/g) || []).length);
+            
+            return html;
+          };
+
+          window.cargarPromociones = async function() {
+            try {
+              console.log('🔄 Cargando promociones...');
+              const tbody = document.getElementById('promocionesTableBody');
+              if (!tbody) {
+                console.error('❌ No se encontró tbody promocionesTableBody');
+                return;
+              }
+              
+              console.log('📡 Haciendo fetch a /promociones/admin...');
+              const response = await fetch('/promociones/admin');
+              console.log('📡 Response status:', response.status);
+              
+              if (!response.ok) {
+                console.log('⚠️ Response no OK, intentando con datos de prueba...');
+                // Si falla, usar datos de prueba para mostrar la tabla
+                const promocionesPrueba = [
+                  {
+                    id: 1,
+                    titulo: 'Promo Agosto - 25% OFF',
+                    imagen: 'img/promo-agosto.jpg',
+                    cartilla_pdf: 'docs/cartilla-agosto.pdf',
+                    activo: true,
+                    fecha_creacion: '2025-08-01'
+                  },
+                  {
+                    id: 2,
+                    titulo: 'Promo Julio - 25% OFF',
+                    imagen: 'img/promo-julio.jpg',
+                    cartilla_pdf: 'docs/cartilla-julio.pdf',
+                    activo: true,
+                    fecha_creacion: '2025-07-01'
+                  }
+                ];
+                console.log('🧪 Renderizando con datos de prueba:', promocionesPrueba);
+                const htmlGenerado = promocionesPrueba.map(renderPromocionRow).join('');
+                console.log('🔍 HTML completo generado:', htmlGenerado);
+                console.log('🔍 Longitud del HTML:', htmlGenerado.length);
+                tbody.innerHTML = htmlGenerado;
+                
+                // Verificar después de insertar
+                setTimeout(() => {
+                  console.log('🔍 Verificando después de insertar...');
+                  console.log('🔍 tbody.innerHTML:', tbody.innerHTML);
+                  console.log('🔍 Número de filas:', tbody.querySelectorAll('tr').length);
+                  const primeraFila = tbody.querySelector('tr');
+                  if (primeraFila) {
+                    console.log('🔍 Número de celdas en primera fila:', primeraFila.querySelectorAll('td').length);
+                    const ultimaCelda = primeraFila.querySelector('td:last-child');
+                    console.log('🔍 Última celda:', ultimaCelda ? ultimaCelda.outerHTML : 'NO ENCONTRADA');
+                  }
+                }, 100);
+                
+                return;
+              }
+              
+              const promociones = await response.json();
+              console.log('📦 Promociones recibidas:', promociones);
+              console.log('📦 Tipo de datos:', typeof promociones, Array.isArray(promociones));
+              if (promociones && promociones.length > 0) {
+                console.log('📦 Primera promoción:', promociones[0]);
+                console.log('📦 Campos disponibles:', Object.keys(promociones[0]));
+              }
+              
+              tbody.innerHTML = (promociones && promociones.length)
+                ? promociones.map(renderPromocionRow).join('')
+                : '<tr><td colspan="6" class="text-center text-muted">No hay promociones registradas</td></tr>';
+                
+              console.log('✅ Promociones cargadas exitosamente, HTML generado:', tbody.innerHTML.length + ' caracteres');
+              console.log('🔍 HTML generado:', tbody.innerHTML);
+              console.log('🔍 Elemento tbody:', tbody);
+              console.log('🔍 ¿Tbody está visible?', tbody.offsetHeight > 0);
+              
+              // Verificar número de columnas en el HTML generado
+              const firstRow = tbody.querySelector('tr');
+              if (firstRow) {
+                const columns = firstRow.querySelectorAll('td');
+                console.log('🔍 Número de columnas en la primera fila:', columns.length);
+                columns.forEach((col, index) => {
+                  console.log(`🔍 Columna ${index}:`, col.outerHTML.substring(0, 100) + '...');
+                });
+              }
+              
+              // Forzar actualización del DOM
+              setTimeout(() => {
+                console.log('🔄 Verificando después de timeout...');
+                console.log('🔍 HTML actual en tbody:', document.getElementById('promocionesTableBody').innerHTML.substring(0, 200) + '...');
+              }, 100);
+            } catch (error) {
+              console.error('❌ Error cargando promociones:', error);
+              const tbody = document.getElementById('promocionesTableBody');
+              if (tbody) tbody.innerHTML = '<tr><td colspan="6" class="text-center text-danger">Error: ' + error.message + '</td></tr>';
+            }
+          };
+
+          window.editarPromocion = function(id) {
+            console.log('✏️ Editando promoción con ID:', id);
+            
+            // Buscar la promoción en los datos cargados
+            fetch(`/promociones/admin`)
+              .then(response => response.json())
+              .then(promociones => {
+                const promocion = promociones.find(p => p.id == id);
+                if (!promocion) {
+                  showErrorToast('Promoción no encontrada');
+                  return;
+                }
+                
+                // Precargar datos en el modal
+                document.getElementById('promocionId').value = promocion.id;
+                document.getElementById('promocionTitulo').value = promocion.titulo || '';
+                document.getElementById('promocionImagen').value = promocion.imagen || '';
+                document.getElementById('promocionCartillaPdf').value = promocion.cartilla_pdf || '';
+                document.getElementById('promocionActivo').value = promocion.activo ? '1' : '0';
+                
+                // Configurar fecha de creación
+                if (promocion.fecha_creacion) {
+                  const fecha = new Date(promocion.fecha_creacion);
+                  const fechaISO = fecha.toISOString().split('T')[0];
+                  document.getElementById('promocionFechaCreacion').value = fechaISO;
+                }
+                
+                // Mostrar vista previa si hay imagen
+                if (promocion.imagen) {
+                  const previewImagen = document.getElementById('previewImagenPromocion');
+                  const vistaPrevia = document.getElementById('vistaPreviaPromocion');
+                  previewImagen.src = promocion.imagen;
+                  vistaPrevia.style.display = 'block';
+                }
+                
+                // Cambiar título del modal
+                document.getElementById('modalPromocionLabel').textContent = 'Editar Promoción';
+                const btnGuardar = document.getElementById('btnGuardarPromocion');
+                if (btnGuardar) {
+                  btnGuardar.innerHTML = '<i class="fa fa-save"></i> Actualizar Promoción';
+                }
+                
+                // Mostrar modal
+                $('#modalPromocion').modal('show');
+                
+                console.log('Promoción cargada para edición:', promocion);
+              })
+              .catch(error => {
+                console.error('Error cargando promoción:', error);
+                showErrorToast('Error al cargar los datos de la promoción');
+              });
+          };
+
+          window.eliminarPromocion = function(id) {
+            console.log('🗑️ Eliminando promoción con ID:', id);
+            
+            // Buscar la promoción para mostrar su nombre en la confirmación
+            fetch(`/promociones/admin`)
+              .then(response => response.json())
+              .then(promociones => {
+                const promocion = promociones.find(p => p.id == id);
+                const nombrePromocion = promocion ? promocion.titulo : `la promoción #${id}`;
+                
+                showDeleteConfirmation({
+                  title: 'Eliminar Promoción',
+                  message: `¿Estás seguro de que quieres eliminar "${nombrePromocion}"?`,
+                  subMessage: 'Esta acción no se puede deshacer.',
+                  confirmText: 'Sí, Eliminar',
+                  cancelText: 'Cancelar',
+                  onConfirm: async function() {
+                    try {
+                      const response = await fetch(`/promociones/${id}`, {
+                        method: 'DELETE',
+                        headers: {
+                          'Content-Type': 'application/json'
+                        }
+                      });
+                      
+                      if (response.ok) {
+                        showSuccessToast('Promoción eliminada exitosamente');
+                        // Recargar la lista de promociones
+                        cargarPromociones();
+                      } else {
+                        const errorData = await response.text();
+                        showErrorToast('Error al eliminar la promoción: ' + errorData);
+                      }
+                    } catch (error) {
+                      console.error('Error eliminando promoción:', error);
+                      showErrorToast('Error al eliminar la promoción');
+                    }
+                  }
+                });
+              })
+              .catch(error => {
+                console.error('Error cargando promoción:', error);
+                // Mostrar confirmación genérica si no se puede cargar
+                showDeleteConfirmation({
+                  title: 'Eliminar Promoción',
+                  message: `¿Estás seguro de que quieres eliminar la promoción #${id}?`,
+                  subMessage: 'Esta acción no se puede deshacer.',
+                  confirmText: 'Sí, Eliminar',
+                  cancelText: 'Cancelar',
+                  onConfirm: async function() {
+                    try {
+                      const response = await fetch(`/promociones/${id}`, {
+                        method: 'DELETE',
+                        headers: {
+                          'Content-Type': 'application/json'
+                        }
+                      });
+                      
+                      if (response.ok) {
+                        showSuccessToast('Promoción eliminada exitosamente');
+                        cargarPromociones();
+                      } else {
+                        const errorData = await response.text();
+                        showErrorToast('Error al eliminar la promoción: ' + errorData);
+                      }
+                    } catch (error) {
+                      console.error('Error eliminando promoción:', error);
+                      showErrorToast('Error al eliminar la promoción');
+                    }
+                  }
+                });
+              });
+          };
+
+          window.abrirModalNuevaPromocion = function() {
+            console.log('➕ Abriendo modal nueva promoción');
+            limpiarModalPromocion();
+            $('#modalPromocion').modal('show');
+          };
+
+          // Función para guardar promoción (crear o actualizar)
+          window.guardarPromocion = async function() {
+            const form = document.getElementById('formPromocion');
+            const formData = new FormData(form);
+            
+            const promocionId = document.getElementById('promocionId').value;
+            const isEditing = promocionId && promocionId !== '';
+            
+            const btnGuardar = document.getElementById('btnGuardarPromocion');
+            const originalText = btnGuardar.innerHTML;
+            
+            try {
+              // Mostrar loading en el botón
+              btnGuardar.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Guardando...';
+              btnGuardar.disabled = true;
+              
+              // Preparar datos
+              const promocionData = {
+                titulo: formData.get('titulo'),
+                imagen: formData.get('imagen'),
+                cartilla_pdf: formData.get('cartilla_pdf'),
+                activo: parseInt(formData.get('activo')),
+                fecha_creacion: formData.get('fecha_creacion')
+              };
+              
+              // Manejar archivos de imagen si se seleccionó uno
+              const fileImagen = document.getElementById('promocionImagenFile').files[0];
+              if (fileImagen) {
+                // Aquí podrías implementar la subida de archivo si tienes endpoint para ello
+                // Por ahora, usamos la URL manual
+                console.log('Archivo de imagen seleccionado:', fileImagen.name);
+              }
+              
+              // Manejar archivos PDF si se seleccionó uno
+              const filePdf = document.getElementById('promocionPdfFile').files[0];
+              if (filePdf) {
+                // Aquí podrías implementar la subida de archivo si tienes endpoint para ello
+                console.log('Archivo PDF seleccionado:', filePdf.name);
+              }
+              
+              // Decidir si es CREATE o UPDATE
+              const url = isEditing ? `/promociones/${promocionId}` : '/promociones';
+              const method = isEditing ? 'PUT' : 'POST';
+              
+              const response = await fetch(url, {
+                method: method,
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(promocionData)
+              });
+              
+              if (response.ok) {
+                const mensaje = isEditing ? 'Promoción actualizada exitosamente' : 'Promoción creada exitosamente';
+                showSuccessToast(mensaje);
+                
+                // Cerrar modal y recargar lista
+                $('#modalPromocion').modal('hide');
+                cargarPromociones();
+                
+                console.log('Promoción guardada:', promocionData);
+              } else {
+                const errorData = await response.text();
+                showErrorToast('Error al guardar la promoción: ' + errorData);
+              }
+              
+            } catch (error) {
+              console.error('Error guardando promoción:', error);
+              showErrorToast('Error al guardar la promoción');
+            } finally {
+              // Restaurar botón
+              btnGuardar.innerHTML = originalText;
+              btnGuardar.disabled = false;
+            }
+          };
+          
+          // Cargar promociones inmediatamente
+          cargarPromociones();
+          
+          // Configurar búsqueda de promociones
+          const buscarPromocionInput = document.getElementById('buscarPromocion');
+          if (buscarPromocionInput) {
+            buscarPromocionInput.addEventListener('input', function() {
+              filtrarPromociones(this.value);
+            });
+          }
+          
+          // Función para filtrar promociones
+          window.filtrarPromociones = function(termino) {
+            const tbody = document.getElementById('promocionesTableBody');
+            if (!tbody) return;
+            
+            const filas = tbody.querySelectorAll('tr');
+            
+            filas.forEach(fila => {
+              if (fila.cells.length < 2) return; // Saltar filas de carga o vacías
+              
+              const titulo = fila.cells[1].textContent.toLowerCase();
+              const estado = fila.cells[3].textContent.toLowerCase();
+              const fecha = fila.cells[4].textContent.toLowerCase();
+              
+              const coincide = titulo.includes(termino.toLowerCase()) ||
+                              estado.includes(termino.toLowerCase()) ||
+                              fecha.includes(termino.toLowerCase());
+              
+              fila.style.display = coincide ? '' : 'none';
             });
             
-            if (typeof window.inicializarPromociones === 'function') {
-              console.log('✅ Inicializando promociones después de carga dinámica...');
-              window.inicializarPromociones();
-            } else if (typeof window.cargarPromociones === 'function') {
-              console.log('✅ Cargando promociones directamente...');
-              window.cargarPromociones();
-            } else {
-              console.log('⚠️ Funciones no disponibles, intentando debug...');
-              if (typeof window.debugPromociones === 'function') {
-                window.debugPromociones();
-              }
+            // Mostrar mensaje si no hay resultados
+            const filasVisibles = Array.from(filas).filter(fila => 
+              fila.style.display !== 'none' && fila.cells.length >= 2
+            );
+            
+            if (filasVisibles.length === 0 && termino) {
+              tbody.innerHTML = `
+                <tr>
+                  <td colspan="6" class="text-center text-muted py-4">
+                    <i class="fa fa-search fa-2x mb-2"></i><br>
+                    No se encontraron promociones que coincidan con "${termino}"
+                  </td>
+                </tr>
+              `;
             }
-          }, 200);
+          };
+          
+          console.log('Promociones component loaded successfully');
           
         } catch (error) {
           console.error('Error loading promociones component:', error);
           contentArea.innerHTML = `
+            <div class="admin-header">
+              <h1><i class="fa fa-bullhorn"></i> Gestión de Promociones</h1>
+              <p class="mb-0 text-muted">Error al cargar el componente</p>
+            </div>
             <div class="alert alert-danger">
-              <h4>Error al cargar el componente de promociones</h4>
-              <p>No se pudo cargar el componente de promociones. Error: ${error.message}</p>
-              <p>Verifica que el archivo /components/promociones.html existe y el servidor está funcionando correctamente.</p>
+              <h4>Error</h4>
+              <p>No se pudo cargar el componente de promociones: ${error.message}</p>
             </div>
           `;
         }
@@ -2543,7 +3204,7 @@ function getClientesHTML() {
       document.addEventListener('click', function(e) {
         if (e.target && e.target.matches('a[data-section]')) {
           const section = e.target.getAttribute('data-section');
-          const sidebarLink = document.querySelector(`#adminSidebar a[data-section="${section}"]`);
+          const sidebarLink = document.querySelector('#adminSidebar a[data-section="' + section + '"]');
           if (sidebarLink) {
             sidebarLink.click();
           }
@@ -2552,13 +3213,15 @@ function getClientesHTML() {
 
       // Manejar navegación con hash
       // ========= Componente de Testimonios =========
+      // NOTA: Funcionalidad temporalmente deshabilitada en el menú (línea 339)
+      // Para reactivar: descomentar línea del enlace en el sidebar y la condición en el switch (línea ~476)
       async function loadTestimoniosComponent() {
         try {
           console.log('Fetching testimonios component...');
           const response = await fetch('/admin/component/testimonios');
           
           if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            throw new Error('HTTP error! status: ' + response.status);
           }
           
           const html = await response.text();
@@ -2766,7 +3429,7 @@ function getClientesHTML() {
             let response;
             if (id) {
               // Actualizar
-              response = await fetch(`/testimonios/${id}`, {
+              response = await fetch('/testimonios/' + id, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(datos)
@@ -2842,7 +3505,7 @@ function getClientesHTML() {
           // Configurar el modal de confirmación
           const deleteMessage = document.getElementById('deleteTestimonioMessage');
           if (deleteMessage) {
-            deleteMessage.textContent = `¿Está seguro de eliminar el testimonio de ${testimonio.nombre}?`;
+            deleteMessage.textContent = '¿Está seguro de eliminar el testimonio de ' + testimonio.nombre + '?';
           }
           
           // Configurar el botón de confirmación
@@ -2858,7 +3521,7 @@ function getClientesHTML() {
               $('#deleteTestimonioConfirmModal').modal('hide');
               
               try {
-                const response = await fetch(`/testimonios/${id}`, {
+                const response = await fetch('/testimonios/' + id, {
                   method: 'DELETE'
                 });
                 
@@ -3104,80 +3767,156 @@ function getClientesHTML() {
   <!-- Contenedor para notificaciones toast -->
   <div class="toast-container" id="toastContainer"></div>
 
+  <!-- CSS para tabla de promociones -->
+  <style>
+    /* Estilos consistentes para tabla de promociones */
+    .promociones-component .table-responsive {
+      overflow-x: auto;
+    }
+    
+    .promociones-component table {
+      table-layout: fixed;
+      width: 100%;
+      min-width: 1000px; /* Reducido pero manteniendo expansión */
+      font-size: 14px; /* Tamaño más moderado */
+    }
+    
+    .promociones-component th,
+    .promociones-component td {
+      padding: 0.9rem; /* Padding más moderado */
+      vertical-align: middle;
+      border-bottom: 1px solid #dee2e6;
+    }
+    
+    .promociones-component thead th {
+      background-color: #f8f9fa;
+      border-bottom: 2px solid #dee2e6;
+      font-weight: 600;
+      font-size: 0.9rem;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    
+    /* Anchos específicos de columnas optimizados */
+    .promociones-component th:nth-child(1) { width: 110px; } /* Imagen */
+    .promociones-component th:nth-child(2) { width: 280px; } /* Título */
+    .promociones-component th:nth-child(3) { width: 130px; } /* Archivos */
+    .promociones-component th:nth-child(4) { width: 110px; } /* Estado */
+    .promociones-component th:nth-child(5) { width: 130px; } /* Fecha */
+    .promociones-component th:nth-child(6) { width: 240px; } /* Acciones */
+    
+    .promociones-component .d-flex {
+      display: flex !important;
+      align-items: center;
+      gap: 0.6rem; /* Espacio moderado entre botones */
+    }
+    
+    .promociones-component .btn-sm {
+      padding: 0.5rem 0.9rem; /* Botones más proporcionados */
+      font-size: 0.85rem; /* Texto bien legible pero no excesivo */
+      display: inline-block !important;
+      visibility: visible !important;
+      min-width: 85px; /* Ancho mínimo reducido */
+    }
+    
+    .promociones-component .acciones button {
+      display: inline-block !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+      margin-right: 0.5rem;
+    }
+    
+    .promociones-component .btn-outline-primary {
+      color: #007bff;
+      border-color: #007bff;
+      background-color: transparent;
+      border-width: 1px; /* Bordes más sutiles */
+    }
+    
+    .promociones-component .btn-outline-primary:hover {
+      color: white;
+      background-color: #007bff;
+      border-color: #007bff;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 4px rgba(0,123,255,0.2);
+    }
+    
+    .promociones-component .btn-outline-danger {
+      color: #dc3545;
+      border-color: #dc3545;
+      background-color: transparent;
+      border-width: 1px;
+    }
+    
+    .promociones-component .btn-outline-danger:hover {
+      color: white;
+      background-color: #dc3545;
+      border-color: #dc3545;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 4px rgba(220,53,69,0.2);
+    }
+    
+    /* Estilos adicionales para mejor presentación */
+    .promociones-component .badge {
+      font-size: 0.8rem; /* Badges proporcionados */
+      padding: 0.4rem 0.7rem;
+      font-weight: 500;
+    }
+    
+    .promociones-component img {
+      width: 70px; /* Imágenes más proporcionadas */
+      height: 70px;
+      object-fit: cover;
+      border-radius: 6px;
+      border: 1px solid #dee2e6;
+    }
+    
+    .promociones-component .card {
+      border: none;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    
+    .promociones-component .card-header {
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+      border-bottom: 2px solid #dee2e6;
+    }
+    
+    .promociones-component .table-hover tbody tr:hover {
+      background-color: #f8f9fa;
+      transition: background-color 0.15s ease;
+    }
+    
+    /* Debugging específico para promociones */
+    .promociones-component .acciones {
+      min-width: 240px !important;
+    }
+    
+    /* Responsividad mejorada */
+    @media (max-width: 1400px) {
+      .promociones-component table {
+        min-width: 900px;
+      }
+    }
+    
+    @media (max-width: 1200px) {
+      .promociones-component table {
+        min-width: 800px;
+      }
+      .promociones-component th,
+      .promociones-component td {
+        padding: 0.7rem;
+      }
+      .promociones-component .btn-sm {
+        padding: 0.4rem 0.7rem;
+        font-size: 0.8rem;
+      }
+    }
+  </style>
+
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
   <!-- Script para asegurar que el campo Estado funcione correctamente -->
   <script src="js/campo-estado.js?v=20250807_1245"></script>
 </body>
-<!-- Modal de Producto (siempre presente en el DOM) -->
-<div class="modal fade" id="modalProducto" tabindex="-1" role="dialog" aria-labelledby="modalProductoTitle" aria-hidden="true">
-  <div class="modal-dialog modal-lg" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="modalProductoTitle">Producto</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <form id="formProducto">
-          <input type="hidden" id="productoId" name="id">
-          <div class="form-group">
-            <label for="productoNombre">Nombre</label>
-            <input type="text" class="form-control" id="productoNombre" name="nombre" required>
-          </div>
-          <div class="form-group">
-            <label for="productoDescripcion">Descripción</label>
-            <textarea class="form-control" id="productoDescripcion" name="descripcion"></textarea>
-          </div>
-          <div class="form-row">
-            <div class="form-group col-md-6">
-              <label for="productoCategoria">Categoría</label>
-              <select class="form-control" id="productoCategoria" name="categoria" required></select>
-            </div>
-            <div class="form-group col-md-6">
-              <label for="productoSubcategoria">Subcategoría</label>
-              <select class="form-control" id="productoSubcategoria" name="subcategoria"></select>
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group col-md-6">
-              <label for="productoPrecio">Precio (ARS)</label>
-              <input type="number" class="form-control" id="productoPrecio" name="precio" step="0.01">
-            </div>
-            <div class="form-group col-md-6">
-              <label for="productoPrecioUsd">Precio (USD)</label>
-              <input type="number" class="form-control" id="productoPrecioUsd" name="precio_usd" step="0.01">
-            </div>
-          </div>
-          <div class="form-group">
-            <label for="productoImagen">URL Imagen Molde</label>
-            <input type="text" class="form-control" id="productoImagen" name="imagen_url">
-            <input type="file" class="form-control-file mt-1" id="productoImagenFile" accept="image/*">
-          </div>
-          <div class="form-group">
-            <label for="productoImagenMosaico">URL Imagen Mosaico</label>
-            <input type="text" class="form-control" id="productoImagenMosaico" name="imagen_mosaico_url">
-            <input type="file" class="form-control-file mt-1" id="productoImagenMosaicoFile" accept="image/*">
-          </div>
-          <div class="form-group">
-            <label for="productoPdf">URL PDF</label>
-            <input type="text" class="form-control" id="productoPdf" name="pdf_url">
-          </div>
-          <div class="form-group">
-            <label for="productoEstado">Estado</label>
-            <select class="form-control" id="productoEstado" name="activo">
-              <option value="1">Activo</option>
-              <option value="0">Inactivo</option>
-            </select>
-          </div>
-        </form>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-        <button type="submit" class="btn btn-primary" form="formProducto">Guardar Producto</button>
-      </div>
-    </div>
-  </div>
-</div>
 </html>

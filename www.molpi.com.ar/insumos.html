@@ -397,8 +397,8 @@
 					return;
 				}
 
-				// Generar HTML para los productos manteniendo el diseño original
-				mostrarProductosOriginal(productosPorSubcategoria);
+				   // Generar HTML para los productos con el diseño dinámico moderno
+				   mostrarProductos(productosPorSubcategoria);
 
 			} catch (error) {
 				console.error('Error al cargar productos:', error);
@@ -407,121 +407,90 @@
 			}
 		}
 
-		function mostrarProductosOriginal(productosPorSubcategoria) {
-			const container = document.getElementById('productos-container');
-			let html = '<div class="col-md-12"><h2><strong> </strong></h2></div>';
-			let columnaActual = 1; // Para alternar entre columnas
 
-			// Función auxiliar para crear estructura de producto con diseño original
-			function crearProducto(producto, esColumnaIzquierda, indexEnFila) {
-				const tieneBotella = producto.imagen_mosaico_url && producto.imagen_mosaico_url.trim() !== '';
-
-				// Usar delays simples como en revestimientos
-				const delayImagen1 = esColumnaIzquierda ? 0 : 200;
-				const delayImagen2 = esColumnaIzquierda ? 200 : 400;
-
-				return `
-						<div class="col-md-6">
-							<div class="col-md-12">
-								<h4 class="mb-xl mt-xlg">
-									${producto.nombre}${producto.descripcion ? `<br><small>${producto.descripcion}</small>` : ''}
-								</h4>
-								<div class="divider divider-primary divider-small mb-xl"> 
-									<hr>
-								</div>
-							</div>
-							<img src="${producto.imagen_url}" 
-								 data-appear-animation="fadeInLeft" 
-								 data-appear-animation-delay="${delayImagen1}" 
-								 data-plugin-options="{'accY': 10}" 
-								 alt="${producto.nombre}" 
-								 class="custom-product-image-pos-1 _relative img-responsive" />
-							
-							${tieneBotella ? `
-							<img src="${producto.imagen_mosaico_url}" 
-								 data-appear-animation="fadeInLeft" 
-								 data-appear-animation-delay="${delayImagen2}" 
-								 data-plugin-options="{'accY': 10}" 
-								 alt="${producto.nombre} botella" 
-								 class="custom-product-image-pos-5 _absolute img-responsive" />
-							` : ''}
-						</div>
-					`;
-			}
-
-			// Ordenar subcategorías para mostrar en orden específico
-			const ordenSubcategorias = ['Curadores', 'Pigmentos Básicos', 'Pigmentos Concentrados', 'Pigmentos Extra', 'Materiales', 'Desmoldantes', 'Herramientas'];
-
-			ordenSubcategorias.forEach(subcategoria => {
-				if (productosPorSubcategoria[subcategoria] && productosPorSubcategoria[subcategoria].length > 0) {
-					const productos = productosPorSubcategoria[subcategoria];
-
-					// Título de subcategoría si hay más de una subcategoría
-					if (ordenSubcategorias.filter(sub => productosPorSubcategoria[sub] && productosPorSubcategoria[sub].length > 0).length > 1) {
-						html += `
-								<div class="col-md-12">
-									<h3 class="text-center mb-4">${subcategoria}</h3>
-									<div class="divider divider-primary divider-small mb-xl text-center"> 
-										<hr>
-									</div>
-								</div>
-							`;
-					}
-
-					productos.forEach((producto, index) => {
-						// Crear el producto 
-						html += crearProducto(producto, columnaActual === 1, index);
-
-						// Alternar columnas y añadir separadores según el diseño original
-						if (columnaActual === 2 || index === productos.length - 1) {
-							html += `
-									<div class="col-md-12">
-										<hr>
-									</div>
-								`;
-							columnaActual = 1;
-						} else {
-							columnaActual = 2;
-						}
-					});
-				}
+		   // Versión dinámica moderna (de insumos_dinamico.html)
+		   function mostrarProductos(productosPorSubcategoria) {
+			   const container = document.getElementById('productos-container');
+			   let html = '';
+			// Mostrar solo las subcategorías solicitadas, en el orden deseado
+			const subcategoriasDeseadas = ['Curadores', 'Pigmentos Básicos', 'Pigmentos Concentrados', 'Pigmentos Extra', 'Materiales', 'Desmoldantes', 'Herramientas'];
+			subcategoriasDeseadas.forEach(subcategoria => {
+			   const productos = productosPorSubcategoria[subcategoria];
+			   if (productos && productos.length > 0) {
+				   // Filtrar solo productos activos
+				   const productosActivos = productos.filter(p => p.activo === 1 || p.activo === true || p.activo === '1');
+				   if (productosActivos.length === 0) return;
+				   html += `
+					   <div class="col-md-12">
+						   <h3 class="text-center mb-4">${subcategoria}</h3>
+						   <div class="divider divider-primary divider-small mb-xl text-center"><hr></div>
+					   </div>
+				   `;
+				   for (let i = 0; i < productosActivos.length; i += 2) {
+					   html += '<div class="row">';
+					   [0, 1].forEach(j => {
+						   const producto = productosActivos[i + j];
+						   if (producto) {
+							   const tieneBotella = producto.imagen_mosaico_url && producto.imagen_mosaico_url.trim() !== '';
+							   const delay1 = j === 0 ? 0 : 200;
+							   const delay2 = j === 0 ? 200 : 400;
+							   html += `
+								   <div class="col-md-6">
+									   <div class="col-md-12">
+										   <h4 class="mb-xl mt-xlg">
+											   ${producto.nombre}${producto.descripcion ? `<br><small>${producto.descripcion}</small>` : ''}
+										   </h4>
+										   <div class="divider divider-primary divider-small mb-xl"><hr></div>
+									   </div>
+									   <img src="${producto.imagen_url}" 
+										   data-appear-animation="fadeInLeft" 
+										   data-appear-animation-delay="${delay1}" 
+										   data-plugin-options="{'accY': 10}" 
+										   alt="${producto.nombre}" 
+										   class="custom-product-image-pos-1 _relative img-responsive" />
+									   ${tieneBotella ? `
+									   <img src="${producto.imagen_mosaico_url}" 
+										   data-appear-animation="fadeInLeft" 
+										   data-appear-animation-delay="${delay2}" 
+										   data-plugin-options="{'accY': 10}" 
+										   alt="${producto.nombre} botella" 
+										   class="custom-product-image-pos-5 _absolute img-responsive" />` : ''}
+								   </div>
+							   `;
+						   }
+					   });
+					   html += '</div><div class="col-md-12"><hr></div>';
+				   }
+			   }
 			});
+			   container.innerHTML = html;
 
-			container.innerHTML = html;
-
-			// Reinicializar animaciones usando el método exacto del tema
-			setTimeout(function () {
-				console.log('Reinicializando animaciones...');
-
-				// Método 1: Usar el inicializador del tema
-				if (window.theme && window.theme.PluginAppear && window.theme.PluginAppear.initialize) {
-					window.theme.PluginAppear.initialize();
-				}
-
-				// Método 2: Inicializar manualmente cada elemento
-				$('[data-appear-animation]').each(function () {
-					var $this = $(this);
-					if (typeof $this.appear === 'function') {
-						$this.appear(function () {
-							var delay = $this.attr('data-appear-animation-delay') ? parseInt($this.attr('data-appear-animation-delay'), 10) : 0;
-							setTimeout(function () {
-								if ($this.hasClass('appear-animation-visible')) return;
-								$this.addClass('appear-animation-visible');
-
-								var animationClass = $this.attr('data-appear-animation');
-								if (animationClass) {
-									$this.addClass('animated ' + animationClass);
-								}
-							}, delay);
-						}, { accY: -50 });
-					}
-				});
-
-				// Forzar detección de elementos visibles
-				$(window).trigger('scroll.appear');
-
-			}, 300);
-		}
+			   // Reinicializar animaciones y efectos después de cargar el contenido
+			   setTimeout(function () {
+				   if (window.theme && window.theme.PluginAppear && window.theme.PluginAppear.initialize) {
+					   window.theme.PluginAppear.initialize();
+				   }
+				   if (typeof $ !== 'undefined') {
+					   $('[data-appear-animation]').each(function () {
+						   var $this = $(this);
+						   if (typeof $this.appear === 'function') {
+							   $this.appear(function () {
+								   var delay = $this.attr('data-appear-animation-delay') ? parseInt($this.attr('data-appear-animation-delay'), 10) : 0;
+								   setTimeout(function () {
+									   if ($this.hasClass('appear-animation-visible')) return;
+									   $this.addClass('appear-animation-visible');
+									   var animationClass = $this.attr('data-appear-animation');
+									   if (animationClass) {
+										   $this.addClass('animated ' + animationClass);
+									   }
+								   }, delay);
+							   }, { accY: -50 });
+						   }
+					   });
+					   $(window).trigger('scroll.appear');
+				   }
+			   }, 300);
+		   }
 
 		// Cargar productos cuando se carga la página
 		document.addEventListener('DOMContentLoaded', function () {
