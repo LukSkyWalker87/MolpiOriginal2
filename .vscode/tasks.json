@@ -28,6 +28,27 @@
 			"command": "Copy-Item -Path www.molpi.com.ar\\listones.html -Destination www.molpi.com.ar\\listones.html -Force",
 			"problemMatcher": [],
 			"group": "build"
+		},
+		{
+			"label": "Inspeccionar subcategorías duplicadas",
+			"type": "shell",
+			"command": "python backend/inspeccionar_subcategorias.py",
+			"group": "build"
+		},
+		{
+			"label": "Limpiar subcategorias duplicadas",
+			"type": "shell",
+			"command": "python backend/limpiar_subcategorias_duplicadas.py",
+			"group": "build"
+		},
+		{
+			"label": "Run backend tests",
+			"type": "shell",
+			"command": "python -m unittest backend/test_app.py",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "build"
 		}
 	]
 }

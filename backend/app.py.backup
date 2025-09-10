@@ -1,11 +1,10 @@
 # ========= IMPORTS Y CONFIGURACIÓN INICIAL =========
-from flask import Flask, request, jsonify, send_from_directory
+from flask import Flask, request, jsonify
 from flask_cors import CORS
 import os
 import sqlite3
 import json
-from datetime import datetime, timedelta
-import jwt
+from datetime import datetime
 
 # ========= Configuración de Flask =========
 app = Flask(__name__, template_folder="../www.molpi.com.ar", static_folder="../www.molpi.com.ar", static_url_path="")
@@ -63,33 +62,6 @@ app.config['SECRET_KEY'] = 'molpi-secret-key-2025'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///molpi.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-# ========= Rutas para componentes admin (productos, testimonios, promociones) =========
-COMPONENTS_DIR = os.path.join(os.path.dirname(__file__), '..', 'www.molpi.com.ar', 'components')
-
-@app.route('/admin/component/productos')
-def admin_component_productos():
-    resp = send_from_directory(COMPONENTS_DIR, 'productos.html')
-    resp.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
-    resp.headers['Pragma'] = 'no-cache'
-    resp.headers['Expires'] = '0'
-    return resp
-
-@app.route('/admin/component/testimonios')
-def admin_component_testimonios():
-    resp = send_from_directory(COMPONENTS_DIR, 'testimonios.html')
-    resp.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
-    resp.headers['Pragma'] = 'no-cache'
-    resp.headers['Expires'] = '0'
-    return resp
-
-@app.route('/admin/component/promociones')
-def admin_component_promociones():
-    resp = send_from_directory(COMPONENTS_DIR, 'promociones.html')
-    resp.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
-    resp.headers['Pragma'] = 'no-cache'
-    resp.headers['Expires'] = '0'
-    return resp
-
 # ========= Upload de imágenes de productos =========
 @app.route('/upload/producto', methods=['POST'])
 def upload_producto():
@@ -110,6 +82,8 @@ def upload_producto():
 # CORS configurado correctamente
 CORS(app, resources={r"/*": {
     "origins": [
+        "https://molpi.netlify.app",
+        "https://molpi-original.vercel.app",
         "https://www.molpi.com.ar",
         "http://localhost:3000",
         "http://127.0.0.1:3000",
@@ -166,111 +140,39 @@ def health_check():
             'timestamp': datetime.now().isoformat()
         }), 500
 
-# ========= Login (unificado) =========
+# ========= Login =========
 @app.route('/api/login', methods=['POST'])
+def api_login():
+    """Endpoint de autenticación para API"""
+    data = request.get_json()
+    if not data:
+        return jsonify({'error': 'No se enviaron datos JSON válidos'}), 400
+        
+    username = data.get('username')
+    password = data.get('password')
+    
+    if username == 'admin' and password == '1234':
+        return jsonify({'token': 'valid-token'}), 200
+    else:
+        return jsonify({'message': 'Credenciales inválidas'}), 401
+
 @app.route('/login', methods=['POST'])
 def login():
-    """Autenticación unificada: acepta JSON (fetch) o formulario clásico."""
-    # Credenciales (puedes moverlas a variables de entorno luego)
-    USER = os.environ.get('MOLPI_ADMIN_USER', 'admin')
-    PASS = os.environ.get('MOLPI_ADMIN_PASS', '1234')
-    JWT_SECRET = os.environ.get('MOLPI_JWT_SECRET', app.config['SECRET_KEY'])
-    JWT_EXP_MINUTES = int(os.environ.get('MOLPI_JWT_EXP_MINUTES', '120'))
-
-    if request.is_json:
-        data = request.get_json(silent=True) or {}
-        username = data.get('username')
-        password = data.get('password')
+    """Endpoint de autenticación directo (compatibilidad)"""
+    data = request.get_json()
+    if not data:
+        return jsonify({'error': 'No se enviaron datos JSON válidos'}), 400
+        
+    username = data.get('username')
+    password = data.get('password')
+    
+    if username == 'admin' and password == '1234':
+        return jsonify({'token': 'valid-token'}), 200
     else:
-        username = request.form.get('username')
-        password = request.form.get('password')
-
-    if username == USER and password == PASS:
-        payload = {
-            'sub': username,
-            'role': 'admin',
-            'type': 'access',
-            'iat': datetime.utcnow(),
-            'exp': datetime.utcnow() + timedelta(minutes=JWT_EXP_MINUTES)
-        }
-        refresh_payload = {
-            'sub': username,
-            'role': 'admin',
-            'type': 'refresh',
-            'iat': datetime.utcnow(),
-            'exp': datetime.utcnow() + timedelta(days=7)
-        }
-        token = jwt.encode(payload, JWT_SECRET, algorithm='HS256')
-        refresh_token = jwt.encode(refresh_payload, JWT_SECRET, algorithm='HS256')
-        return jsonify({'token': token, 'refresh_token': refresh_token, 'expires_in_minutes': JWT_EXP_MINUTES}), 200
-    return jsonify({'message': 'Credenciales inválidas'}), 401
-
-# ======== Decorador de protección ========
-from functools import wraps
-
-def login_required(f):
-    @wraps(f)
-    def wrapper(*args, **kwargs):
-        JWT_SECRET = os.environ.get('MOLPI_JWT_SECRET', app.config['SECRET_KEY'])
-        auth_header = request.headers.get('Authorization', '')
-        token = None
-        if auth_header.startswith('Bearer '):
-            token = auth_header.split(' ', 1)[1].strip()
-        elif 'token' in request.args:
-            token = request.args.get('token')
-        if not token:
-            return jsonify({'error': 'Token requerido'}), 401
-        try:
-            jwt.decode(token, JWT_SECRET, algorithms=['HS256'])
-        except jwt.ExpiredSignatureError:
-            return jsonify({'error': 'Token expirado'}), 401
-        except Exception:
-            return jsonify({'error': 'Token inválido'}), 401
-        return f(*args, **kwargs)
-    return wrapper
-
-def _decode_token(token):
-    JWT_SECRET = os.environ.get('MOLPI_JWT_SECRET', app.config['SECRET_KEY'])
-    return jwt.decode(token, JWT_SECRET, algorithms=['HS256'])
-
-@app.route('/api/me', methods=['GET'])
-@login_required
-def me():
-    auth_header = request.headers.get('Authorization', '')
-    token = auth_header.split(' ',1)[1] if auth_header.startswith('Bearer ') else request.args.get('token','')
-    data = _decode_token(token)
-    return jsonify({'user': data['sub'], 'role': data.get('role','admin')})
-
-@app.route('/api/token/refresh', methods=['POST'])
-def refresh_token():
-    """Intercambia un refresh_token válido por un nuevo access token."""
-    JWT_SECRET = os.environ.get('MOLPI_JWT_SECRET', app.config['SECRET_KEY'])
-    JWT_EXP_MINUTES = int(os.environ.get('MOLPI_JWT_EXP_MINUTES', '120'))
-    payload = request.get_json(silent=True) or {}
-    provided = payload.get('refresh_token')
-    if not provided:
-        return jsonify({'error': 'refresh_token requerido'}), 400
-    try:
-        decoded = jwt.decode(provided, JWT_SECRET, algorithms=['HS256'])
-        if decoded.get('type') != 'refresh':
-            return jsonify({'error': 'Tipo de token inválido'}), 400
-    except jwt.ExpiredSignatureError:
-        return jsonify({'error': 'Refresh token expirado'}), 401
-    except Exception:
-        return jsonify({'error': 'Refresh token inválido'}), 401
-    new_payload = {
-        'sub': decoded['sub'],
-        'role': decoded.get('role','admin'),
-        'type': 'access',
-        'iat': datetime.utcnow(),
-        'exp': datetime.utcnow() + timedelta(minutes=JWT_EXP_MINUTES)
-    }
-    new_token = jwt.encode(new_payload, JWT_SECRET, algorithm='HS256')
-    return jsonify({'token': new_token, 'expires_in_minutes': JWT_EXP_MINUTES})
+        return jsonify({'message': 'Credenciales inválidas'}), 401
 
 # ========= Productos =========
 @app.route('/api/productos', methods=['GET'])
-@app.route('/productos', methods=['GET'])
 def get_productos():
     """Obtener productos"""
     categoria = request.args.get('categoria')
@@ -330,8 +232,6 @@ def get_productos():
     })
 
 @app.route('/api/productos', methods=['POST'])
-@app.route('/productos', methods=['POST'])
-@login_required
 def add_producto():
     """Agregar producto, evitando duplicados por nombre, categoría y subcategoría"""
     data = request.get_json()
@@ -370,8 +270,6 @@ def add_producto():
     return jsonify({'message': 'Producto agregado correctamente', 'id': producto_id}), 201
 
 @app.route('/api/productos/<int:producto_id>', methods=['PUT'])
-@app.route('/productos/<int:producto_id>', methods=['PUT'])
-@login_required
 def update_producto(producto_id):
     """Actualizar producto"""
     data = request.get_json()
@@ -405,8 +303,6 @@ def update_producto(producto_id):
     return jsonify({'message': 'Producto actualizado correctamente'})
 
 @app.route('/api/productos/<int:producto_id>', methods=['DELETE'])
-@app.route('/productos/<int:producto_id>', methods=['DELETE'])
-@login_required
 def delete_producto(producto_id):
     """Eliminar producto (eliminación lógica)"""
     conn = sqlite3.connect(DB_PATH)
@@ -425,7 +321,6 @@ def delete_producto(producto_id):
 
 # ========= Endpoints específicos por línea =========
 @app.route('/api/productos/linea/20x20', methods=['GET'])
-@app.route('/productos/linea/20x20', methods=['GET'])
 def get_productos_linea_20x20():
     """Productos línea 20x20"""
     conn = sqlite3.connect(DB_PATH)
@@ -462,7 +357,6 @@ def get_productos_linea_20x20():
     return jsonify(productos)
 
 @app.route('/api/productos/linea/40x40', methods=['GET'])
-@app.route('/productos/linea/40x40', methods=['GET'])
 def get_productos_linea_40x40():
     """Productos línea 40x40"""
     conn = sqlite3.connect(DB_PATH)
@@ -499,7 +393,6 @@ def get_productos_linea_40x40():
     return jsonify(productos)
 
 @app.route('/api/productos/linea/50x50', methods=['GET'])
-@app.route('/productos/linea/50x50', methods=['GET'])
 def get_productos_linea_50x50():
     """Productos línea 50x50"""
     conn = sqlite3.connect(DB_PATH)
@@ -536,7 +429,6 @@ def get_productos_linea_50x50():
     return jsonify(productos)
 
 @app.route('/api/productos/piscinas', methods=['GET'])
-@app.route('/productos/piscinas', methods=['GET'])
 def get_productos_piscinas():
     """Productos de piscinas organizados por subcategoría"""
     conn = sqlite3.connect(DB_PATH)
@@ -579,7 +471,6 @@ def get_productos_piscinas():
     return jsonify(productos_por_subcategoria)
 
 @app.route('/api/productos/revestimientos', methods=['GET'])
-@app.route('/productos/revestimientos', methods=['GET'])
 def get_productos_revestimientos():
     """Productos de revestimientos organizados por subcategoría"""
     conn = sqlite3.connect(DB_PATH)
@@ -622,7 +513,6 @@ def get_productos_revestimientos():
     return jsonify(productos_por_subcategoria)
 
 @app.route('/api/productos/placas-antihumedad', methods=['GET'])
-@app.route('/productos/placas-antihumedad', methods=['GET'])
 def get_productos_placas_antihumedad():
     """Productos de placas antihumedad organizados por subcategoría"""
     conn = sqlite3.connect(DB_PATH)
@@ -665,7 +555,6 @@ def get_productos_placas_antihumedad():
     return jsonify(productos_por_subcategoria)
 
 @app.route('/api/productos/insumos', methods=['GET'])
-@app.route('/productos/insumos', methods=['GET'])
 def get_productos_insumos():
     """Productos de insumos organizados por subcategoría"""
     conn = sqlite3.connect(DB_PATH)
@@ -743,7 +632,6 @@ def get_productos_listones():
 
 # ========= Testimonios =========
 @app.route('/api/testimonios', methods=['GET'])
-@app.route('/testimonios', methods=['GET'])
 def get_testimonios():
     """Obtener testimonios activos"""
     conn = sqlite3.connect(DB_PATH)
@@ -773,8 +661,6 @@ def get_testimonios():
     return jsonify(testimonios)
 
 @app.route('/api/testimonios', methods=['POST'])
-@app.route('/testimonios', methods=['POST'])
-@login_required
 def crear_testimonio():
     """Crear testimonio"""
     data = request.get_json()
@@ -808,8 +694,6 @@ def crear_testimonio():
     return jsonify({'id': testimonio_id, 'message': 'Testimonio creado exitosamente'}), 201
 
 @app.route('/api/testimonios/<int:testimonio_id>', methods=['PUT'])
-@app.route('/testimonios/<int:testimonio_id>', methods=['PUT'])
-@login_required
 def actualizar_testimonio(testimonio_id):
     """Actualizar testimonio"""
     data = request.get_json()
@@ -843,8 +727,6 @@ def actualizar_testimonio(testimonio_id):
     return jsonify({'message': 'Testimonio actualizado exitosamente'})
 
 @app.route('/api/testimonios/<int:testimonio_id>', methods=['DELETE'])
-@app.route('/testimonios/<int:testimonio_id>', methods=['DELETE'])
-@login_required
 def eliminar_testimonio(testimonio_id):
     """Eliminar testimonio"""
     conn = sqlite3.connect(DB_PATH)
@@ -867,7 +749,6 @@ def eliminar_testimonio(testimonio_id):
     return jsonify({'message': 'Testimonio eliminado exitosamente'})
 
 @app.route('/api/testimonios/admin', methods=['GET'])
-@app.route('/testimonios/admin', methods=['GET'])
 def get_testimonios_admin():
     """Obtener todos los testimonios para admin"""
     conn = sqlite3.connect(DB_PATH)
@@ -898,7 +779,6 @@ def get_testimonios_admin():
 
 # ========= Promociones =========
 @app.route('/api/promociones', methods=['GET'])
-@app.route('/promociones', methods=['GET'])
 def get_promociones():
     """Obtener promociones activas"""
     conn = sqlite3.connect(DB_PATH)
@@ -925,8 +805,6 @@ def get_promociones():
     return jsonify(promociones)
 
 @app.route('/api/promociones', methods=['POST'])
-@app.route('/promociones', methods=['POST'])
-@login_required
 def create_promocion():
     """Crear promoción"""
     try:
@@ -963,8 +841,6 @@ def create_promocion():
         return jsonify({'error': 'Error interno del servidor'}), 500
 
 @app.route('/api/promociones/<int:promocion_id>', methods=['PUT'])
-@app.route('/promociones/<int:promocion_id>', methods=['PUT'])
-@login_required
 def update_promocion(promocion_id):
     """Actualizar promoción"""
     try:
@@ -1004,8 +880,6 @@ def update_promocion(promocion_id):
         return jsonify({'error': 'Error interno del servidor'}), 500
 
 @app.route('/api/promociones/<int:promocion_id>', methods=['DELETE'])
-@app.route('/promociones/<int:promocion_id>', methods=['DELETE'])
-@login_required
 def delete_promocion(promocion_id):
     """Eliminar promoción"""
     conn = sqlite3.connect(DB_PATH)
@@ -1027,7 +901,6 @@ def delete_promocion(promocion_id):
     return jsonify({'message': 'Promoción eliminada exitosamente'})
 
 @app.route('/api/promociones/admin', methods=['GET'])
-@app.route('/promociones/admin', methods=['GET'])
 def get_promociones_admin():
     """Obtener todas las promociones para admin"""
     conn = sqlite3.connect(DB_PATH)
@@ -1059,7 +932,6 @@ def get_promociones_admin():
 
 # ========= Categorías y Subcategorías =========
 @app.route('/api/categorias', methods=['GET'])
-@app.route('/categorias', methods=['GET'])
 def get_categorias():
     """Obtener categorías"""
     conn = sqlite3.connect(DB_PATH)
@@ -1081,7 +953,6 @@ def get_categorias():
     return jsonify(categorias)
 
 @app.route('/api/subcategorias', methods=['GET'])
-@app.route('/subcategorias', methods=['GET'])
 def get_subcategorias():
     """Obtener subcategorías"""
     categoria_id = request.args.get('categoria_id')

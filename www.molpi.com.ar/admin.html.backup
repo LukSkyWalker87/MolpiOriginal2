@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
 
@@ -86,78 +86,6 @@
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
   <link rel="stylesheet" href="css/general.css">
   <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700&display=swap" rel="stylesheet">
-
-  <!-- Helper centralizado para construir URLs de la API -->
-  <script>
-    // Permite sobreescribir window.API_BASE antes de cargar este archivo si hace falta
-    window.API_BASE = window.API_BASE || window.location.origin;
-    function apiUrl(path) {
-      if (!path.startsWith('/')) path = '/' + path;
-      return window.API_BASE + path;
-    }
-
-    // Gestión básica de tokens
-    function getAccessToken(){ return localStorage.getItem('molpi_access_token'); }
-    function setAccessToken(t){ localStorage.setItem('molpi_access_token', t); }
-    function getRefreshToken(){ return localStorage.getItem('molpi_refresh_token'); }
-    function setRefreshToken(t){ localStorage.setItem('molpi_refresh_token', t); }
-
-    async function refreshTokenIfPossible(){
-      const rt = getRefreshToken();
-      if(!rt) return false;
-      try {
-        const r = await fetch(apiUrl('api/token/refresh'), { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ refresh_token: rt })});
-        if(!r.ok) return false;
-        const data = await r.json();
-        if(data.token) setAccessToken(data.token);
-        if(data.refresh_token) setRefreshToken(data.refresh_token);
-        return true;
-      } catch(e){ console.warn('No se pudo refrescar token', e); return false; }
-    }
-
-    // Wrapper fetch con Authorization y retry 401 una sola vez
-    async function molpiFetch(path, options = {}) {
-      const finalUrl = path.startsWith('http') ? path : apiUrl(path);
-      const headers = Object.assign({}, options.headers || {});
-      const token = getAccessToken();
-      if(token) headers['Authorization'] = 'Bearer ' + token;
-      if(options.body && !(options.body instanceof FormData) && !headers['Content-Type']) {
-        headers['Content-Type'] = 'application/json';
-      }
-      let response = await fetch(finalUrl, { ...options, headers });
-      if(response.status === 401) {
-        const refreshed = await refreshTokenIfPossible();
-        if(refreshed) {
-          const newToken = getAccessToken();
-            if(newToken) headers['Authorization'] = 'Bearer ' + newToken;
-          response = await fetch(finalUrl, { ...options, headers });
-        }
-      }
-      return response;
-    }
-    window.molpiFetch = molpiFetch;
-
-    // Función de login: espera {username, password} y guarda tokens si vienen
-    async function molpiLogin(username, password){
-      try {
-        const r = await fetch(apiUrl('login'), {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({username, password})});
-        const data = await r.json().catch(()=>({}));
-        if(!r.ok){ throw new Error(data.message || 'Credenciales inválidas'); }
-        if(data.token) setAccessToken(data.token);
-        if(data.refresh_token) setRefreshToken(data.refresh_token);
-        return { ok:true, data };
-      } catch(e){ return { ok:false, error: e.message }; }
-    }
-    window.molpiLogin = molpiLogin;
-
-    function molpiLogout(){
-      localStorage.removeItem('molpi_access_token');
-      localStorage.removeItem('molpi_refresh_token');
-      console.info('Logout realizado, tokens limpiados');
-    }
-    window.molpiLogout = molpiLogout;
-  </script>
-  </script>
 
   <style>
     body {
@@ -401,31 +329,6 @@
 </head>
 
 <body>
-  <!-- Overlay de Login -->
-  <div id="loginOverlay" style="position:fixed;inset:0;background:linear-gradient(135deg,#0d1220,#1d2a44);display:none;align-items:center;justify-content:center;z-index:9999;font-family:'Open Sans',sans-serif;">
-    <div style="background:#ffffff12;backdrop-filter:blur(8px);padding:40px 36px;border-radius:16px;box-shadow:0 10px 30px -5px rgba(0,0,0,.5);width:100%;max-width:380px;color:#fff;">
-      <h2 style="margin:0 0 8px;font-weight:600;letter-spacing:.5px;">Acceso Admin</h2>
-      <p style="margin:0 0 28px;font-size:13px;opacity:.8;">Ingresá tus credenciales para administrar el contenido.</p>
-      <form id="loginForm" autocomplete="off">
-        <div style="margin-bottom:18px;">
-          <label style="display:block;font-size:13px;margin-bottom:6px;opacity:.85;">Usuario</label>
-          <input id="loginUser" type="text" required style="width:100%;padding:10px 12px;border:1px solid #394967;background:#141d2c;color:#fff;border-radius:6px;font-size:14px;outline:none;">
-        </div>
-        <div style="margin-bottom:10px;">
-          <label style="display:block;font-size:13px;margin-bottom:6px;opacity:.85;">Contraseña</label>
-          <input id="loginPass" type="password" required style="width:100%;padding:10px 12px;border:1px solid #394967;background:#141d2c;color:#fff;border-radius:6px;font-size:14px;outline:none;">
-        </div>
-        <div id="loginError" style="display:none;margin:6px 0 14px;font-size:13px;color:#ff6b6b;background:#3d0f1f;border:1px solid #ff6b6b33;padding:8px 10px;border-radius:6px;"></div>
-        <button id="loginBtn" type="submit" style="width:100%;padding:11px 14px;background:#2d72ff;border:none;border-radius:8px;color:#fff;font-size:15px;font-weight:600;letter-spacing:.3px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;">
-          <span>Ingresar</span>
-        </button>
-      </form>
-      <div style="margin-top:18px;display:flex;justify-content:space-between;font-size:12px;opacity:.6;">
-        <span>© Molpi</span>
-        <a href="/" style="color:#8fb4ff;text-decoration:none;">Volver al sitio</a>
-      </div>
-    </div>
-  </div>
   <div class="sidebar" id="adminSidebar">
     <div class="d-flex align-items-center justify-content-center mb-3">
       <img src="img/logo.png" alt="Molpi" style="height: 40px; margin-right: 10px;">
@@ -450,58 +353,6 @@
   <script>
     document.addEventListener("DOMContentLoaded", function () {
       console.log('Admin panel JavaScript loaded');
-
-      // ====== Gestión de Login ======
-      const overlay = document.getElementById('loginOverlay');
-      const form = document.getElementById('loginForm');
-      const userInput = document.getElementById('loginUser');
-      const passInput = document.getElementById('loginPass');
-      const errorBox = document.getElementById('loginError');
-      const loginBtn = document.getElementById('loginBtn');
-
-      function hideOverlay(){ if(overlay) overlay.style.display='none'; }
-      function showOverlay(){ if(overlay) overlay.style.display='flex'; }
-      function showError(msg){ if(!errorBox) return; errorBox.textContent = msg; errorBox.style.display='block'; }
-      function clearError(){ if(errorBox){ errorBox.style.display='none'; errorBox.textContent=''; } }
-
-      async function attemptAuto(){
-        const token = localStorage.getItem('molpi_access_token');
-        if(!token){ showOverlay(); return; }
-        // Ocultar optimistamente para evitar flash
-        hideOverlay();
-        try {
-          const r = await molpiFetch('api/me');
-          if(r.ok){ inicializarAdminTrasLogin(); }
-          else { showOverlay(); }
-        } catch { showOverlay(); }
-      }
-
-      form.addEventListener('submit', async (e)=>{
-        e.preventDefault(); clearError();
-        loginBtn.disabled = true; loginBtn.style.opacity='.6';
-        loginBtn.firstElementChild.textContent='Ingresando...';
-        const u = userInput.value.trim(); const p = passInput.value;
-        const r = await molpiLogin(u,p);
-        if(r.ok){
-          hideOverlay(); inicializarAdminTrasLogin();
-        } else {
-          showError(r.error || 'Error de autenticación');
-        }
-        loginBtn.disabled=false; loginBtn.style.opacity='1';
-        loginBtn.firstElementChild.textContent='Ingresar';
-      });
-
-      // Función que re-carga secciones protegidas tras login
-      let _adminInitialized = false;
-      function inicializarAdminTrasLogin(){
-        if(_adminInitialized) return; // evitar duplicados
-        _adminInitialized = true;
-        const firstLink = document.querySelector('#adminSidebar a[data-section].active') || document.querySelector('#adminSidebar a[data-section]');
-        if(firstLink){ firstLink.click(); }
-        setTimeout(()=>{ molpiFetch('promociones/admin').catch(()=>{}); }, 1200);
-      }
-
-      attemptAuto();
       
       const sidebarLinks = document.querySelectorAll("#adminSidebar a[data-section]");
       const contentArea = document.getElementById("adminContent");
@@ -604,17 +455,45 @@
       console.log('Found sidebar links:', sidebarLinks.length);
       console.log('Content area:', contentArea);
 sidebarLinks.forEach((link) => {
-  link.addEventListener("click", function (e) {
+  link.addEventListener("click", async function (e) {
     e.preventDefault();
     const section = this.getAttribute("data-section");
+    
     console.log('Clicked section:', section);
-    // Solo actualizar el hash; el cargador real se ejecuta en loadSectionFromHash()
-    const current = window.location.hash ? window.location.hash.substring(1) : '';
-    if (current !== section) {
-      window.location.hash = section;
-    } else {
-      // Si el hash ya es el mismo, forzar recarga controlada
-      loadSectionFromHash();
+    
+    // Actualizar la URL con hash
+    window.location.hash = section;
+
+    sidebarLinks.forEach(l => l.classList.remove("active"));
+    this.classList.add("active");
+
+    try {
+      if (section === "productos") {
+        console.log('Loading productos section');
+        loadProductosComponent();
+      } else if (section === "promociones") {
+        console.log('Loading promociones section');
+        loadPromocionesComponent();
+      /*} else if (section === "testimonios") {
+        console.log('Loading testimonios section');
+        loadTestimoniosComponent();*/
+      } else {
+        // Sección desconocida
+        contentArea.innerHTML = `
+          <div class="alert alert-warning">
+            <h3>Sección en desarrollo</h3>
+            <p>La sección "${section}" está actualmente en desarrollo.</p>
+          </div>
+        `;
+      }
+    } catch (error) {
+      console.error("Error al cargar la sección:", error);
+      contentArea.innerHTML = `
+        <div class="alert alert-danger">
+          <h3>Error al cargar la sección</h3>
+          <p>No se pudo cargar la sección "${section}". Por favor intente nuevamente.</p>
+        </div>
+      `;
     }
   });
 });
@@ -658,7 +537,7 @@ function getClientesHTML() {
       async function loadProductosComponent() {
         try {
           console.log('Fetching productos component...');
-          const response = await fetch(apiUrl('admin/component/productos'));
+          const response = await fetch('/admin/component/productos');
           if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
           }
@@ -697,38 +576,35 @@ function getClientesHTML() {
           return;
         }
         
-  // Variables del componente (usar la global 'categorias')
-  let productos = [];
-  categorias = [];
-  let productoEditando = null;
+        // Variables locales para el componente
+        let productos = [];
+        let categorias = [];
+        let productoEditando = null;
         
         // 1. Cargar categorías
         try {
           console.log('Cargando categorías...');
-          const response = await fetch(apiUrl('categorias'));
+          const response = await fetch('/api/categorias');
           categorias = await response.json();
           
-          // Deduplicar por nombre
-          const nombresCat = new Set();
-          const categoriasUnicas = [];
-          categorias.forEach(c => { if (!nombresCat.has(c.nombre)) { nombresCat.add(c.nombre); categoriasUnicas.push(c); } });
-          categorias = categoriasUnicas;
-
-          // Rellenar select de categorías (modal)
+          // Rellenar select de categorías
           selectCategoria.innerHTML = '<option value="">Selecciona una categoría</option>';
           categorias.forEach(categoria => {
-            selectCategoria.add(new Option(categoria.nombre, categoria.nombre));
+            const option = new Option(categoria.nombre, categoria.nombre);
+            selectCategoria.add(option);
           });
-
-            // Rellenar filtro de categorías
+          
+          // Rellenar filtro de categorías
           filtroCategoria.innerHTML = '<option value="">Todas las categorías</option>';
           categorias.forEach(categoria => {
-            filtroCategoria.add(new Option(categoria.nombre, categoria.nombre));
+            const option = new Option(categoria.nombre, categoria.nombre);
+            filtroCategoria.add(option);
           });
           
           console.log('Categorías cargadas:', categorias.length);
           
-          // El filtro de subcategorías se inicializa más abajo tras bindear listeners
+          // Inicializar filtro de subcategorías con todas las subcategorías
+          actualizarFiltroSubcategorias();
         } catch (error) {
           console.error('Error cargando categorías:', error);
         }
@@ -736,7 +612,7 @@ function getClientesHTML() {
         // 2. Cargar productos
         try {
           console.log('Cargando productos...');
-          const response = await fetch(apiUrl('api/productos?incluir_inactivos=true'));
+          const response = await fetch('/api/productos?incluir_inactivos=true');
           const data = await response.json();
           productos = data.productos; // Asegura que el array global se actualiza
           mostrarProductos(productos);
@@ -876,7 +752,7 @@ function getClientesHTML() {
           if (categoria === 'Podotáctiles') {
             try {
               // Cargar productos podotáctiles desde la base de datos (incluyendo inactivos)
-              const response = await fetch(apiUrl('api/productos?incluir_inactivos=true'));
+              const response = await fetch('/api/productos?incluir_inactivos=true');
               const todosProductos = await response.json();
               
               // Filtrar solo productos podotáctiles
@@ -930,7 +806,7 @@ function getClientesHTML() {
                 await sincronizarPodotactilesConBD(productosPredefinidos);
                 
                 // Volver a cargar desde la BD para obtener los estados actuales
-                const responseRefresh = await fetch(apiUrl('api/productos?incluir_inactivos=true'));
+                const responseRefresh = await fetch('/api/productos?incluir_inactivos=true');
                 const productosRefresh = await responseRefresh.json();
                 productosPodotactiles = productosRefresh.filter(p => p.categoria === 'Podotáctiles');
               }
@@ -1195,89 +1071,154 @@ function getClientesHTML() {
           }
         }
         
-    // 7. Función para cargar subcategorías SOLO en el modal (no toca el filtro global)
-    async function cargarSubcategorias(categoriaParaFiltro = null) {
+        // 7. Función para cargar subcategorías dinámicamente en modal
+        async function cargarSubcategorias(categoriaSeleccionada = null) {
+          const selectSubcategoria = document.getElementById('filtroSubcategoria');
+          if (!selectSubcategoria) return;
+
+          // Limpiar opciones existentes excepto la primera
+          selectSubcategoria.innerHTML = '<option value="">Todas las subcategorías</option>';
+
+          let url = '/subcategorias';
+          if (categoriaSeleccionada) {
+            // Buscar el ID de la categoría seleccionada
+            const categorias = await fetch('/api/categorias').then(res => res.json());
+            const categoria = categorias.find(cat => cat.nombre === categoriaSeleccionada);
+            if (categoria) {
+              url += `?categoria_id=${categoria.id}`;
+            }
+          }
+
           try {
-            const categoriasBackend = categorias && categorias.length ? categorias : await fetch(apiUrl('categorias')).then(r=>r.json());
-            if (!categorias || categorias.length === 0) categorias = categoriasBackend;
-
-            // Obtener subcategorías según filtro directamente desde la DB para evitar duplicados
-            let endpoint = 'subcategorias';
-            if (categoriaParaFiltro) {
-              const catObj = categorias.find(c => c.nombre === categoriaParaFiltro);
-              if (catObj) endpoint += `?categoria_id=${catObj.id}`;
+            const subcategorias = await fetch(url).then(res => res.json());
+            if (Array.isArray(subcategorias)) {
+              subcategorias.forEach(subcat => {
+                const option = document.createElement('option');
+                option.value = subcat.nombre;
+                option.textContent = subcat.nombre;
+                selectSubcategoria.appendChild(option);
+              });
             }
-            const todasSubcategorias = await fetch(apiUrl(endpoint)).then(r => r.json());
-
-      // 7. Modal de producto (select id=productoSubcategoria)
-            const categoriaSeleccionadaModal = document.getElementById('productoCategoria')?.value;
-            const selectModal = document.getElementById('productoSubcategoria');
-            if (selectModal) {
-              selectModal.innerHTML = '<option value="">Selecciona una subcategoría</option>';
-              if (categoriaSeleccionadaModal) {
-                const categoriaObj = categorias.find(c => c.nombre === categoriaSeleccionadaModal);
-                if (categoriaObj) {
-                  const listaModal = todasSubcategorias.filter(s => s.categoria_id === categoriaObj.id);
-                  const nombresModal = new Set();
-                  listaModal.forEach(s => {
-                    const key = (s.nombre || '').trim().toLowerCase();
-                    if (!nombresModal.has(key)) {
-                      nombresModal.add(key);
-                      const nombreMostrar = (s.nombre || '').trim();
-                      selectModal.add(new Option(nombreMostrar, nombreMostrar));
-                    }
-                  });
+          } catch (error) {
+            console.error('Error cargando subcategorías:', error);
+          }
+        }
+        
+        // 7a. Función para cargar subcategorías dinámicamente en modal
+        async function cargarSubcategorias() {
+          const categoriaSeleccionada = document.getElementById('productoCategoria').value;
+          const selectSubcategoria = document.getElementById('productoSubcategoria');
+          
+          if (selectSubcategoria) {
+            selectSubcategoria.innerHTML = '<option value="">Selecciona una subcategoría</option>';
+          }
+          
+          if (!categoriaSeleccionada) return;
+          
+          try {
+            const response = await fetch('/api/subcategorias');
+            const todasSubcategorias = await response.json();
+            
+            // Filtrar subcategorías por categoría
+            const categoria = categorias.find(c => c.nombre === categoriaSeleccionada);
+            if (categoria && selectSubcategoria) {
+              const subcategoriasFiltered = todasSubcategorias.filter(s => s.categoria_id === categoria.id);
+              
+              // Eliminar duplicados por nombre usando Set
+              const nombresUnicos = new Set();
+              const subcategoriasUnicas = [];
+              
+              subcategoriasFiltered.forEach(subcategoria => {
+                if (!nombresUnicos.has(subcategoria.nombre)) {
+                  nombresUnicos.add(subcategoria.nombre);
+                  subcategoriasUnicas.push(subcategoria);
                 }
-              }
+              });
+              
+              subcategoriasUnicas.forEach(subcategoria => {
+                const option = new Option(subcategoria.nombre, subcategoria.nombre);
+                selectSubcategoria.add(option);
+              });
             }
-          } catch (e) {
-            console.error('Error cargarSubcategorias unificada:', e);
+          } catch (error) {
+            console.error('Error cargando subcategorías:', error);
           }
         }
         
         // 7b. Función para actualizar filtro de subcategorías
         async function actualizarFiltroSubcategorias() {
-          // Evitar condiciones de carrera: solo la última llamada aplica cambios
-          window._subcatSeq = (window._subcatSeq || 0) + 1;
-          const seq = window._subcatSeq;
-          const filtroCategoriaEl = document.getElementById('filtroCategoria');
+          const categoriaSeleccionada = document.getElementById('filtroCategoria');
           const filtroSubcategoria = document.getElementById('filtroSubcategoria');
-          if (!filtroCategoriaEl || !filtroSubcategoria) return;
-          const categoriaValue = filtroCategoriaEl.value;
+          
+          // Verificar que los elementos existan antes de continuar
+          if (!categoriaSeleccionada || !filtroSubcategoria) {
+            console.log('Elementos de filtro no encontrados - probablemente no estamos en la vista de productos');
+            return;
+          }
+          
+          const categoriaValue = categoriaSeleccionada.value;
+          console.log('🔄 Actualizando subcategorías para categoría:', categoriaValue);
+          
+          // Limpiar completamente el select
+          filtroSubcategoria.innerHTML = '';
+          
+          // Agregar la opción por defecto
+          const defaultOption = document.createElement('option');
+          defaultOption.value = '';
+          defaultOption.textContent = 'Todas las subcategorías';
+          filtroSubcategoria.appendChild(defaultOption);
+          
           try {
-            let endpoint = 'subcategorias';
-            if (categoriaValue && categoriaValue !== 'Podotáctiles') {
-              const categoriaObj = categorias.find(c => c.nombre === categoriaValue);
-              if (categoriaObj) endpoint += `?categoria_id=${categoriaObj.id}`;
-            }
-            const lista = await fetch(apiUrl(endpoint)).then(r=>r.json());
-            // Si otra llamada más reciente inició después, abortar aplicar cambios
-            if (seq !== window._subcatSeq) return;
-
-            // Reiniciar opciones ahora, justo antes de aplicar
-            filtroSubcategoria.innerHTML = '<option value="">Todas las subcategorías</option>';
-            // Dedupe robusto contra ejecuciones repetidas
-            const existentes = new Set();
-            Array.from(filtroSubcategoria.options).forEach(o => existentes.add((o.value || '').trim().toLowerCase()));
-            const nombres = new Set();
-            lista.forEach(s => {
-              const key = (s.nombre || '').trim().toLowerCase();
-              const nombreMostrar = (s.nombre || '').trim();
-              if (!nombres.has(key) && !existentes.has(key)) {
-                nombres.add(key);
-                filtroSubcategoria.appendChild(new Option(nombreMostrar, nombreMostrar));
+            if (!categoriaValue) {
+              // Si no hay categoría seleccionada, cargar todas las subcategorías
+              const response = await fetch('/subcategorias');
+              const todasSubcategorias = await response.json();
+              
+              todasSubcategorias.forEach(subcategoria => {
+                const option = document.createElement('option');
+                option.value = subcategoria.nombre;
+                option.textContent = subcategoria.nombre;
+                filtroSubcategoria.appendChild(option);
+              });
+              
+              // Agregar subcategoría especial para Podotáctiles
+              const optionPodotactiles = document.createElement('option');
+              optionPodotactiles.value = 'Discapacidad';
+              optionPodotactiles.textContent = 'Discapacidad';
+              filtroSubcategoria.appendChild(optionPodotactiles);
+              
+            } else if (categoriaValue === 'Podotáctiles') {
+              // Caso especial para Podotáctiles
+              const option = document.createElement('option');
+              option.value = 'Discapacidad';
+              option.textContent = 'Discapacidad';
+              filtroSubcategoria.appendChild(option);
+              
+            } else {
+              // Para otras categorías, cargar subcategorías específicas
+              const response = await fetch('/subcategorias');
+              const todasSubcategorias = await response.json();
+              
+              // Filtrar subcategorías por categoría seleccionada
+              const categoria = categorias.find(c => c.nombre === categoriaValue);
+              if (categoria) {
+                const subcategoriasParaMostrar = todasSubcategorias.filter(s => s.categoria_id === categoria.id);
+                
+                subcategoriasParaMostrar.forEach(subcategoria => {
+                  const option = document.createElement('option');
+                  option.value = subcategoria.nombre;
+                  option.textContent = subcategoria.nombre;
+                  filtroSubcategoria.appendChild(option);
+                });
               }
-            });
-            if (!categoriaValue || categoriaValue === 'Podotáctiles') {
-              if (!nombres.has('discapacidad') && !existentes.has('discapacidad')) filtroSubcategoria.appendChild(new Option('Discapacidad','Discapacidad'));
             }
-          } catch (e) {
-            console.error('Error actualizarFiltroSubcategorias dedupe:', e);
+            
+            console.log('✅ Subcategorías actualizadas correctamente');
+            
+          } catch (error) {
+            console.error('Error cargando subcategorías del filtro:', error);
           }
         }
-  // Exponer funciones clave globalmente (compatibilidad con atributos inline existentes)
-  window.actualizarFiltroSubcategorias = actualizarFiltroSubcategorias;
-  window.cargarSubcategorias = cargarSubcategorias;
         
         // 8. Función para guardar producto
         async function guardarProducto() {
@@ -1359,7 +1300,7 @@ function getClientesHTML() {
               }
               // Recargar productos
               // Siempre recargar todos los productos (activos + inactivos) y actualizar el array global
-              const response2 = await fetch(apiUrl('api/productos?incluir_inactivos=true'));
+              const response2 = await fetch('/api/productos?incluir_inactivos=true');
               const data2 = await response2.json();
               productos = data2.productos || data2;
               // Aplicar el filtrado actual para mantener la vista
@@ -1468,8 +1409,6 @@ function getClientesHTML() {
             });
           }
         }
-  // Exponer global para handlers inline existentes
-  window.editarProducto = editarProducto;
         
         // 10. Función para eliminar producto
         async function eliminarProducto(id) {
@@ -1482,7 +1421,7 @@ function getClientesHTML() {
             description: 'Esta acción no se puede deshacer. El producto será eliminado permanentemente del sistema.',
             onConfirm: async () => {
               try {
-                const response = await molpiFetch(`productos/${id}`, {
+                const response = await fetch(`/productos/${id}`, {
                   method: 'DELETE'
                 });
                 
@@ -1511,7 +1450,7 @@ function getClientesHTML() {
                     console.log('🔄 Recargando vista de podotáctiles...');
                     
                     // Forzar recarga desde servidor para podotáctiles (incluyendo inactivos)
-                    const response2 = await fetch(apiUrl('api/productos?incluir_inactivos=true'));
+                    const response2 = await fetch('/api/productos?incluir_inactivos=true');
                     const todosProductos = await response2.json();
                     const productosPodotactiles = todosProductos.filter(p => p.categoria === 'Podotáctiles');
                     
@@ -1526,7 +1465,7 @@ function getClientesHTML() {
                   } else {
                     // Para otras categorías o vista general, recargar normalmente
                     console.log('🔄 Recargando productos para categoría:', categoriaActual || 'todas');
-                    const response2 = await fetch(apiUrl('api/productos?incluir_inactivos=true'));
+                    const response2 = await fetch('/api/productos?incluir_inactivos=true');
                     let data2 = await response2.json();
                     productos = Array.isArray(data2) ? data2 : (data2.productos || []);
                     
@@ -1550,8 +1489,6 @@ function getClientesHTML() {
             }
           });
         }
-  // Exponer global
-  window.eliminarProducto = eliminarProducto;
         
         // 11. Funciones para manejar productos podotáctiles
         function editarPodotactil(id) {
@@ -1726,7 +1663,7 @@ function getClientesHTML() {
             };
             
             // Enviar al servidor
-            const response = await molpiFetch(`productos/${id}`, {
+            const response = await fetch(`/productos/${id}`, {
               method: 'PUT',
               headers: {
                 'Content-Type': 'application/json'
@@ -1789,7 +1726,7 @@ function getClientesHTML() {
               activo: nuevoEstado ? 1 : 0  // Solo cambiamos el estado activo
             };
             
-            const response = await molpiFetch(`productos/${id}`, {
+            const response = await fetch(`/productos/${id}`, {
               method: 'PUT',
               headers: {
                 'Content-Type': 'application/json'
@@ -1799,7 +1736,7 @@ function getClientesHTML() {
             
             if (response.ok) {
               // Recargar productos desde la base de datos para reflejar el cambio
-              const response2 = await fetch(apiUrl('api/productos?incluir_inactivos=true'));
+              const response2 = await fetch('/api/productos?incluir_inactivos=true');
               const todosProductos = await response2.json();
               
               // Actualizar el producto en el array local
@@ -1832,11 +1769,11 @@ function getClientesHTML() {
           try {
             for (const producto of productosPodotactiles) {
               // Verificar si el producto existe en la base de datos
-              const response = await molpiFetch(`productos/${producto.id}`);
+              const response = await fetch(`/productos/${producto.id}`);
               
               if (response.status === 404) {
                 // El producto no existe, crearlo
-                const createResponse = await fetch(apiUrl('productos'), {
+                const createResponse = await fetch('/productos', {
                   method: 'POST',
                   headers: {
                     'Content-Type': 'application/json'
@@ -1858,7 +1795,7 @@ function getClientesHTML() {
                     productoExistente.imagen_url !== producto.imagen_url ||
                     productoExistente.imagen_mosaico_url !== producto.imagen_mosaico_url) {
                   
-                  const updateResponse = await molpiFetch(`productos/${producto.id}`, {
+                  const updateResponse = await fetch(`/productos/${producto.id}`, {
                     method: 'PUT',
                     headers: {
                       'Content-Type': 'application/json'
@@ -1915,10 +1852,7 @@ function getClientesHTML() {
           buscarProducto.addEventListener('input', filtrarProductos);
         }
         
-  // Inicializar filtro de subcategorías una sola vez
-  await actualizarFiltroSubcategorias();
-
-  // Event listeners para filtros rápidos
+        // Event listeners para filtros rápidos
         
         if (filtro20x20) {
           filtro20x20.addEventListener('click', async function() {
@@ -1931,7 +1865,7 @@ function getClientesHTML() {
               window.currentFilter = '20x20';
               
               // Cargar productos específicos de línea 20x20
-              const response = await fetch(apiUrl('productos/linea/20x20'));
+              const response = await fetch('/productos/linea/20x20');
               if (response.ok) {
                 const productosLinea = await response.json();
                 productos = productosLinea;
@@ -1957,7 +1891,7 @@ function getClientesHTML() {
               window.currentFilter = '40x40';
               
               // Cargar productos específicos de zócalos 40x40
-              const response = await fetch(apiUrl('productos/linea/40x40'));
+              const response = await fetch('/productos/linea/40x40');
               if (response.ok) {
                 const productosLinea = await response.json();
                 productos = productosLinea;
@@ -1983,7 +1917,7 @@ function getClientesHTML() {
               window.currentFilter = '50x50';
               
               // Cargar productos específicos de zócalos 50x50
-              const response = await fetch(apiUrl('productos/linea/50x50'));
+              const response = await fetch('/productos/linea/50x50');
               if (response.ok) {
                 const productosLinea = await response.json();
                 productos = productosLinea;
@@ -2006,7 +1940,7 @@ function getClientesHTML() {
               this.classList.add('active');
               
               // Cargar productos podotáctiles desde la base de datos
-              const response = await fetch(apiUrl('productos?incluir_inactivos=true'));
+              const response = await fetch('/productos?incluir_inactivos=true');
               if (response.ok) {
                 const todosLosProductos = await response.json();
                 let productosPodotactiles = todosLosProductos.filter(p => p.categoria === 'Podotáctiles');
@@ -2061,7 +1995,7 @@ function getClientesHTML() {
                   await sincronizarPodotactilesConBD(productosPredefinidos);
                   
                   // Volver a cargar desde la BD para obtener los productos creados
-                  const responseRefresh = await fetch(apiUrl('productos?incluir_inactivos=true'));
+                  const responseRefresh = await fetch('/productos?incluir_inactivos=true');
                   const productosRefresh = await responseRefresh.json();
                   productosPodotactiles = productosRefresh.filter(p => p.categoria === 'Podotáctiles');
                   
@@ -2269,7 +2203,8 @@ function getClientesHTML() {
           });
         }
         
-  // La inicialización de productos ya se realiza en initComponenteProductos()
+        // Inicializar carga de datos para filtros y productos
+        initProductosScript();
 
         console.log('=== Componente productos inicializado correctamente ===');
       }
@@ -2361,15 +2296,14 @@ function getClientesHTML() {
         console.log('initProductosScript called - loading data directly');
         
         // Cargar categorías, subcategorías y productos
-  cargarCategorias();
-  // Inicializar subcategorías del filtro sin duplicar
-  // (evitar repoblado redundante)
+        cargarCategorias();
+        cargarSubcategorias();
         cargarProductos();
       }
       
       // Funciones del ABM de productos
       function cargarCategorias() {
-        fetch(apiUrl('categorias'))
+        fetch('/categorias')
           .then(response => response.json())
           .then(categoriasData => {
             // Guardar categorías en variable global
@@ -2377,27 +2311,74 @@ function getClientesHTML() {
             
             const selectCategoria = document.getElementById('filtroCategoria');
             if (selectCategoria) {
-              // Limpiar primero para evitar acumulación
-              if (!selectCategoria.dataset._llenadoCategorias) {
-                const opcionesExistentes = new Set();
-                Array.from(selectCategoria.options).forEach(o => opcionesExistentes.add(o.value));
-                categorias.forEach(categoria => {
-                  if (!opcionesExistentes.has(categoria.nombre)) {
-                    selectCategoria.appendChild(new Option(categoria.nombre, categoria.nombre));
-                  }
-                });
-                // Agregar especial si falta
-                if (![...opcionesExistentes].includes('Podotáctiles') && !categorias.some(c=>c.nombre==='Podotáctiles')) {
-                  selectCategoria.appendChild(new Option('Podotáctiles','Podotáctiles'));
-                }
-                selectCategoria.dataset._llenadoCategorias = '1';
+              categorias.forEach(categoria => {
+                const option = document.createElement('option');
+                option.value = categoria.nombre;
+                option.textContent = categoria.nombre;
+                selectCategoria.appendChild(option);
+              });
+              
+              // Agregar categoría especial "Podotáctiles" si no existe
+              const tienePodotactiles = categorias.some(cat => cat.nombre === 'Podotáctiles');
+              if (!tienePodotactiles) {
+                const optionPodotactiles = document.createElement('option');
+                optionPodotactiles.value = 'Podotáctiles';
+                optionPodotactiles.textContent = 'Podotáctiles';
+                selectCategoria.appendChild(optionPodotactiles);
+                
+                // También agregar a la variable global
+                categorias.push({ id: 999, nombre: 'Podotáctiles' });
               }
             }
           })
           .catch(error => console.error('Error cargando categorías:', error));
       }
       
-  // (Definición duplicada de cargarSubcategorias eliminada; ahora se usa la versión unificada superior)
+      function cargarSubcategorias(categoriaSeleccionada = null) {
+        const selectSubcategoria = document.getElementById('filtroSubcategoria');
+        if (!selectSubcategoria) return;
+        
+        // Limpiar opciones existentes excepto la primera
+        selectSubcategoria.innerHTML = '<option value="">Todas las subcategorías</option>';
+        
+        let url = '/subcategorias';
+        if (categoriaSeleccionada) {
+          // Buscar el ID de la categoría seleccionada
+          fetch('/categorias')
+            .then(response => response.json())
+            .then(categorias => {
+              const categoria = categorias.find(cat => cat.nombre === categoriaSeleccionada);
+              if (categoria) {
+                url += `?categoria_id=${categoria.id}`;
+              }
+              
+              fetch(url)
+                .then(response => response.json())
+                .then(subcategorias => {
+                  subcategorias.forEach(subcategoria => {
+                    const option = document.createElement('option');
+                    option.value = subcategoria.nombre;
+                    option.textContent = subcategoria.nombre;
+                    selectSubcategoria.appendChild(option);
+                  });
+                })
+                .catch(error => console.error('Error cargando subcategorías:', error));
+            });
+        } else {
+          // Cargar todas las subcategorías
+          fetch(url)
+            .then(response => response.json())
+            .then(subcategorias => {
+              subcategorias.forEach(subcategoria => {
+                const option = document.createElement('option');
+                option.value = subcategoria.nombre;
+                option.textContent = subcategoria.nombre;
+                selectSubcategoria.appendChild(option);
+              });
+            })
+            .catch(error => console.error('Error cargando subcategorías:', error));
+        }
+      }
       
       // Variables para evitar cargas múltiples
       let cargandoProductos = false;
@@ -2408,7 +2389,7 @@ function getClientesHTML() {
         if (cargandoProductos) return;
         cargandoProductos = true;
         
-  fetch(apiUrl('productos'))
+        fetch('/productos')
           .then(response => response.json())
           .then(data => {
             console.log('Datos recibidos:', data);
@@ -2535,7 +2516,7 @@ function getClientesHTML() {
         console.log('🔍 Filtrando productos:', { categoria, subcategoria, linea, busqueda });
         
         // Cargar productos y aplicar filtros
-  fetch(apiUrl('productos'))
+        fetch('/productos')
           .then(response => response.json())
           .then(data => {
             console.log('📦 Datos recibidos:', data);
@@ -2590,18 +2571,29 @@ function getClientesHTML() {
           });
       }
       
-  function limpiarFiltros() {
+      function limpiarFiltros() {
         console.log('🧹 Limpiando filtros...');
         document.getElementById('filtroCategoria').value = '';
         document.getElementById('filtroSubcategoria').value = '';
         document.getElementById('filtroLinea').value = '';
         document.getElementById('buscarProducto').value = '';
-  // Repoblar subcategorías según todas las categorías (sin duplicados)
-  actualizarFiltroSubcategorias();
+        cargarSubcategorias(); // Recargar todas las subcategorías
         cargarProductos(); // Cargar todos los productos
       }
       
-  // Eliminado: versiones antiguas de mostrarModalProducto/editarProducto/eliminarProducto
+      function mostrarModalProducto() {
+        alert('Modal de producto - Por implementar');
+      }
+      
+      function editarProducto(id) {
+        alert('Editar producto ' + id + ' - Por implementar');
+      }
+      
+      function eliminarProducto(id) {
+        if (confirm('¿Estás seguro de que quieres eliminar este producto?')) {
+          alert('Eliminar producto ' + id + ' - Por implementar');
+        }
+      }
 
       // ========= Componente de Promociones =========
       async function loadPromocionesComponent() {
@@ -2848,7 +2840,7 @@ function getClientesHTML() {
               }
               
               console.log('📡 Haciendo fetch a /promociones/admin...');
-              const response = await molpiFetch('promociones/admin');
+              const response = await fetch('/promociones/admin');
               console.log('📡 Response status:', response.status);
               
               if (!response.ok) {
@@ -2937,7 +2929,7 @@ function getClientesHTML() {
             console.log('✏️ Editando promoción con ID:', id);
             
             // Buscar la promoción en los datos cargados
-            molpiFetch(`promociones/admin`)
+            fetch(`/promociones/admin`)
               .then(response => response.json())
               .then(promociones => {
                 const promocion = promociones.find(p => p.id == id);
@@ -2990,7 +2982,7 @@ function getClientesHTML() {
             console.log('🗑️ Eliminando promoción con ID:', id);
             
             // Buscar la promoción para mostrar su nombre en la confirmación
-            molpiFetch(`promociones/admin`)
+            fetch(`/promociones/admin`)
               .then(response => response.json())
               .then(promociones => {
                 const promocion = promociones.find(p => p.id == id);
@@ -3004,7 +2996,7 @@ function getClientesHTML() {
                   cancelText: 'Cancelar',
                   onConfirm: async function() {
                     try {
-                      const response = await molpiFetch(`promociones/${id}`, {
+                      const response = await fetch(`/promociones/${id}`, {
                         method: 'DELETE',
                         headers: {
                           'Content-Type': 'application/json'
@@ -3037,7 +3029,7 @@ function getClientesHTML() {
                   cancelText: 'Cancelar',
                   onConfirm: async function() {
                     try {
-                      const response = await molpiFetch(`promociones/${id}`, {
+                      const response = await fetch(`/promociones/${id}`, {
                         method: 'DELETE',
                         headers: {
                           'Content-Type': 'application/json'
@@ -3226,7 +3218,7 @@ function getClientesHTML() {
       async function loadTestimoniosComponent() {
         try {
           console.log('Fetching testimonios component...');
-          const response = await fetch(apiUrl('admin/component/testimonios'));
+          const response = await fetch('/admin/component/testimonios');
           
           if (!response.ok) {
             throw new Error('HTTP error! status: ' + response.status);
@@ -3310,7 +3302,7 @@ function getClientesHTML() {
         async function cargarTestimonios() {
           try {
             console.log('Cargando testimonios...');
-            const response = await fetch(apiUrl('testimonios/admin'));
+            const response = await fetch('/testimonios/admin');
             testimonios = await response.json();
             mostrarTestimonios(testimonios);
             console.log('Testimonios cargados:', testimonios.length);
@@ -3437,14 +3429,14 @@ function getClientesHTML() {
             let response;
             if (id) {
               // Actualizar
-              response = await fetch(apiUrl('testimonios/' + id), {
+              response = await fetch('/testimonios/' + id, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(datos)
               });
             } else {
               // Crear
-              response = await fetch(apiUrl('testimonios'), {
+              response = await fetch('/testimonios', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(datos)
@@ -3529,7 +3521,7 @@ function getClientesHTML() {
               $('#deleteTestimonioConfirmModal').modal('hide');
               
               try {
-                const response = await fetch(apiUrl('testimonios/' + id), {
+                const response = await fetch('/testimonios/' + id, {
                   method: 'DELETE'
                 });
                 
@@ -3586,29 +3578,26 @@ function getClientesHTML() {
       }
 
       function loadSectionFromHash() {
-        const hashRaw = window.location.hash ? window.location.hash.substring(1) : '';
-        const hash = hashRaw || 'productos';
+        const hash = window.location.hash.substring(1); // Remover el #
         console.log('Loading section from hash:', hash);
-
-        // Actualizar estado activo del sidebar
-        document.querySelectorAll('#adminSidebar a[data-section]').forEach(a => {
-          a.classList.toggle('active', a.getAttribute('data-section') === hash);
-        });
-
-        // Cargar sección directamente sin simular clics (evita recursión y duplicados)
-        if (hash === 'productos') {
-          loadProductosComponent();
-        } else if (hash === 'promociones') {
-          loadPromocionesComponent();
-        /*} else if (hash === 'testimonios') {
-          loadTestimoniosComponent();*/
+        
+        if (hash) {
+          const sectionLink = document.querySelector(`#adminSidebar a[data-section="${hash}"]`);
+          if (sectionLink) {
+            console.log('Found section link for:', hash);
+            sectionLink.click();
+            return;
+          }
+        }
+        
+        // Si no hay hash o no se encuentra la sección, cargar productos por defecto
+        console.log('No hash found, loading default productos section');
+        const productosLink = document.querySelector('#adminSidebar a[data-section="productos"]');
+        if (productosLink) {
+          productosLink.click();
         } else {
-          contentArea.innerHTML = `
-            <div class="alert alert-warning">
-              <h3>Sección en desarrollo</h3>
-              <p>La sección "${hash}" está actualmente en desarrollo.</p>
-            </div>
-          `;
+          // Fallback si no encuentra productos
+          loadProductosComponent();
         }
       }
 
