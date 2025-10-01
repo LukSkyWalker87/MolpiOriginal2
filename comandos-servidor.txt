@@ -1,0 +1,189 @@
+====================================================================
+COMANDOS PARA EJECUTAR EN EL SERVIDOR VPS
+====================================================================
+
+Servidor: 179.43.112.121:5690
+Usuario: root
+Contraseña: aN)-2y87mdRiut
+
+====================================================================
+PASO 1: CONECTAR AL SERVIDOR
+====================================================================
+
+Desde PowerShell ejecuta:
+ssh -p 5690 root@179.43.112.121
+
+Cuando pida contraseña, escribe: aN)-2y87mdRiut
+
+
+====================================================================
+PASO 2: PREPARAR EL SERVIDOR
+====================================================================
+
+# Actualizar sistema
+apt-get update
+apt-get upgrade -y
+
+# Instalar git
+apt-get install -y git curl wget nano
+
+# Verificar que Docker está instalado
+docker --version
+
+
+====================================================================
+PASO 3: CLONAR REPOSITORIO
+====================================================================
+
+# Crear directorio
+mkdir -p /opt/molpi
+cd /opt/molpi
+
+# Clonar repositorio
+git clone https://github.com/LukSkyWalker87/MolpiOriginal2.git
+cd MolpiOriginal2
+
+# Verificar que se clonó correctamente
+ls -la
+
+
+====================================================================
+PASO 4: BUILD DE LA IMAGEN DOCKER
+====================================================================
+
+# Construir imagen (esto puede tomar unos minutos)
+docker build -t molpi-app:latest .
+
+# Verificar que la imagen se creó
+docker images | grep molpi
+
+
+====================================================================
+PASO 5: CREAR DIRECTORIOS PARA DATOS
+====================================================================
+
+# Crear directorios para persistencia
+mkdir -p /opt/molpi/data
+mkdir -p /opt/molpi/backups
+mkdir -p /opt/molpi/logs
+
+
+====================================================================
+PASO 6: EJECUTAR CONTENEDOR
+====================================================================
+
+# Ejecutar aplicación
+docker run -d \
+  --name molpi-prod \
+  --restart unless-stopped \
+  -p 80:5000 \
+  -v /opt/molpi/data:/app/backend/data \
+  -v /opt/molpi/logs:/app/logs \
+  -e FLASK_ENV=production \
+  molpi-app:latest
+
+
+====================================================================
+PASO 7: VERIFICAR QUE ESTÁ FUNCIONANDO
+====================================================================
+
+# Ver contenedores activos
+docker ps
+
+# Ver logs
+docker logs molpi-prod
+
+# Ver logs en tiempo real (Ctrl+C para salir)
+docker logs -f molpi-prod
+
+# Probar que responde
+curl http://localhost:5000
+
+
+====================================================================
+PASO 8: VERIFICAR DESDE NAVEGADOR
+====================================================================
+
+Abre tu navegador y ve a:
+- http://179.43.112.121
+- http://vps-5346672-x.dattaweb.com
+
+Deberías ver tu aplicación Molpi funcionando.
+
+
+====================================================================
+COMANDOS ÚTILES PARA EL FUTURO
+====================================================================
+
+# Ver logs
+docker logs -f molpi-prod
+
+# Reiniciar aplicación
+docker restart molpi-prod
+
+# Detener aplicación
+docker stop molpi-prod
+
+# Iniciar aplicación
+docker start molpi-prod
+
+# Ver estado
+docker ps
+
+# Entrar al contenedor
+docker exec -it molpi-prod bash
+
+# Ver uso de recursos
+docker stats molpi-prod
+
+
+====================================================================
+ACTUALIZAR LA APLICACIÓN EN EL FUTURO
+====================================================================
+
+cd /opt/molpi/MolpiOriginal2
+git pull
+docker build -t molpi-app:latest .
+docker stop molpi-prod
+docker rm molpi-prod
+docker run -d \
+  --name molpi-prod \
+  --restart unless-stopped \
+  -p 80:5000 \
+  -v /opt/molpi/data:/app/backend/data \
+  -v /opt/molpi/logs:/app/logs \
+  -e FLASK_ENV=production \
+  molpi-app:latest
+
+
+====================================================================
+BACKUP DE LA BASE DE DATOS
+====================================================================
+
+# Crear backup
+docker cp molpi-prod:/app/backend/molpi.db /opt/molpi/backups/molpi_$(date +%Y%m%d_%H%M%S).db
+
+# Ver backups disponibles
+ls -lh /opt/molpi/backups/
+
+
+====================================================================
+SOLUCIÓN DE PROBLEMAS
+====================================================================
+
+# Si el contenedor no inicia
+docker logs molpi-prod
+
+# Si el puerto está ocupado
+netstat -tulpn | grep :80
+
+# Reiniciar Docker
+systemctl restart docker
+
+# Ver todos los contenedores (incluso detenidos)
+docker ps -a
+
+# Eliminar contenedor y recrear
+docker stop molpi-prod
+docker rm molpi-prod
+# Luego ejecutar el comando de "PASO 6" nuevamente

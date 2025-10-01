@@ -116,7 +116,7 @@ async function cargarPromociones() {
             return;
         }
         
-        const response = await fetch('http://localhost:5000/promociones/admin');
+        const response = await fetch(apiUrl('/promociones/admin'));
         if (!response.ok) {
             throw new Error(`HTTP ${response.status}`);
         }
@@ -197,7 +197,7 @@ async function guardarPromocion(event) {
             const formData = new FormData();
             formData.append('file', fileInput.files[0]);
             
-            const uploadResponse = await fetch('http://localhost:5000/upload/promocion', {
+            const uploadResponse = await fetch(apiUrl('/upload/promocion'), {
                 method: 'POST',
                 body: formData
             });
@@ -222,8 +222,8 @@ async function guardarPromocion(event) {
         };
         
         const url = promocionId ? 
-            `http://localhost:5000/promociones/${promocionId}` : 
-            'http://localhost:5000/promociones';
+            apiUrl(`/promociones/${promocionId}`) : 
+            apiUrl('/promociones');
         const method = promocionId ? 'PUT' : 'POST';
         
         const response = await fetch(url, {
@@ -254,7 +254,7 @@ async function guardarPromocion(event) {
 // === FUNCIÓN EDITAR PROMOCIÓN ===
 async function editarPromocion(id) {
     try {
-        const response = await fetch('http://localhost:5000/promociones/admin');
+        const response = await fetch(apiUrl('/promociones/admin'));
         const promociones = await response.json();
         const promocion = promociones.find(p => p.id === id);
         
@@ -288,7 +288,7 @@ async function eliminarPromocion(id) {
     if (!confirm('¿Estás seguro de eliminar esta promoción?')) return;
     
     try {
-        const response = await fetch(`http://localhost:5000/promociones/${id}`, {
+        const response = await fetch(apiUrl(`/promociones/${id}`), {
             method: 'DELETE'
         });
         
@@ -405,7 +405,7 @@ window.debugPromociones = function() {
     console.log('- DOM tbody:', !!document.getElementById('promocionesTableBody'));
     console.log('- Inicializado:', window.promocionesInicializado);
     
-    fetch('http://localhost:5000/promociones/admin')
+    fetch(apiUrl('/promociones/admin'))
         .then(r => r.json())
         .then(data => {
             console.log('- Conectividad: ✅');

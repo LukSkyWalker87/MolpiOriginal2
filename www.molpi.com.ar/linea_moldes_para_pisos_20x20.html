@@ -443,7 +443,7 @@ function cargarProductosLinea20x20() {
     ];
     
     // Intentar cargar desde el servidor, si falla usar datos locales
-    fetch('http://127.0.0.1:5000/productos/linea/20x20')
+    fetch('/productos/linea/20x20')
         .then(response => response.json())
         .then(productos => {
             // Ordenar productos según el orden deseado

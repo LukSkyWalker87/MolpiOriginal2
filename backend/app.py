@@ -186,23 +186,33 @@ def login():
         password = request.form.get('password')
 
     if username == USER and password == PASS:
+        now = datetime.utcnow()
         payload = {
             'sub': username,
             'role': 'admin',
             'type': 'access',
-            'iat': datetime.utcnow(),
-            'exp': datetime.utcnow() + timedelta(minutes=JWT_EXP_MINUTES)
+            'iat': now,
+            'exp': now + timedelta(minutes=JWT_EXP_MINUTES)
         }
         refresh_payload = {
             'sub': username,
             'role': 'admin',
             'type': 'refresh',
-            'iat': datetime.utcnow(),
-            'exp': datetime.utcnow() + timedelta(days=7)
+            'iat': now,
+            'exp': now + timedelta(days=7)
         }
-        token = jwt.encode(payload, JWT_SECRET, algorithm='HS256')
-        refresh_token = jwt.encode(refresh_payload, JWT_SECRET, algorithm='HS256')
-        return jsonify({'token': token, 'refresh_token': refresh_token, 'expires_in_minutes': JWT_EXP_MINUTES}), 200
+        
+        try:
+            token = jwt.encode(payload, JWT_SECRET, algorithm='HS256')
+            refresh_token = jwt.encode(refresh_payload, JWT_SECRET, algorithm='HS256')
+            return jsonify({
+                'token': token, 
+                'refresh_token': refresh_token, 
+                'expires_in_minutes': JWT_EXP_MINUTES
+            }), 200
+        except Exception as e:
+            print(f"Error generando JWT: {e}")
+            return jsonify({'message': 'Error interno del servidor'}), 500
     return jsonify({'message': 'Credenciales inválidas'}), 401
 
 # ======== Decorador de protección ========
@@ -258,12 +268,14 @@ def refresh_token():
         return jsonify({'error': 'Refresh token expirado'}), 401
     except Exception:
         return jsonify({'error': 'Refresh token inválido'}), 401
+    
+    now = datetime.utcnow()
     new_payload = {
         'sub': decoded['sub'],
         'role': decoded.get('role','admin'),
         'type': 'access',
-        'iat': datetime.utcnow(),
-        'exp': datetime.utcnow() + timedelta(minutes=JWT_EXP_MINUTES)
+        'iat': now,
+        'exp': now + timedelta(minutes=JWT_EXP_MINUTES)
     }
     new_token = jwt.encode(new_payload, JWT_SECRET, algorithm='HS256')
     return jsonify({'token': new_token, 'expires_in_minutes': JWT_EXP_MINUTES})

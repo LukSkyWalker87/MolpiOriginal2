@@ -16,12 +16,12 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copiar código de la aplicación
-COPY Python/ ./backend/
+COPY backend/ ./backend/
 # Copiar frontend bueno utilizado por app.py
 COPY www.molpi.com.ar/ ./www.molpi.com.ar/
 
 # Copiar base de datos
-COPY Python/molpi.db ./backend/molpi.db
+COPY backend/molpi.db ./backend/molpi.db
 
 # Crear directorio para archivos estáticos
 RUN mkdir -p ./backend/static

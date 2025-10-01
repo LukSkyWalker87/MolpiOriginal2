@@ -403,7 +403,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function cargarProductos20x20() {
     // Intentar cargar desde el servidor
-    fetch('http://127.0.0.1:5000/productos/linea/20x20')
+    fetch('/productos/linea/20x20')
         .then(response => response.json())
         .then(productos => {
             console.log('Productos cargados:', productos);

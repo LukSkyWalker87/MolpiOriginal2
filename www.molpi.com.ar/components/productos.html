@@ -1,94 +1,58 @@
-<!-- Estilos específicos para el componente productos -->
+<!-- Estilos específicos para el componente productos (alineado con promociones) -->
 <style>
-.productos-component .table img {
-  border-radius: 4px;
+.productos-component .table img { border-radius: 6px; }
+
+/* Miniaturas más grandes como en promociones */
+.productos-component .table td img {
+  width: 150px;   /* 164px en XL */
+  height: 90px;
+  object-fit: cover;
+  border: 1px solid #e9ecef;
 }
 
-.productos-component .badge {
-  font-size: 0.85em;
+.productos-component .badge { font-size: .85rem; }
+
+.productos-component .btn-sm { margin-right: 3px; min-width: 88px; max-width: none; padding:.5rem .85rem; font-size:.95rem; }
+
+.productos-component .modal-lg { max-width: 900px; }
+
+.productos-component #vistaPrevia { border: 2px dashed #ddd; border-radius: 8px; }
+
+.productos-component .card { box-shadow: 0 2px 4px rgba(0,0,0,0.08); border: 0; }
+
+.productos-component .table-responsive { border-radius: 8px; }
+
+/* Overrides – look & feel grande (match promociones + un poco más) */
+.productos-component .card-body{ padding:1rem !important; }
+.productos-component .btn-sm{ padding:.5rem .85rem; font-size:.95rem; }
+.productos-component .table{ margin:0; font-size:1.08rem; }
+.productos-component .table thead th{
+  background:#f8f9fa; border-bottom:2px solid #dee2e6; color:#495057;
+  font-weight:600; font-size:1.05rem; padding:.85rem 1rem; white-space:nowrap;
+}
+.productos-component .table td{
+  padding:.85rem 1rem; vertical-align:middle; border-top:1px solid #eef1f4; white-space:nowrap;
+}
+.productos-component .table tbody tr:hover{ background:#f3f6fb; }
+.productos-component .badge{ font-size:.8rem; padding:.45em .65em; }
+.productos-component .acciones .btn{ min-width:108px; padding:.5rem .8rem; font-size:.95rem; }
+@media (min-width:1200px){
+  .productos-component .table{ font-size:1.12rem; }
+  .productos-component .table thead th{ font-size:1.1rem; }
+  .productos-component .table td img{ width:164px; height:98px; }
 }
 
-.productos-component .btn-sm {
-  margin-right: 3px;
-  min-width: 70px;
-  max-width: none;
-}
+/* Asegurar modal-xl en el tema actual */
+.modal-xl { max-width: 1140px; }
 
-.productos-component .modal-lg {
-  max-width: 900px;
-}
-
-.productos-component #vistaPrevia {
-  border: 2px dashed #ddd;
-  border-radius: 8px;
-}
-
-.productos-component .card {
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.productos-component .table-responsive {
-  border-radius: 8px;
-}
-
-/* Estilos para que la tabla coincida exactamente con la de Insumos */
-.productos-component .table {
-  margin-bottom: 0;
-  font-size: 0.875rem;
-}
-
-
-.productos-component .table th,
-.productos-component .table td {
-  padding: 0.3rem 0.5rem;
-  vertical-align: middle;
-  border-top: 1px solid #dee2e6;
-  white-space: nowrap;
-  font-size: 0.8rem;
-  max-width: 260px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-/* Solo expandir columna Acciones para los botones */
-.productos-component .table th:nth-child(9),
-.productos-component .table td:nth-child(9) {
-  min-width: 180px;
-  width: 210px;
-  max-width: 240px;
-  text-align: center;
-}
+/* Ajustes de ancho de columna Acciones (última columna) */
+.productos-component .table th:last-child,
+.productos-component .table td:last-child { min-width: 200px; width: 240px; max-width: 280px; text-align: center; }
 
 
 
-.productos-component .table th {
-  background-color: #f8f9fa;
-  border-bottom: 2px solid #dee2e6;
-  font-weight: 500;
-  font-size: 0.75rem;
-  color: #495057;
-  text-transform: none;
-  letter-spacing: normal;
-  padding: 0.25rem 0.5rem;
-}
-
-.productos-component .table-striped tbody tr:nth-of-type(odd) {
-  background-color: rgba(0, 0, 0, 0.05);
-}
-
-/* Eliminar efectos hover para coincidir con Insumos */
-.productos-component .table tbody tr:hover {
-  background-color: inherit;
-}
-
-.productos-component .table-striped tbody tr:nth-of-type(odd):hover {
-  background-color: rgba(0, 0, 0, 0.05);
-}
-
-.productos-component .table-striped tbody tr:nth-of-type(even):hover {
-  background-color: transparent;
-}
+/* Rayado suave manteniendo hover agradable */
+.productos-component .table-striped tbody tr:nth-of-type(odd){ background-color: rgba(0,0,0,.035); }
 
 /* Estilos para modal minimalista y moderno */
 .productos-component .modal-content {
@@ -175,12 +139,12 @@
 
 /* Estilos específicos para los filtros del admin */
 .productos-component .card-body .form-control {
-  font-size: 0.85rem !important;
+  font-size: 1.05rem !important;
   color: #2d3748 !important;
   background-color: white !important;
   border: 1px solid #d1d5db !important;
-  height: auto !important;
-  line-height: 1.4 !important;
+  height: 46px !important;
+  line-height: 1.6 !important;
 }
 
 .productos-component .card-body .form-control option {
@@ -190,10 +154,10 @@
 }
 
 .productos-component .card-body .form-control-sm {
-  padding: 0.4rem 0.75rem !important;
-  font-size: 0.875rem !important;
-  line-height: 1.4 !important;
-  height: 32px !important;
+  padding: 0.65rem 1rem !important;
+  font-size: 1.05rem !important;
+  line-height: 1.6 !important;
+  height: 46px !important;
   color: #374151 !important;
   background-color: #ffffff !important;
   border: 1px solid #d1d5db !important;
@@ -210,7 +174,7 @@
 }
 
 .productos-component .form-text {
-  font-size: 0.8rem;
+  font-size: 0.95rem;
   color: #718096;
   margin-top: 0.25rem;
 }
@@ -228,12 +192,7 @@
   border-radius: 0 0 12px 12px;
 }
 
-.productos-component .btn {
-  border-radius: 8px;
-  padding: 0.75rem 1.5rem;
-  font-weight: 500;
-  transition: all 0.2s ease;
-}
+.productos-component .btn { border-radius: 8px; padding: 0.6rem 1.2rem; font-weight: 500; transition: all 0.2s ease; }
 
 .productos-component .btn-primary {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -404,7 +363,7 @@
 
 <!-- Modal para crear/editar producto -->
 <div class="modal fade" id="modalProducto" tabindex="-1" role="dialog">
-  <div class="modal-dialog modal-lg" role="document">
+  <div class="modal-dialog modal-xl" role="document">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="modalProductoTitle">
@@ -434,14 +393,7 @@
                   <i class="fa fa-folder"></i> Categoría *
                 </label>
                 <select class="form-control" id="productoCategoria" name="categoria" required>
-                    <option value=""> Selecciona una categoría</option>
-                  </select>
-                  <style>
-                    #productoCategoria {
-                      max-width: 250px;
-                      min-width: 120px;
-                    }
-                  </style>
+                  <option value="">Selecciona una categoría</option>
                 </select>
                 </div>
             </div>
@@ -587,7 +539,7 @@
 
 <!-- Modal especial para editar textos descriptivos de podotáctiles -->
 <div class="modal fade" id="modalEditarPodotactil" tabindex="-1" role="dialog">
-  <div class="modal-dialog modal-lg" role="document">
+  <div class="modal-dialog modal-xl" role="document">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">

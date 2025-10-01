@@ -466,14 +466,29 @@
 
       async function attemptAuto(){
         const token = localStorage.getItem('molpi_access_token');
-        if(!token){ showOverlay(); return; }
-        // Ocultar optimistamente para evitar flash
-        hideOverlay();
+        if(!token){ 
+          console.log('No token found, showing login overlay');
+          showOverlay(); 
+          return; 
+        }
+        
+        console.log('Token found, attempting auto-login...');
         try {
           const r = await molpiFetch('api/me');
-          if(r.ok){ inicializarAdminTrasLogin(); }
-          else { showOverlay(); }
-        } catch { showOverlay(); }
+          if(r.ok){ 
+            console.log('Auto-login successful, hiding overlay and initializing admin');
+            hideOverlay();
+            inicializarAdminTrasLogin(); 
+          } else { 
+            console.log('Token invalid, showing login overlay');
+            localStorage.removeItem('molpi_access_token');
+            showOverlay(); 
+          }
+        } catch (error) { 
+          console.log('Auto-login failed:', error);
+          localStorage.removeItem('molpi_access_token');
+          showOverlay(); 
+        }
       }
 
       form.addEventListener('submit', async (e)=>{
@@ -483,7 +498,9 @@
         const u = userInput.value.trim(); const p = passInput.value;
         const r = await molpiLogin(u,p);
         if(r.ok){
-          hideOverlay(); inicializarAdminTrasLogin();
+          console.log('Manual login successful, hiding overlay and initializing admin');
+          hideOverlay(); 
+          inicializarAdminTrasLogin();
         } else {
           showError(r.error || 'Error de autenticación');
         }
@@ -496,9 +513,19 @@
       function inicializarAdminTrasLogin(){
         if(_adminInitialized) return; // evitar duplicados
         _adminInitialized = true;
-        const firstLink = document.querySelector('#adminSidebar a[data-section].active') || document.querySelector('#adminSidebar a[data-section]');
-        if(firstLink){ firstLink.click(); }
-        setTimeout(()=>{ molpiFetch('promociones/admin').catch(()=>{}); }, 1200);
+        console.log('Inicializando admin tras login...');
+        
+        // Forzar hash a productos si no hay hash o está vacío
+        const currentHash = window.location.hash ? window.location.hash.substring(1) : '';
+        if(!currentHash || currentHash === '') {
+          window.location.hash = 'productos';
+        }
+        
+        // Forzar carga de la sección actual
+        setTimeout(() => {
+          loadSectionFromHash();
+          molpiFetch('promociones/admin').catch(()=>{});
+        }, 100);
       }
 
       attemptAuto();
@@ -1678,7 +1705,7 @@ function getClientesHTML() {
               const formData = new FormData();
               formData.append('file', fileInputMolde.files[0]);
               
-              const uploadResponse = await fetch('http://localhost:5000/upload/producto', {
+              const uploadResponse = await fetch(apiUrl('/upload/producto'), {
                 method: 'POST',
                 body: formData
               });
@@ -1697,7 +1724,7 @@ function getClientesHTML() {
               const formData = new FormData();
               formData.append('file', fileInputMosaico.files[0]);
               
-              const uploadResponse = await fetch('http://localhost:5000/upload/producto', {
+              const uploadResponse = await fetch(apiUrl('/upload/producto'), {
                 method: 'POST',
                 body: formData
               });
