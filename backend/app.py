@@ -173,7 +173,7 @@ def login():
     """Autenticación unificada: acepta JSON (fetch) o formulario clásico."""
     # Credenciales (puedes moverlas a variables de entorno luego)
     USER = os.environ.get('MOLPI_ADMIN_USER', 'admin')
-    PASS = os.environ.get('MOLPI_ADMIN_PASS', '1234')
+    PASS = os.environ.get('MOLPI_ADMIN_PASS', 'dumba3110')
     JWT_SECRET = os.environ.get('MOLPI_JWT_SECRET', app.config['SECRET_KEY'])
     JWT_EXP_MINUTES = int(os.environ.get('MOLPI_JWT_EXP_MINUTES', '120'))
 
