@@ -153,10 +153,10 @@
 
         <div class="form-row">
           <div class="form-group col-md-6">
-            <label>Imagen (archivo o URL)</label>
+            <label>Imagen (opcional)</label>
             <input type="file" class="form-control-file mb-2" id="promocionImagenFile" accept="image/*">
-            <input type="text" class="form-control" id="promocionImagen" placeholder="O ingrese la URL">
-            <small class="text-muted">Recomendado 1200×400px</small>
+            <input type="text" class="form-control" id="promocionImagen" placeholder="URL de la imagen (opcional)">
+            <small class="text-muted">Recomendado 1200×400px (opcional)</small>
             <div id="archivoEstadoImagen" class="mt-2 d-none"><span class="badge badge-img">IMG seleccionada</span></div>
             <div id="imagenPreview" class="mt-3 d-none">
               <img id="imagenPreviewImg" class="preview-img" alt="Vista previa">
@@ -166,7 +166,7 @@
           <div class="form-group col-md-6">
             <label>Cartilla PDF (opcional)</label>
             <input type="file" class="form-control-file mb-2" id="promocionPdfFile" accept=".pdf">
-            <input type="text" class="form-control" id="promocionPdf" placeholder="O ingrese la URL del PDF">
+            <input type="text" class="form-control" id="promocionPdf" placeholder="URL del PDF (opcional)">
             <div id="archivoEstadoPdf" class="mt-2 d-none"><span class="badge badge-pdf">PDF seleccionado</span></div>
             <div id="pdfPreview" class="mt-3 d-none">
               <div class="alert alert-info py-2 px-3 mb-0">
@@ -322,8 +322,7 @@ async function guardarPromocion(event) {
       pdfUrl = res.path;
     }
 
-    if (!imagenUrl) throw new Error('Debe seleccionar una imagen');
-
+    // Ya no requerimos la imagen
     const promocionId = document.getElementById('promocionId').value;
     const data = {
       titulo: document.getElementById('promocionTitulo').value,
