@@ -1,5 +1,6 @@
 ﻿<!DOCTYPE html>
 <html lang="es">
+
 <head>
 
   <!-- Reglas globales para botones outline (homogeneidad en todas las secciones) -->
@@ -11,14 +12,16 @@
       box-shadow: none;
       transition: background 0.15s, color 0.15s, box-shadow 0.15s;
     }
+
     .btn-outline-primary:hover,
     .btn-outline-primary:focus,
     .btn-outline-primary:active {
       color: #fff;
       background-color: #007bff;
       border-color: #007bff;
-      box-shadow: 0 4px 12px rgba(0,123,255,0.15);
+      box-shadow: 0 4px 12px rgba(0, 123, 255, 0.15);
     }
+
     .btn-outline-danger {
       color: #dc3545;
       background-color: #fff;
@@ -26,13 +29,14 @@
       box-shadow: none;
       transition: background 0.15s, color 0.15s, box-shadow 0.15s;
     }
+
     .btn-outline-danger:hover,
     .btn-outline-danger:focus,
     .btn-outline-danger:active {
       color: #fff;
       background-color: #dc3545;
       border-color: #dc3545;
-      box-shadow: 0 4px 12px rgba(220,53,69,0.15);
+      box-shadow: 0 4px 12px rgba(220, 53, 69, 0.15);
     }
   </style>
 
@@ -43,36 +47,40 @@
       min-width: 96px;
       padding: .45rem .7rem;
       font-size: .9rem;
-      box-shadow: 0 2px 4px rgba(0,0,0,.08);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, .08);
       transition: background 0.15s, color 0.15s, box-shadow 0.15s;
     }
+
     .testimonios-component .btn-outline-primary {
       color: #007bff;
       background-color: #fff;
       border: 1.5px solid #007bff;
       box-shadow: none;
     }
+
     .testimonios-component .btn-outline-primary:hover,
     .testimonios-component .btn-outline-primary:focus,
     .testimonios-component .btn-outline-primary:active {
       color: #fff;
       background-color: #007bff;
       border-color: #007bff;
-      box-shadow: 0 4px 12px rgba(0,123,255,0.15);
+      box-shadow: 0 4px 12px rgba(0, 123, 255, 0.15);
     }
+
     .testimonios-component .btn-outline-danger {
       color: #dc3545;
       background-color: #fff;
       border: 1.5px solid #dc3545;
       box-shadow: none;
     }
+
     .testimonios-component .btn-outline-danger:hover,
     .testimonios-component .btn-outline-danger:focus,
     .testimonios-component .btn-outline-danger:active {
       color: #fff;
       background-color: #dc3545;
       border-color: #dc3545;
-      box-shadow: 0 4px 12px rgba(220,53,69,0.15);
+      box-shadow: 0 4px 12px rgba(220, 53, 69, 0.15);
     }
   </style>
   <meta charset="utf-8">
@@ -93,7 +101,7 @@
   <!-- Helper centralizado para construir URLs de la API -->
   <script>
     // Código para mostrar/ocultar el botón de pasaje a producción
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
       const btnPasajeProduccion = document.querySelector('.btn-pasaje-produccion');
       if (window.env && window.env.ENTORNO === 'uat') {
         btnPasajeProduccion.style.display = 'block';
@@ -108,22 +116,22 @@
     }
 
     // Gestión básica de tokens
-    function getAccessToken(){ return localStorage.getItem('molpi_access_token'); }
-    function setAccessToken(t){ localStorage.setItem('molpi_access_token', t); }
-    function getRefreshToken(){ return localStorage.getItem('molpi_refresh_token'); }
-    function setRefreshToken(t){ localStorage.setItem('molpi_refresh_token', t); }
+    function getAccessToken() { return localStorage.getItem('molpi_access_token'); }
+    function setAccessToken(t) { localStorage.setItem('molpi_access_token', t); }
+    function getRefreshToken() { return localStorage.getItem('molpi_refresh_token'); }
+    function setRefreshToken(t) { localStorage.setItem('molpi_refresh_token', t); }
 
-    async function refreshTokenIfPossible(){
+    async function refreshTokenIfPossible() {
       const rt = getRefreshToken();
-      if(!rt) return false;
+      if (!rt) return false;
       try {
-        const r = await fetch(apiUrl('api/token/refresh'), { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ refresh_token: rt })});
-        if(!r.ok) return false;
+        const r = await molpiFetch('api/token/refresh', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ refresh_token: rt }) });
+        if (!r.ok) return false;
         const data = await r.json();
-        if(data.token) setAccessToken(data.token);
-        if(data.refresh_token) setRefreshToken(data.refresh_token);
+        if (data.token) setAccessToken(data.token);
+        if (data.refresh_token) setRefreshToken(data.refresh_token);
         return true;
-      } catch(e){ console.warn('No se pudo refrescar token', e); return false; }
+      } catch (e) { console.warn('No se pudo refrescar token', e); return false; }
     }
 
     // Wrapper fetch con Authorization y retry 401 una sola vez
@@ -131,16 +139,16 @@
       const finalUrl = path.startsWith('http') ? path : apiUrl(path);
       const headers = Object.assign({}, options.headers || {});
       const token = getAccessToken();
-      if(token) headers['Authorization'] = 'Bearer ' + token;
-      if(options.body && !(options.body instanceof FormData) && !headers['Content-Type']) {
+      if (token) headers['Authorization'] = 'Bearer ' + token;
+      if (options.body && !(options.body instanceof FormData) && !headers['Content-Type']) {
         headers['Content-Type'] = 'application/json';
       }
       let response = await fetch(finalUrl, { ...options, headers });
-      if(response.status === 401) {
+      if (response.status === 401) {
         const refreshed = await refreshTokenIfPossible();
-        if(refreshed) {
+        if (refreshed) {
           const newToken = getAccessToken();
-            if(newToken) headers['Authorization'] = 'Bearer ' + newToken;
+          if (newToken) headers['Authorization'] = 'Bearer ' + newToken;
           response = await fetch(finalUrl, { ...options, headers });
         }
       }
@@ -149,19 +157,19 @@
     window.molpiFetch = molpiFetch;
 
     // Función de login: espera {username, password} y guarda tokens si vienen
-    async function molpiLogin(username, password){
+    async function molpiLogin(username, password) {
       try {
-        const r = await fetch(apiUrl('login'), {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({username, password})});
-        const data = await r.json().catch(()=>({}));
-        if(!r.ok){ throw new Error(data.message || 'Credenciales inválidas'); }
-        if(data.token) setAccessToken(data.token);
-        if(data.refresh_token) setRefreshToken(data.refresh_token);
-        return { ok:true, data };
-      } catch(e){ return { ok:false, error: e.message }; }
+        const r = await fetch(apiUrl('login'), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username, password }) });
+        const data = await r.json().catch(() => ({}));
+        if (!r.ok) { throw new Error(data.message || 'Credenciales inválidas'); }
+        if (data.token) setAccessToken(data.token);
+        if (data.refresh_token) setRefreshToken(data.refresh_token);
+        return { ok: true, data };
+      } catch (e) { return { ok: false, error: e.message }; }
     }
     window.molpiLogin = molpiLogin;
 
-    function molpiLogout(){
+    function molpiLogout() {
       localStorage.removeItem('molpi_access_token');
       localStorage.removeItem('molpi_refresh_token');
       console.info('Logout realizado, tokens limpiados');
@@ -174,7 +182,7 @@
     body {
       font-family: 'Open Sans', sans-serif;
       margin: 0;
-  display: flex;
+      display: flex;
     }
 
     /* Estilos para botones de acciones minimalistas */
@@ -192,29 +200,29 @@
       align-items: center;
       justify-content: center;
     }
-    
+
     .btn-group .btn:hover {
       transform: translateY(-1px);
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
-    
+
     .btn-group .btn i {
       font-size: 0.95em;
       margin-right: 4px;
     }
-    
+
     .btn-outline-primary:hover {
       background-color: #007bff;
       border-color: #007bff;
       color: white;
     }
-    
+
     .btn-outline-danger:hover {
       background-color: #dc3545;
       border-color: #dc3545;
       color: white;
     }
-    
+
     .btn-outline-info:hover {
       background-color: #17a2b8;
       border-color: #17a2b8;
@@ -234,7 +242,7 @@
       max-width: 400px;
       margin-bottom: 10px;
       border-radius: 12px;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
       border: none;
       backdrop-filter: blur(10px);
       animation: slideInRight 0.4s ease-out;
@@ -257,7 +265,7 @@
 
     .custom-toast .toast-header {
       background: transparent;
-      border-bottom: 1px solid rgba(255,255,255,0.2);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
       color: inherit;
       padding: 12px 16px 8px;
     }
@@ -282,6 +290,7 @@
         transform: translateX(100%);
         opacity: 0;
       }
+
       to {
         transform: translateX(0);
         opacity: 1;
@@ -297,7 +306,7 @@
       left: 0;
       top: 0;
       padding: 30px 20px;
-      box-shadow: 2px 0 10px rgba(0,0,0,0.3);
+      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
       display: flex;
       flex-direction: column;
     }
@@ -307,7 +316,7 @@
       text-align: center;
       margin-bottom: 30px;
     }
-    
+
     .btn-pasaje-produccion {
       display: none;
       background-color: #28a745;
@@ -357,7 +366,7 @@
       background-color: #32495f;
       text-align: center;
       font-weight: bold;
-      border: 1px solid rgba(255,255,255,0.2);
+      border: 1px solid rgba(255, 255, 255, 0.2);
     }
 
     .sidebar a.exit-button:hover {
@@ -366,7 +375,8 @@
 
     .main-content {
       margin-left: 280px;
-      padding: 1.5rem 2rem; /* Padding más balanceado */
+      padding: 1.5rem 2rem;
+      /* Padding más balanceado */
       /* Asegurar que el contenido use todo el espacio disponible */
       width: auto;
       max-width: calc(100vw - 280px);
@@ -374,7 +384,8 @@
       overflow-x: auto;
       min-width: 0;
       background-color: #f8f9fa;
-      min-height: 100vh; /* Usar toda la altura de la pantalla */
+      min-height: 100vh;
+      /* Usar toda la altura de la pantalla */
     }
 
     /* Hacer responsivo el encabezado de tarjetas con título + botón */
@@ -382,18 +393,33 @@
       flex-wrap: wrap;
       gap: 0.5rem;
     }
+
     .card .card-header.d-flex .btn {
       white-space: nowrap;
     }
 
     /* Ajustar layout cuando la pantalla es más angosta */
     @media (max-width: 1200px) {
-      .sidebar { width: 240px; }
-      .main-content { margin-left: 240px; max-width: calc(100vw - 240px); }
+      .sidebar {
+        width: 240px;
+      }
+
+      .main-content {
+        margin-left: 240px;
+        max-width: calc(100vw - 240px);
+      }
     }
+
     @media (max-width: 992px) {
-      .sidebar { width: 220px; }
-      .main-content { margin-left: 220px; max-width: calc(100vw - 220px); padding: 24px; }
+      .sidebar {
+        width: 220px;
+      }
+
+      .main-content {
+        margin-left: 220px;
+        max-width: calc(100vw - 220px);
+        padding: 24px;
+      }
     }
 
     /* Estilos para tabla de productos */
@@ -409,17 +435,17 @@
       display: table-cell !important;
       visibility: visible !important;
     }
-    
+
     /* Ocultar columnas de precios SOLO en productos */
-    .productos-component .table th:nth-child(6), 
+    .productos-component .table th:nth-child(6),
     .productos-component .table td:nth-child(6),
-    .productos-component .table th:nth-child(7), 
+    .productos-component .table th:nth-child(7),
     .productos-component .table td:nth-child(7) {
       display: none !important;
     }
-    
+
     /* Asegurar espacio adecuado para la celda de acciones */
-    .table td:last-child, 
+    .table td:last-child,
     .table th:last-child {
       padding-left: 8px !important;
       padding-right: 8px !important;
@@ -431,21 +457,28 @@
 
 <body>
   <!-- Overlay de Login -->
-  <div id="loginOverlay" style="position:fixed;inset:0;background:linear-gradient(135deg,#0d1220,#1d2a44);display:none;align-items:center;justify-content:center;z-index:9999;font-family:'Open Sans',sans-serif;">
-    <div style="background:#ffffff12;backdrop-filter:blur(8px);padding:40px 36px;border-radius:16px;box-shadow:0 10px 30px -5px rgba(0,0,0,.5);width:100%;max-width:380px;color:#fff;">
+  <div id="loginOverlay"
+    style="position:fixed;inset:0;background:linear-gradient(135deg,#0d1220,#1d2a44);display:none;align-items:center;justify-content:center;z-index:9999;font-family:'Open Sans',sans-serif;">
+    <div
+      style="background:#ffffff12;backdrop-filter:blur(8px);padding:40px 36px;border-radius:16px;box-shadow:0 10px 30px -5px rgba(0,0,0,.5);width:100%;max-width:380px;color:#fff;">
       <h2 style="margin:0 0 8px;font-weight:600;letter-spacing:.5px;">Acceso Admin</h2>
       <p style="margin:0 0 28px;font-size:13px;opacity:.8;">Ingresá tus credenciales para administrar el contenido.</p>
       <form id="loginForm" autocomplete="off">
         <div style="margin-bottom:18px;">
           <label style="display:block;font-size:13px;margin-bottom:6px;opacity:.85;">Usuario</label>
-          <input id="loginUser" type="text" required style="width:100%;padding:10px 12px;border:1px solid #394967;background:#141d2c;color:#fff;border-radius:6px;font-size:14px;outline:none;">
+          <input id="loginUser" type="text" required
+            style="width:100%;padding:10px 12px;border:1px solid #394967;background:#141d2c;color:#fff;border-radius:6px;font-size:14px;outline:none;">
         </div>
         <div style="margin-bottom:10px;">
           <label style="display:block;font-size:13px;margin-bottom:6px;opacity:.85;">Contraseña</label>
-          <input id="loginPass" type="password" required style="width:100%;padding:10px 12px;border:1px solid #394967;background:#141d2c;color:#fff;border-radius:6px;font-size:14px;outline:none;">
+          <input id="loginPass" type="password" required
+            style="width:100%;padding:10px 12px;border:1px solid #394967;background:#141d2c;color:#fff;border-radius:6px;font-size:14px;outline:none;">
         </div>
-        <div id="loginError" style="display:none;margin:6px 0 14px;font-size:13px;color:#ff6b6b;background:#3d0f1f;border:1px solid #ff6b6b33;padding:8px 10px;border-radius:6px;"></div>
-        <button id="loginBtn" type="submit" style="width:100%;padding:11px 14px;background:#2d72ff;border:none;border-radius:8px;color:#fff;font-size:15px;font-weight:600;letter-spacing:.3px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;">
+        <div id="loginError"
+          style="display:none;margin:6px 0 14px;font-size:13px;color:#ff6b6b;background:#3d0f1f;border:1px solid #ff6b6b33;padding:8px 10px;border-radius:6px;">
+        </div>
+        <button id="loginBtn" type="submit"
+          style="width:100%;padding:11px 14px;background:#2d72ff;border:none;border-radius:8px;color:#fff;font-size:15px;font-weight:600;letter-spacing:.3px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;">
           <span>Ingresar</span>
         </button>
       </form>
@@ -469,7 +502,7 @@
       <i class="fa fa-rocket"></i> Pasaje a Producción
     </button>
     <!-- Botón de salir -->
-  <a href="index.html" class="exit-button">🚪 SALIR</a>
+    <a href="index.html" class="exit-button">🚪 SALIR</a>
   </div>
 
 
@@ -478,8 +511,8 @@
     <h1 class="text-danger">Panel de Administración de Molpi</h1>
     <p class="text-muted">Desde aquí podés editar contenido del sitio.</p>
   </div>
-  
-  
+
+
   <script>
     // Función para iniciar el pasaje a producción
     async function iniciarPasajeAProduccion() {
@@ -518,86 +551,86 @@
       const errorBox = document.getElementById('loginError');
       const loginBtn = document.getElementById('loginBtn');
 
-      function hideOverlay(){ if(overlay) overlay.style.display='none'; }
-      function showOverlay(){ if(overlay) overlay.style.display='flex'; }
-      function showError(msg){ if(!errorBox) return; errorBox.textContent = msg; errorBox.style.display='block'; }
-      function clearError(){ if(errorBox){ errorBox.style.display='none'; errorBox.textContent=''; } }
+      function hideOverlay() { if (overlay) overlay.style.display = 'none'; }
+      function showOverlay() { if (overlay) overlay.style.display = 'flex'; }
+      function showError(msg) { if (!errorBox) return; errorBox.textContent = msg; errorBox.style.display = 'block'; }
+      function clearError() { if (errorBox) { errorBox.style.display = 'none'; errorBox.textContent = ''; } }
 
-      async function attemptAuto(){
+      async function attemptAuto() {
         const token = localStorage.getItem('molpi_access_token');
-        if(!token){ 
+        if (!token) {
           console.log('No token found, showing login overlay');
-          showOverlay(); 
-          return; 
+          showOverlay();
+          return;
         }
-        
+
         console.log('Token found, attempting auto-login...');
         try {
           const r = await molpiFetch('api/me');
-          if(r.ok){ 
+          if (r.ok) {
             console.log('Auto-login successful, hiding overlay and initializing admin');
             hideOverlay();
-            inicializarAdminTrasLogin(); 
-          } else { 
+            inicializarAdminTrasLogin();
+          } else {
             console.log('Token invalid, showing login overlay');
             localStorage.removeItem('molpi_access_token');
-            showOverlay(); 
+            showOverlay();
           }
-        } catch (error) { 
+        } catch (error) {
           console.log('Auto-login failed:', error);
           localStorage.removeItem('molpi_access_token');
-          showOverlay(); 
+          showOverlay();
         }
       }
 
-      form.addEventListener('submit', async (e)=>{
+      form.addEventListener('submit', async (e) => {
         e.preventDefault(); clearError();
-        loginBtn.disabled = true; loginBtn.style.opacity='.6';
-        loginBtn.firstElementChild.textContent='Ingresando...';
+        loginBtn.disabled = true; loginBtn.style.opacity = '.6';
+        loginBtn.firstElementChild.textContent = 'Ingresando...';
         const u = userInput.value.trim(); const p = passInput.value;
-        const r = await molpiLogin(u,p);
-        if(r.ok){
+        const r = await molpiLogin(u, p);
+        if (r.ok) {
           console.log('Manual login successful, hiding overlay and initializing admin');
-          hideOverlay(); 
+          hideOverlay();
           inicializarAdminTrasLogin();
         } else {
           showError(r.error || 'Error de autenticación');
         }
-        loginBtn.disabled=false; loginBtn.style.opacity='1';
-        loginBtn.firstElementChild.textContent='Ingresar';
+        loginBtn.disabled = false; loginBtn.style.opacity = '1';
+        loginBtn.firstElementChild.textContent = 'Ingresar';
       });
 
       // Función que re-carga secciones protegidas tras login
       let _adminInitialized = false;
-      function inicializarAdminTrasLogin(){
-        if(_adminInitialized) return; // evitar duplicados
+      function inicializarAdminTrasLogin() {
+        if (_adminInitialized) return; // evitar duplicados
         _adminInitialized = true;
         console.log('Inicializando admin tras login...');
-        
+
         // Forzar hash a productos si no hay hash o está vacío
         const currentHash = window.location.hash ? window.location.hash.substring(1) : '';
-        if(!currentHash || currentHash === '') {
+        if (!currentHash || currentHash === '') {
           window.location.hash = 'productos';
         }
-        
+
         // Forzar carga de la sección actual
         setTimeout(() => {
           loadSectionFromHash();
-          molpiFetch('promociones/admin').catch(()=>{});
+          molpiFetch('promociones/admin').catch(() => { });
         }, 100);
       }
 
       attemptAuto();
-      
+
       const sidebarLinks = document.querySelectorAll("#adminSidebar a[data-section]");
       const contentArea = document.getElementById("adminContent");
-      
+
       // ========== FUNCIONES PARA NOTIFICACIONES TOAST ==========
-      
+
       function showToast(message, type = 'success', duration = 4000) {
         const toastContainer = document.getElementById('toastContainer');
         const toastId = 'toast-' + Date.now();
-        
+
         const toastHTML = `
           <div class="toast custom-toast ${type}" id="${toastId}" role="alert">
             <div class="toast-header">
@@ -613,32 +646,32 @@
             </div>
           </div>
         `;
-        
+
         toastContainer.insertAdjacentHTML('beforeend', toastHTML);
         const toastElement = document.getElementById(toastId);
-        
+
         // Mostrar el toast
         $(toastElement).toast({
           autohide: true,
           delay: duration
         });
         $(toastElement).toast('show');
-        
+
         // Eliminar el elemento del DOM después de que se oculte
-        $(toastElement).on('hidden.bs.toast', function() {
+        $(toastElement).on('hidden.bs.toast', function () {
           toastElement.remove();
         });
       }
-      
+
       // Funciones de conveniencia
       window.showSuccessToast = (message, duration = 4000) => showToast(message, 'success', duration);
       window.showErrorToast = (message, duration = 5000) => showToast(message, 'error', duration);
       window.showInfoToast = (message, duration = 4000) => showToast(message, 'info', duration);
-      
+
       // ========== FIN FUNCIONES TOAST ==========
-      
+
       // ========== FUNCIÓN PARA CONFIRMACIONES DE ELIMINACIÓN ==========
-      
+
       function showDeleteConfirmation(options = {}) {
         const {
           title = 'Confirmar eliminación',
@@ -646,108 +679,108 @@
           description = 'Esta acción no se puede deshacer. El elemento será eliminado permanentemente del sistema.',
           confirmText = 'Sí, eliminar',
           cancelText = 'Cancelar',
-          onConfirm = () => {},
+          onConfirm = () => { },
           itemName = ''
         } = options;
-        
+
         // Resetear estilos del modal a los valores por defecto (eliminación)
         const modal = document.getElementById('deleteConfirmModal');
         const header = modal.querySelector('.modal-header');
         const icon = modal.querySelector('.modal-body i');
         const confirmBtn = document.getElementById('confirmDeleteBtn');
-        
+
         header.className = 'modal-header bg-danger text-white';
         icon.style.color = '#dc3545';
         icon.className = 'fa fa-trash-o';
         confirmBtn.className = 'btn btn-danger ml-2';
-        
+
         // Actualizar contenido del modal
         document.getElementById('deleteConfirmModalLabel').innerHTML = `
           <i class="fa fa-exclamation-triangle mr-2"></i>${title}
         `;
-        document.getElementById('deleteConfirmMessage').textContent = itemName ? 
+        document.getElementById('deleteConfirmMessage').textContent = itemName ?
           `¿Estás seguro de eliminar ${itemName}?` : message;
         document.getElementById('deleteConfirmDescription').textContent = description;
         document.getElementById('confirmDeleteBtn').innerHTML = `
           <i class="fa fa-trash-o mr-1"></i> ${confirmText}
         `;
-        
+
         // Configurar evento de confirmación
         const newConfirmBtn = confirmBtn.cloneNode(true);
         confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
-        
-        newConfirmBtn.addEventListener('click', function() {
+
+        newConfirmBtn.addEventListener('click', function () {
           $('#deleteConfirmModal').modal('hide');
           onConfirm();
         });
-        
+
         // Mostrar modal
         $('#deleteConfirmModal').modal('show');
       }
-      
+
       // ========== FIN FUNCIÓN CONFIRMACIONES ==========
-      
+
       // ========== BOTÓN PASAJE A PRODUCCIÓN (UAT) ==========
       // Mostrar el botón solo si estamos en UAT
       if (window.location.hostname.startsWith('uat.') || (window.env && window.env.ENTORNO === 'uat')) {
         const btnPasaje = document.getElementById('btnPasajeProduccion');
         if (btnPasaje) {
           btnPasaje.style.display = 'block';
-          btnPasaje.addEventListener('click', function(e) {
+          btnPasaje.addEventListener('click', function (e) {
             e.preventDefault();
             if (confirm('¿Seguro que quieres promover los cambios de UAT a producción?\n\nEsto copiará toda la base de datos de UAT a producción.')) {
               // Llamar al endpoint de backend para promover
               fetch(apiUrl('/api/promover-a-produccion'), {
                 method: 'POST',
-                headers: { 
+                headers: {
                   'Content-Type': 'application/json',
                   'Authorization': 'Bearer ' + getAccessToken()
                 },
                 credentials: 'include'
               })
-              .then(resp => resp.json())
-              .then(data => {
-                if (data.success) {
-                  showSuccessToast('¡Pasaje a producción realizado exitosamente!');
-                } else {
-                  showErrorToast('Error en el pasaje: ' + (data.error || 'Desconocido'));
-                }
-              })
-              .catch(err => {
-                showErrorToast('Error de red: ' + err.message);
-              });
+                .then(resp => resp.json())
+                .then(data => {
+                  if (data.success) {
+                    showSuccessToast('¡Pasaje a producción realizado exitosamente!');
+                  } else {
+                    showErrorToast('Error en el pasaje: ' + (data.error || 'Desconocido'));
+                  }
+                })
+                .catch(err => {
+                  showErrorToast('Error de red: ' + err.message);
+                });
             }
           });
         }
       }
       // ========== FIN BOTÓN PASAJE A PRODUCCIÓN ==========
-      
+
       console.log('Found sidebar links:', sidebarLinks.length);
       console.log('Content area:', contentArea);
-sidebarLinks.forEach((link) => {
-  link.addEventListener("click", function (e) {
-    e.preventDefault();
-    const section = this.getAttribute("data-section");
-    console.log('Clicked section:', section);
-    // Solo actualizar el hash; el cargador real se ejecuta en loadSectionFromHash()
-    const current = window.location.hash ? window.location.hash.substring(1) : '';
-    if (current !== section) {
-      window.location.hash = section;
-    } else {
-      // Si el hash ya es el mismo, forzar recarga controlada
-      loadSectionFromHash();
-    }
-  });
-});
+      sidebarLinks.forEach((link) => {
+        link.addEventListener("click", function (e) {
+          e.preventDefault();
+          const section = this.getAttribute("data-section");
+          console.log('Clicked section:', section);
+          // Solo actualizar el hash; el cargador real se ejecuta en loadSectionFromHash()
+          const current = window.location.hash ? window.location.hash.substring(1) : '';
+          if (current !== section) {
+            window.location.hash = section;
+          } else {
+            // Si el hash ya es el mismo, forzar recarga controlada
+            loadSectionFromHash();
+          }
+        });
+      });
 
-// La carga por defecto se maneja ahora en loadSectionFromHash()
-// console.log('Cargando sección productos por defecto...');
-// loadProductosComponent();
+      // La carga por defecto se maneja ahora en loadSectionFromHash()
+      // console.log('Cargando sección productos por defecto...');
+      // loadProductosComponent();
 
-// Agregar estas funciones para cada sección
+      // Agregar estas funciones para cada sección
 
-function getClientesHTML() {
-  return `
+      function getClientesHTML() {
+        return `
     <h1 class="mb-4">Administrar Clientes / Logos</h1>
     <p class="text-muted">Agregá o modificá los logos de clientes que aparecen en la sección.</p>
     
@@ -774,7 +807,7 @@ function getClientesHTML() {
       </div>
     </div>
   `;
-}
+      }
 
       async function loadProductosComponent() {
         try {
@@ -786,13 +819,13 @@ function getClientesHTML() {
           const componentHTML = await response.text();
           contentArea.innerHTML = componentHTML;
           console.log('Productos component loaded successfully');
-          
+
           // Esperar un poco para que el DOM se actualice y luego inicializar
           setTimeout(() => {
             console.log('Iniciando carga de productos...');
             initComponenteProductos();
           }, 300);
-          
+
         } catch (error) {
           console.error('Error loading productos component:', error);
           contentArea.innerHTML = `
@@ -808,27 +841,27 @@ function getClientesHTML() {
       // Función para inicializar completamente el componente productos
       async function initComponenteProductos() {
         console.log('=== Iniciando componente productos ===');
-        
+
         // Verificar que estamos en la vista correcta
         const selectCategoria = document.getElementById('productoCategoria');
         const filtroCategoria = document.getElementById('filtroCategoria');
-        
+
         if (!selectCategoria || !filtroCategoria) {
           console.log('No estamos en la vista de productos, saltando inicialización');
           return;
         }
-        
-  // Variables del componente (usar la global 'categorias')
-  let productos = [];
-  categorias = [];
-  let productoEditando = null;
-        
+
+        // Variables del componente (usar la global 'categorias')
+        let productos = [];
+        categorias = [];
+        let productoEditando = null;
+
         // 1. Cargar categorías
         try {
           console.log('Cargando categorías...');
           const response = await fetch(apiUrl('categorias'));
           categorias = await response.json();
-          
+
           // Deduplicar por nombre
           const nombresCat = new Set();
           const categoriasUnicas = [];
@@ -841,23 +874,23 @@ function getClientesHTML() {
             selectCategoria.add(new Option(categoria.nombre, categoria.nombre));
           });
 
-            // Rellenar filtro de categorías
+          // Rellenar filtro de categorías
           filtroCategoria.innerHTML = '<option value="">Todas las categorías</option>';
           categorias.forEach(categoria => {
             filtroCategoria.add(new Option(categoria.nombre, categoria.nombre));
           });
-          
+
           console.log('Categorías cargadas:', categorias.length);
-          
+
           // El filtro de subcategorías se inicializa más abajo tras bindear listeners
         } catch (error) {
           console.error('Error cargando categorías:', error);
         }
-        
+
         // 2. Cargar productos
         try {
           console.log('Cargando productos...');
-          const response = await fetch(apiUrl('api/productos?incluir_inactivos=true'));
+         const response = await molpiFetch('api/productos?incluir_inactivos=true');
           const data = await response.json();
           productos = data.productos; // Asegura que el array global se actualiza
           mostrarProductos(productos);
@@ -869,12 +902,12 @@ function getClientesHTML() {
             tbody.innerHTML = '<tr><td colspan="9" class="text-center text-danger">Error al cargar productos</td></tr>';
           }
         }
-        
+
         // 3. Función para mostrar productos en la tabla
         function mostrarProductos(productosAMostrar) {
           const tbody = document.getElementById('tablaProductos');
           if (!tbody) return;
-          
+
           // Obtener la tabla completa y asegurar que tenga thead
           const tablaCompleta = tbody.closest('table');
           if (tablaCompleta) {
@@ -884,7 +917,7 @@ function getClientesHTML() {
               thead = document.createElement('thead');
               tablaCompleta.insertBefore(thead, tbody);
             }
-            
+
             // Asegurar que el thead tenga los títulos correctos
             thead.innerHTML = `
               <tr>
@@ -899,18 +932,18 @@ function getClientesHTML() {
                 <th style="min-width: 200px; width: 200px;">Acciones</th>
               </tr>
             `;
-            
+
             thead.style.display = 'table-header-group';
             console.log('✅ Thead creado/actualizado con títulos (función local)');
           }
-          
+
           tbody.innerHTML = '';
-          
+
           if (productosAMostrar.length === 0) {
             tbody.innerHTML = '<tr><td colspan="9" class="text-center">No hay productos para mostrar</td></tr>';
             return;
           }
-          
+
           productosAMostrar.forEach(producto => {
             const fila = document.createElement('tr');
             // Detectar si es un producto podotáctil
@@ -918,10 +951,10 @@ function getClientesHTML() {
             fila.innerHTML = `
               <td>${producto.id}</td>
               <td>
-                ${producto.imagen_url ? 
-                  `<img src="${producto.imagen_url}" alt="${producto.nombre}" style="width: 60px; height: 60px; object-fit: cover;" class="rounded" onerror="this.src='img/placeholder.png'; this.onerror=null;">` : 
-                  '<span class="text-muted">Sin imagen</span>'
-                }
+                ${producto.imagen_url ?
+                `<img src="${producto.imagen_url}" alt="${producto.nombre}" style="width: 60px; height: 60px; object-fit: cover;" class="rounded" onerror="this.src='img/placeholder.png'; this.onerror=null;">` :
+                '<span class="text-muted">Sin imagen</span>'
+              }
               </td>
               <td>
                 <strong>${producto.nombre}</strong>
@@ -939,70 +972,70 @@ function getClientesHTML() {
               </td>
               <td>
                 <div class="btn-group" role="group">
-                  ${esPodotactil ? 
-                    `<button class="btn btn-outline-primary btn-sm btn-editar-podotactil" data-id="${producto.id}" title="Editar">
+                  ${esPodotactil ?
+                `<button class="btn btn-outline-primary btn-sm btn-editar-podotactil" data-id="${producto.id}" title="Editar">
                       <i class="fa fa-edit"></i> Editar
                     </button>
                     <button class="btn btn-outline-danger btn-sm btn-eliminar" data-id="${producto.id}" title="Eliminar">
                       <i class="fa fa-trash"></i> Eliminar
                     </button>` :
-                    `<button class="btn btn-outline-primary btn-sm btn-editar" data-id="${producto.id}" title="Editar">
+                `<button class="btn btn-outline-primary btn-sm btn-editar" data-id="${producto.id}" title="Editar">
                       <i class="fa fa-edit"></i> Editar
                     </button>
                     <button class="btn btn-outline-danger btn-sm btn-eliminar" data-id="${producto.id}" title="Eliminar">
                       <i class="fa fa-trash"></i> Eliminar
                     </button>`
-                  }
+              }
                 </div>
               </td>
             `;
             tbody.appendChild(fila);
           });
-          
+
           // Configurar botones de editar y eliminar
           document.querySelectorAll('.btn-editar').forEach(btn => {
-            btn.addEventListener('click', function() {
+            btn.addEventListener('click', function () {
               const id = parseInt(this.dataset.id);
               editarProducto(id);
             });
           });
-          
+
           document.querySelectorAll('.btn-eliminar').forEach(btn => {
-            btn.addEventListener('click', function() {
+            btn.addEventListener('click', function () {
               const id = parseInt(this.dataset.id);
               eliminarProducto(id);
             });
           });
-          
+
           // Configurar botones de editar podotáctiles
           document.querySelectorAll('.btn-editar-podotactil').forEach(btn => {
-            btn.addEventListener('click', function() {
+            btn.addEventListener('click', function () {
               const id = parseInt(this.dataset.id);
               editarPodotactil(id);
             });
           });
         }
-        
+
         // 4. Función para filtrar productos
         async function filtrarProductos() {
           const filtroCategoria = document.getElementById('filtroCategoria');
           const filtroSubcategoria = document.getElementById('filtroSubcategoria');
           const buscarProducto = document.getElementById('buscarProducto');
-          
+
           const categoria = filtroCategoria ? filtroCategoria.value : '';
           const subcategoria = filtroSubcategoria ? filtroSubcategoria.value : '';
           const busqueda = buscarProducto ? buscarProducto.value.toLowerCase() : '';
-          
+
           // Si se está filtrando por categoría "Podotáctiles", cargar desde BD
           if (categoria === 'Podotáctiles') {
             try {
               // Cargar productos podotáctiles desde la base de datos (incluyendo inactivos)
               const response = await fetch(apiUrl('api/productos?incluir_inactivos=true'));
               const todosProductos = await response.json();
-              
+
               // Filtrar solo productos podotáctiles
               let productosPodotactiles = todosProductos.filter(p => p.categoria === 'Podotáctiles');
-              
+
               // Si no hay productos podotáctiles en la BD, crear los predefinidos
               if (productosPodotactiles.length === 0) {
                 const productosPredefinidos = [
@@ -1046,62 +1079,62 @@ function getClientesHTML() {
                     activo: 1
                   }
                 ];
-                
+
                 // Sincronizar productos predefinidos con la base de datos solo si no existen
                 await sincronizarPodotactilesConBD(productosPredefinidos);
-                
+
                 // Volver a cargar desde la BD para obtener los estados actuales
                 const responseRefresh = await fetch(apiUrl('api/productos?incluir_inactivos=true'));
                 const productosRefresh = await responseRefresh.json();
                 productosPodotactiles = productosRefresh.filter(p => p.categoria === 'Podotáctiles');
               }
-              
+
               // Aplicar filtros adicionales a los productos podotáctiles
               let productosFiltrados = productosPodotactiles;
-              
+
               if (subcategoria) {
                 productosFiltrados = productosFiltrados.filter(p => p.subcategoria === subcategoria);
               }
-              
+
               if (busqueda) {
-                productosFiltrados = productosFiltrados.filter(p => 
-                  p.nombre.toLowerCase().includes(busqueda) || 
+                productosFiltrados = productosFiltrados.filter(p =>
+                  p.nombre.toLowerCase().includes(busqueda) ||
                   (p.descripcion && p.descripcion.toLowerCase().includes(busqueda))
                 );
               }
-              
+
               // Actualizar el array global para que las funciones de edición funcionen
               productos = productosPodotactiles;
               mostrarProductos(productosFiltrados);
               return;
-              
+
             } catch (error) {
               console.error('Error cargando productos podotáctiles desde BD:', error);
               // En caso de error, usar comportamiento normal
             }
           }
-          
+
           // Para otras categorías, usar el comportamiento normal
           let productosFiltrados = productos;
-          
+
           if (categoria) {
             productosFiltrados = productosFiltrados.filter(p => p.categoria === categoria);
           }
-          
+
           if (subcategoria) {
             productosFiltrados = productosFiltrados.filter(p => p.subcategoria === subcategoria);
           }
-          
+
           if (busqueda) {
-            productosFiltrados = productosFiltrados.filter(p => 
-              p.nombre.toLowerCase().includes(busqueda) || 
+            productosFiltrados = productosFiltrados.filter(p =>
+              p.nombre.toLowerCase().includes(busqueda) ||
               (p.descripcion && p.descripcion.toLowerCase().includes(busqueda))
             );
           }
-          
+
           mostrarProductos(productosFiltrados);
         }
-        
+
         // Función para limpiar campos de archivo y estados visuales
         function limpiarCamposArchivo() {
           // Limpiar archivos del modal principal de productos
@@ -1111,7 +1144,7 @@ function getClientesHTML() {
           const archivoEstadoMosaico = document.getElementById('archivoEstadoMosaico');
           const productoImagen = document.getElementById('productoImagen');
           const productoImagenMosaico = document.getElementById('productoImagenMosaico');
-          
+
           if (productoImagenFile) {
             productoImagenFile.value = '';
           }
@@ -1130,7 +1163,7 @@ function getClientesHTML() {
           if (productoImagenMosaico) {
             productoImagenMosaico.placeholder = 'O ingrese la URL de la imagen del mosaico';
           }
-          
+
           // Limpiar archivos del modal de podotáctiles
           const podotactilImagenMoldeFile = document.getElementById('podotactilImagenMoldeFile');
           const podotactilImagenMosaicoFile = document.getElementById('podotactilImagenMosaicoFile');
@@ -1138,7 +1171,7 @@ function getClientesHTML() {
           const archivoEstadoMosaicoPodotactil = document.getElementById('archivoEstadoMosaicoPodotactil');
           const podotactilImagenMolde = document.getElementById('podotactilImagenMolde');
           const podotactilImagenMosaico = document.getElementById('podotactilImagenMosaico');
-          
+
           if (podotactilImagenMoldeFile) {
             podotactilImagenMoldeFile.value = '';
           }
@@ -1158,64 +1191,64 @@ function getClientesHTML() {
             podotactilImagenMosaico.placeholder = 'O ingrese la URL de la imagen del mosaico';
           }
         }
-        
+
         // 5. Función para mostrar modal de nuevo producto
         function mostrarModalProducto() {
           productoEditando = null;
           const modalTitle = document.getElementById('modalProductoTitle');
           const formProducto = document.getElementById('formProducto');
           const productoId = document.getElementById('productoId');
-          
+
           if (modalTitle) modalTitle.textContent = 'Nuevo Producto';
           if (formProducto) formProducto.reset();
           if (productoId) productoId.value = '';
-          
+
           // Limpiar campos de archivo y estados
           limpiarCamposArchivo();
-          
+
           mostrarVistaPrevia('', '');
-          
+
           // Configurar vista previa del modal
           configurarVistasPrevia();
-          
+
           if (typeof $ !== 'undefined' && $('#modalProducto').length) {
             $('#modalProducto').modal('show');
             // Configurar event listeners después de que el modal se muestre
-            $('#modalProducto').on('shown.bs.modal', function() {
+            $('#modalProducto').on('shown.bs.modal', function () {
               configurarEventListenersModal();
             });
           }
         }
-        
+
         // 6. Función para mostrar vista previa de imagen (molde y mosaico)
         function mostrarVistaPrevia(urlMolde, urlMosaico = '') {
           const vistasIndividuales = document.getElementById('vistasIndividuales');
           const sinImagen = document.getElementById('sinImagen');
-          
+
           // Elementos individuales
           const soloMolde = document.getElementById('soloMolde');
           const soloMosaico = document.getElementById('soloMosaico');
           const sinMosaico = document.getElementById('sinMosaico');
-          
+
           if (!vistasIndividuales || !sinImagen) return;
-          
+
           // Si no hay URL del molde, no mostrar nada
           if (!urlMolde || urlMolde.trim() === '') {
             vistasIndividuales.style.display = 'none';
             sinImagen.style.display = 'block';
             return;
           }
-          
+
           // Mostrar las vistas
           vistasIndividuales.style.display = 'block';
           sinImagen.style.display = 'none';
-          
+
           // Configurar imagen del molde
           if (soloMolde) {
             soloMolde.src = urlMolde;
             soloMolde.style.display = 'block';
           }
-          
+
           // Configurar imagen del mosaico
           if (urlMosaico && urlMosaico.trim() !== '') {
             // Hay mosaico
@@ -1235,60 +1268,60 @@ function getClientesHTML() {
               sinMosaico.style.display = 'block';
             }
           }
-          
+
           // Manejar errores de carga
           if (soloMolde) {
-            soloMolde.onerror = function() {
+            soloMolde.onerror = function () {
               vistasIndividuales.style.display = 'none';
               sinImagen.style.display = 'block';
             };
           }
-          
+
           if (soloMosaico) {
-            soloMosaico.onerror = function() {
+            soloMosaico.onerror = function () {
               soloMosaico.style.display = 'none';
               sinMosaico.style.display = 'block';
             };
           }
         }
-        
+
         // Función para configurar las vistas previas del modal
         function configurarVistasPrevia() {
           const productoImagen = document.getElementById('productoImagen');
           const productoImagenMosaico = document.getElementById('productoImagenMosaico');
-          
+
           if (productoImagen) {
-            productoImagen.addEventListener('input', function() {
+            productoImagen.addEventListener('input', function () {
               actualizarVistaPreviaModal();
             });
           }
-          
+
           if (productoImagenMosaico) {
-            productoImagenMosaico.addEventListener('input', function() {
+            productoImagenMosaico.addEventListener('input', function () {
               actualizarVistaPreviaModal();
             });
           }
-          
+
           // Actualizar vista previa inicial
           actualizarVistaPreviaModal();
         }
-        
+
         // Función para actualizar la vista previa del modal
         function actualizarVistaPreviaModal() {
           const urlMolde = document.getElementById('productoImagen')?.value || '';
           const urlMosaico = document.getElementById('productoImagenMosaico')?.value || '';
-          
+
           const previewMolde = document.getElementById('previewMolde');
           const previewMoldeEmpty = document.getElementById('previewMoldeEmpty');
           const previewMosaico = document.getElementById('previewMosaico');
           const previewMosaicoEmpty = document.getElementById('previewMosaicoEmpty');
-          
+
           // Mostrar/ocultar imagen del molde
           if (urlMolde && urlMolde.trim() !== '') {
             if (previewMolde) {
               previewMolde.src = urlMolde;
               previewMolde.style.display = 'block';
-              previewMolde.onerror = function() {
+              previewMolde.onerror = function () {
                 this.style.display = 'none';
                 if (previewMoldeEmpty) previewMoldeEmpty.style.display = 'flex';
               };
@@ -1298,13 +1331,13 @@ function getClientesHTML() {
             if (previewMolde) previewMolde.style.display = 'none';
             if (previewMoldeEmpty) previewMoldeEmpty.style.display = 'flex';
           }
-          
+
           // Mostrar/ocultar imagen del mosaico
           if (urlMosaico && urlMosaico.trim() !== '') {
             if (previewMosaico) {
               previewMosaico.src = urlMosaico;
               previewMosaico.style.display = 'block';
-              previewMosaico.onerror = function() {
+              previewMosaico.onerror = function () {
                 this.style.display = 'none';
                 if (previewMosaicoEmpty) previewMosaicoEmpty.style.display = 'flex';
               };
@@ -1315,11 +1348,11 @@ function getClientesHTML() {
             if (previewMosaicoEmpty) previewMosaicoEmpty.style.display = 'flex';
           }
         }
-        
-    // 7. Función para cargar subcategorías SOLO en el modal (no toca el filtro global)
-    async function cargarSubcategorias(categoriaParaFiltro = null) {
+
+        // 7. Función para cargar subcategorías SOLO en el modal (no toca el filtro global)
+        async function cargarSubcategorias(categoriaParaFiltro = null) {
           try {
-            const categoriasBackend = categorias && categorias.length ? categorias : await fetch(apiUrl('categorias')).then(r=>r.json());
+            const categoriasBackend = categorias && categorias.length ? categorias : await fetch(apiUrl('categorias')).then(r => r.json());
             if (!categorias || categorias.length === 0) categorias = categoriasBackend;
 
             // Obtener subcategorías según filtro directamente desde la DB para evitar duplicados
@@ -1330,7 +1363,7 @@ function getClientesHTML() {
             }
             const todasSubcategorias = await fetch(apiUrl(endpoint)).then(r => r.json());
 
-      // 7. Modal de producto (select id=productoSubcategoria)
+            // 7. Modal de producto (select id=productoSubcategoria)
             const categoriaSeleccionadaModal = document.getElementById('productoCategoria')?.value;
             const selectModal = document.getElementById('productoSubcategoria');
             if (selectModal) {
@@ -1355,7 +1388,7 @@ function getClientesHTML() {
             console.error('Error cargarSubcategorias unificada:', e);
           }
         }
-        
+
         // 7b. Función para actualizar filtro de subcategorías
         async function actualizarFiltroSubcategorias() {
           // Evitar condiciones de carrera: solo la última llamada aplica cambios
@@ -1371,7 +1404,7 @@ function getClientesHTML() {
               const categoriaObj = categorias.find(c => c.nombre === categoriaValue);
               if (categoriaObj) endpoint += `?categoria_id=${categoriaObj.id}`;
             }
-            const lista = await fetch(apiUrl(endpoint)).then(r=>r.json());
+            const lista = await fetch(apiUrl(endpoint)).then(r => r.json());
             // Si otra llamada más reciente inició después, abortar aplicar cambios
             if (seq !== window._subcatSeq) return;
 
@@ -1390,33 +1423,33 @@ function getClientesHTML() {
               }
             });
             if (!categoriaValue || categoriaValue === 'Podotáctiles') {
-              if (!nombres.has('discapacidad') && !existentes.has('discapacidad')) filtroSubcategoria.appendChild(new Option('Discapacidad','Discapacidad'));
+              if (!nombres.has('discapacidad') && !existentes.has('discapacidad')) filtroSubcategoria.appendChild(new Option('Discapacidad', 'Discapacidad'));
             }
           } catch (e) {
             console.error('Error actualizarFiltroSubcategorias dedupe:', e);
           }
         }
-  // Exponer funciones clave globalmente (compatibilidad con atributos inline existentes)
-  window.actualizarFiltroSubcategorias = actualizarFiltroSubcategorias;
-  window.cargarSubcategorias = cargarSubcategorias;
-        
+        // Exponer funciones clave globalmente (compatibilidad con atributos inline existentes)
+        window.actualizarFiltroSubcategorias = actualizarFiltroSubcategorias;
+        window.cargarSubcategorias = cargarSubcategorias;
+
         // 8. Función para guardar producto
         async function guardarProducto() {
           const formProducto = document.getElementById('formProducto');
           if (!formProducto) return;
-          
+
           const btn = document.querySelector('#modalProducto .btn-primary[form="formProducto"]');
           const originalText = btn ? btn.innerHTML : '';
-          
+
           try {
             if (btn) {
               btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Guardando...';
               btn.disabled = true;
             }
-            
+
             let imagenUrl = document.getElementById('productoImagen').value;
             let imagenMosaicoUrl = document.getElementById('productoImagenMosaico').value;
-            
+
             // Determinar la URL de subida según entorno
             const uploadUrl = (window.env && window.env.API_URL) ? `${window.env.API_URL}/upload/producto` : '/upload/producto';
 
@@ -1453,27 +1486,29 @@ function getClientesHTML() {
                 throw new Error('Error subiendo imagen del mosaico: ' + uploadResult.error);
               }
             }
-            
+
             const formData = new FormData(formProducto);
             const productoData = Object.fromEntries(formData);
-            
+
             // Sobrescribir URLs de imagen con las subidas
             if (imagenUrl) productoData.imagen_url = imagenUrl;
             if (imagenMosaicoUrl) productoData.imagen_mosaico_url = imagenMosaicoUrl;
-            
+
             const url = productoEditando ? `/productos/${productoEditando}` : '/productos';
             const method = productoEditando ? 'PUT' : 'POST';
-            
+
+            const token = localStorage.getItem('token');
             const response = await fetch(url, {
-              method: method,
+              method: 'POST', // o 'PUT', 'DELETE'
               headers: {
                 'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token
               },
-              body: JSON.stringify(productoData)
+              body: JSON.stringify(data)
             });
-            
+
             const result = await response.json();
-            
+
             if (response.ok) {
               if (typeof $ !== 'undefined' && $('#modalProducto').length) {
                 $('#modalProducto').modal('hide');
@@ -1499,7 +1534,7 @@ function getClientesHTML() {
             }
           }
         }
-        
+
         // 9. Función para editar producto
         // 9. Función para editar producto
         function editarProducto(id) {
@@ -1510,9 +1545,9 @@ function getClientesHTML() {
             console.error('[DEBUG editarProducto] Producto no encontrado para id:', id);
             return;
           }
-          
+
           productoEditando = id;
-          
+
           const modalTitle = document.getElementById('modalProductoTitle');
           const productoIdInput = document.getElementById('productoId');
           const productoNombre = document.getElementById('productoNombre');
@@ -1523,7 +1558,7 @@ function getClientesHTML() {
           const productoImagen = document.getElementById('productoImagen');
           const productoImagenMosaico = document.getElementById('productoImagenMosaico');
           const productoPdf = document.getElementById('productoPdf');
-          
+
           if (modalTitle) modalTitle.textContent = 'Editar Producto';
           if (productoIdInput) productoIdInput.value = producto.id;
           if (productoNombre) productoNombre.value = producto.nombre;
@@ -1531,15 +1566,15 @@ function getClientesHTML() {
           if (productoCategoria) productoCategoria.value = producto.categoria;
           if (productoPrecio) productoPrecio.value = producto.precio || '';
           if (productoPrecioUsd) productoPrecioUsd.value = producto.precio_usd || '';
-          
+
           // Establecer el estado del producto (activo/inactivo)
           console.log('=== CONFIGURANDO CAMPO ESTADO ===');
           console.log('Producto:', producto.nombre);
           console.log('Estado del producto:', producto.activo);
-          
+
           // Buscar el campo Estado tanto en el modal principal como en el componente
           let productoEstado = document.getElementById('productoEstado');
-          
+
           if (!productoEstado) {
             console.log('Campo Estado no encontrado en modal principal, buscando en componente...');
             // Buscar en el componente productos
@@ -1548,26 +1583,26 @@ function getClientesHTML() {
               productoEstado = componenteProductos.querySelector('#productoEstado');
             }
           }
-          
+
           if (productoEstado) {
             console.log('✅ Campo Estado encontrado');
-            
+
             // Establecer el valor del campo Estado
             const estadoValor = producto.activo !== undefined ? producto.activo : 1;
             productoEstado.value = estadoValor;
-            
+
             console.log('Valor establecido en campo Estado:', estadoValor);
             console.log('Campo Estado después de asignar:', productoEstado.value);
-            
+
           } else {
             console.error('❌ Campo Estado NO encontrado ni en modal principal ni en componente');
             console.log('Elementos disponibles:', document.querySelectorAll('select[name="activo"], #productoEstado'));
           }
-          
+
           if (productoImagen) productoImagen.value = producto.imagen_url || '';
           if (productoImagenMosaico) productoImagenMosaico.value = producto.imagen_mosaico_url || '';
           if (productoPdf) productoPdf.value = producto.pdf_url || '';
-          
+
           // Cargar subcategorías y seleccionar la correcta
           cargarSubcategorias().then(() => {
             const productoSubcategoria = document.getElementById('productoSubcategoria');
@@ -1575,73 +1610,77 @@ function getClientesHTML() {
               productoSubcategoria.value = producto.subcategoria;
             }
           });
-          
+
           mostrarVistaPrevia(producto.imagen_url || '', producto.imagen_mosaico_url || '');
-          
+
           // Configurar listeners para vista previa en tiempo real
           configurarVistasPrevia();
-          
+
           if (typeof $ !== 'undefined' && $('#modalProducto').length) {
             $('#modalProducto').modal('show');
             // Configurar event listeners después de que el modal se muestre
-            $('#modalProducto').on('shown.bs.modal', function() {
+            $('#modalProducto').on('shown.bs.modal', function () {
               configurarEventListenersModal();
             });
           }
         }
-  // Exponer global para handlers inline existentes
-  window.editarProducto = editarProducto;
-        
+        // Exponer global para handlers inline existentes
+        window.editarProducto = editarProducto;
+
         // 10. Función para eliminar producto
         async function eliminarProducto(id) {
           const producto = productos.find(p => p.id === id);
           const nombreProducto = producto ? producto.nombre : `el producto #${id}`;
-          
+
           showDeleteConfirmation({
             title: 'Confirmar eliminación',
             itemName: nombreProducto,
             description: 'Esta acción no se puede deshacer. El producto será eliminado permanentemente del sistema.',
             onConfirm: async () => {
               try {
-                const response = await molpiFetch(`productos/${id}`, {
-                  method: 'DELETE'
+                const token = localStorage.getItem('token');
+                const response = await fetch(`${window.env.API_URL}/productos/${id}`, {
+                  method: 'DELETE',
+                  headers: {
+                    'Authorization': 'Bearer ' + token
+                  }
                 });
-                
+
                 if (response.ok) {
                   console.log('✅ Eliminación exitosa en el servidor');
-                  
+
                   // Verificar el estado del filtro actual
                   const filtroCategoria = document.getElementById('filtroCategoria');
                   const categoriaActual = filtroCategoria ? filtroCategoria.value : '';
-                  
+
                   // Detectar si estamos usando el filtro rápido de Podotáctiles
                   const currentFilter = window.currentFilter || '';
                   const botonPodotactilesActivo = document.querySelector('#filtroPodotactiles.active');
-                  
+
                   console.log(`🔍 Filtro actual: "${currentFilter}"`);
                   console.log(`🔍 Categoría dropdown: "${categoriaActual}"`);
                   console.log('🔍 Botón Podotáctiles activo:', !!botonPodotactilesActivo);
-                  
-                  const estamosEnPodotactiles = currentFilter === 'Podotáctiles' || 
-                                               categoriaActual === 'Podotáctiles' || 
-                                               !!botonPodotactilesActivo;
-                  
+
+                  const estamosEnPodotactiles = currentFilter === 'Podotáctiles' ||
+                    categoriaActual === 'Podotáctiles' ||
+                    !!botonPodotactilesActivo;
+
                   console.log('🎯 ¿Estamos en podotáctiles?', estamosEnPodotactiles);
-                  
+
                   if (estamosEnPodotactiles) {
                     console.log('🔄 Recargando vista de podotáctiles...');
-                    
+
                     // Forzar recarga desde servidor para podotáctiles (incluyendo inactivos)
                     const response2 = await fetch(apiUrl('api/productos?incluir_inactivos=true'));
                     const todosProductos = await response2.json();
                     const productosPodotactiles = todosProductos.filter(p => p.categoria === 'Podotáctiles');
-                    
+
                     console.log('📦 Productos podotáctiles desde servidor:', productosPodotactiles.length);
-                    console.log('📦 Productos después de eliminar:', productosPodotactiles.map(p => ({id: p.id, nombre: p.nombre, activo: p.activo})));
-                    
+                    console.log('📦 Productos después de eliminar:', productosPodotactiles.map(p => ({ id: p.id, nombre: p.nombre, activo: p.activo })));
+
                     // Actualizar array global
                     productos = productosPodotactiles;
-                    
+
                     // Mostrar todos los podotáctiles (activos e inactivos)
                     mostrarProductos(productosPodotactiles);
                   } else {
@@ -1650,7 +1689,7 @@ function getClientesHTML() {
                     const response2 = await fetch(apiUrl('api/productos?incluir_inactivos=true'));
                     let data2 = await response2.json();
                     productos = Array.isArray(data2) ? data2 : (data2.productos || []);
-                    
+
                     if (categoriaActual && categoriaActual !== '') {
                       // Si hay un filtro activo, aplicarlo
                       await filtrarProductos();
@@ -1659,7 +1698,7 @@ function getClientesHTML() {
                       mostrarProductos(productos);
                     }
                   }
-                  
+
                   showSuccessToast('🗑️ Producto eliminado exitosamente');
                 } else {
                   showErrorToast('Error al eliminar el producto');
@@ -1671,9 +1710,9 @@ function getClientesHTML() {
             }
           });
         }
-  // Exponer global
-  window.eliminarProducto = eliminarProducto;
-        
+        // Exponer global
+        window.eliminarProducto = eliminarProducto;
+
         // 11. Funciones para manejar productos podotáctiles
         function editarPodotactil(id) {
           // Buscar el producto podotáctil
@@ -1682,7 +1721,7 @@ function getClientesHTML() {
             showErrorToast('Producto no encontrado');
             return;
           }
-          
+
           // Llenar el modal con los datos del producto
           document.getElementById('podotactilId').value = producto.id;
           document.getElementById('podotactilNombre').value = producto.nombre;
@@ -1690,27 +1729,27 @@ function getClientesHTML() {
           document.getElementById('podotactilImagenMolde').value = producto.imagen_url || '';
           document.getElementById('podotactilImagenMosaico').value = producto.imagen_mosaico_url || '';
           document.getElementById('podotactilActivo').value = producto.activo ? '1' : '0';
-          
+
           // Configurar event listeners para vista previa en tiempo real
           const inputMolde = document.getElementById('podotactilImagenMolde');
           const inputMosaico = document.getElementById('podotactilImagenMosaico');
-          
+
           if (inputMolde) {
             inputMolde.removeEventListener('input', actualizarVistaPreviaPodotactil);
             inputMolde.addEventListener('input', actualizarVistaPreviaPodotactil);
           }
-          
+
           if (inputMosaico) {
             inputMosaico.removeEventListener('input', actualizarVistaPreviaPodotactil);
             inputMosaico.addEventListener('input', actualizarVistaPreviaPodotactil);
           }
-          
+
           // Actualizar vista previa inicial
           actualizarVistaPreviaPodotactil();
-          
+
           // Mostrar el modal
           $('#modalEditarPodotactil').modal('show');
-          
+
           // Log para debugging
           console.log('Editando producto podotáctil:', {
             id: producto.id,
@@ -1720,45 +1759,45 @@ function getClientesHTML() {
             activo: producto.activo
           });
         }
-        
+
         function actualizarVistaPreviaPodotactil() {
           const urlMolde = document.getElementById('podotactilImagenMolde')?.value || '';
           const urlMosaico = document.getElementById('podotactilImagenMosaico')?.value || '';
-          
+
           const vistasIndividuales = document.getElementById('vistasIndividualesPodotactil');
           const sinImagen = document.getElementById('sinImagenPodotactil');
           const moldeImg = document.getElementById('podotactilMoldeImg');
           const mosaicoImg = document.getElementById('podotactilMosaicoImg');
           const sinMosaico = document.getElementById('sinMosaicoPodotactil');
-          
+
           // Si no hay URL del molde, no mostrar nada
           if (!urlMolde || urlMolde.trim() === '') {
             if (vistasIndividuales) vistasIndividuales.style.display = 'none';
             if (sinImagen) sinImagen.style.display = 'block';
             return;
           }
-          
+
           // Mostrar las vistas
           if (vistasIndividuales) vistasIndividuales.style.display = 'block';
           if (sinImagen) sinImagen.style.display = 'none';
-          
+
           // Configurar imagen del molde
           if (moldeImg) {
             moldeImg.src = urlMolde;
             moldeImg.style.display = 'block';
-            moldeImg.onerror = function() {
+            moldeImg.onerror = function () {
               this.src = 'img/placeholder.png';
               console.log('Error cargando imagen molde:', urlMolde);
             };
           }
-          
+
           // Configurar imagen del mosaico
           if (urlMosaico && urlMosaico.trim() !== '') {
             // Hay mosaico
             if (mosaicoImg) {
               mosaicoImg.src = urlMosaico;
               mosaicoImg.style.display = 'block';
-              mosaicoImg.onerror = function() {
+              mosaicoImg.onerror = function () {
                 this.src = 'img/placeholder.png';
                 console.log('Error cargando imagen mosaico:', urlMosaico);
               };
@@ -1770,7 +1809,7 @@ function getClientesHTML() {
             if (sinMosaico) sinMosaico.style.display = 'block';
           }
         }
-        
+
         async function guardarPodotactil() {
           const id = parseInt(document.getElementById('podotactilId').value);
           const nombre = document.getElementById('podotactilNombre').value;
@@ -1778,32 +1817,32 @@ function getClientesHTML() {
           let imagenMolde = document.getElementById('podotactilImagenMolde').value;
           let imagenMosaico = document.getElementById('podotactilImagenMosaico').value;
           const activo = parseInt(document.getElementById('podotactilActivo').value);
-          
+
           if (!nombre || !descripcion) {
             showErrorToast('Por favor completa todos los campos requeridos');
             return;
           }
-          
+
           const btn = document.querySelector('#modalEditarPodotactil .btn-primary[form="formEditarPodotactil"]');
           const originalText = btn ? btn.innerHTML : '';
-          
+
           try {
             if (btn) {
               btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Guardando...';
               btn.disabled = true;
             }
-            
+
             // Subir archivo de imagen del molde si existe
             const fileInputMolde = document.getElementById('podotactilImagenMoldeFile');
             if (fileInputMolde && fileInputMolde.files.length > 0) {
               const formData = new FormData();
               formData.append('file', fileInputMolde.files[0]);
-              
+
               const uploadResponse = await fetch(apiUrl('/upload/producto'), {
                 method: 'POST',
                 body: formData
               });
-              
+
               const uploadResult = await uploadResponse.json();
               if (uploadResponse.ok) {
                 imagenMolde = uploadResult.path;
@@ -1811,18 +1850,18 @@ function getClientesHTML() {
                 throw new Error('Error subiendo imagen del molde: ' + uploadResult.error);
               }
             }
-            
+
             // Subir archivo de imagen del mosaico si existe
             const fileInputMosaico = document.getElementById('podotactilImagenMosaicoFile');
             if (fileInputMosaico && fileInputMosaico.files.length > 0) {
               const formData = new FormData();
               formData.append('file', fileInputMosaico.files[0]);
-              
+
               const uploadResponse = await fetch(apiUrl('/upload/producto'), {
                 method: 'POST',
                 body: formData
               });
-              
+
               const uploadResult = await uploadResponse.json();
               if (uploadResponse.ok) {
                 imagenMosaico = uploadResult.path;
@@ -1830,7 +1869,7 @@ function getClientesHTML() {
                 throw new Error('Error subiendo imagen del mosaico: ' + uploadResult.error);
               }
             }
-            
+
             // Preparar datos para enviar al servidor
             const productoData = {
               id: id,
@@ -1845,7 +1884,7 @@ function getClientesHTML() {
               pdf_url: '',
               activo: activo
             };
-            
+
             // Enviar al servidor
             const response = await molpiFetch(`productos/${id}`, {
               method: 'PUT',
@@ -1854,22 +1893,22 @@ function getClientesHTML() {
               },
               body: JSON.stringify(productoData)
             });
-            
+
             if (response.ok) {
               // También actualizar localmente
               const index = productos.findIndex(p => p.id === id);
               if (index !== -1) {
                 productos[index] = productoData;
               }
-              
+
               // Actualizar la vista
               mostrarProductos(productos);
-              
+
               // Cerrar modal
               $('#modalEditarPodotactil').modal('hide');
-              
+
               showSuccessToast('Producto podotáctil actualizado exitosamente en base de datos');
-              
+
               console.log('Producto podotáctil guardado en BD:', productoData);
             } else {
               throw new Error('Error del servidor al guardar');
@@ -1884,17 +1923,17 @@ function getClientesHTML() {
             }
           }
         }
-        
+
         async function togglePodotactil(id) {
           const producto = productos.find(p => p.id === id);
           if (!producto) {
             showErrorToast('Producto no encontrado');
             return;
           }
-          
+
           const nuevoEstado = !producto.activo;
           const accion = nuevoEstado ? 'activar' : 'desactivar';
-          
+
           try {
             // Enviar solo el campo activo que queremos cambiar (como en promociones)
             const productoData = {
@@ -1909,7 +1948,7 @@ function getClientesHTML() {
               precio_usd: producto.precio_usd,
               activo: nuevoEstado ? 1 : 0  // Solo cambiamos el estado activo
             };
-            
+
             const response = await molpiFetch(`productos/${id}`, {
               method: 'PUT',
               headers: {
@@ -1917,12 +1956,12 @@ function getClientesHTML() {
               },
               body: JSON.stringify(productoData)
             });
-            
+
             if (response.ok) {
               // Recargar productos desde la base de datos para reflejar el cambio
               const response2 = await fetch(apiUrl('api/productos?incluir_inactivos=true'));
               const todosProductos = await response2.json();
-              
+
               // Actualizar el producto en el array local
               const index = productos.findIndex(p => p.id === id);
               if (index !== -1) {
@@ -1932,12 +1971,12 @@ function getClientesHTML() {
                   productos[index] = productoActualizado;
                 }
               }
-              
+
               // Actualizar la vista con los productos actuales
               mostrarProductos(productos);
-              
+
               showSuccessToast(`✅ Producto "${producto.nombre}" ${nuevoEstado ? 'activado' : 'desactivado'} exitosamente`);
-              
+
               console.log(`Producto podotáctil ${accion}:`, productoData);
             } else {
               throw new Error(`Error del servidor al ${accion}`);
@@ -1947,14 +1986,14 @@ function getClientesHTML() {
             showErrorToast(`Error al ${accion} el producto`);
           }
         }
-        
+
         // Función para sincronizar productos podotáctiles con la base de datos
         async function sincronizarPodotactilesConBD(productosPodotactiles) {
           try {
             for (const producto of productosPodotactiles) {
               // Verificar si el producto existe en la base de datos
               const response = await molpiFetch(`productos/${producto.id}`);
-              
+
               if (response.status === 404) {
                 // El producto no existe, crearlo
                 const createResponse = await fetch(apiUrl('productos'), {
@@ -1964,7 +2003,7 @@ function getClientesHTML() {
                   },
                   body: JSON.stringify(producto)
                 });
-                
+
                 if (createResponse.ok) {
                   console.log(`Producto podotáctil ${producto.nombre} creado en BD`);
                 } else {
@@ -1973,12 +2012,12 @@ function getClientesHTML() {
               } else if (response.ok) {
                 // El producto existe, verificar si necesita actualización
                 const productoExistente = await response.json();
-                
+
                 // Solo actualizar si las descripciones o imágenes son diferentes
                 if (productoExistente.descripcion !== producto.descripcion ||
-                    productoExistente.imagen_url !== producto.imagen_url ||
-                    productoExistente.imagen_mosaico_url !== producto.imagen_mosaico_url) {
-                  
+                  productoExistente.imagen_url !== producto.imagen_url ||
+                  productoExistente.imagen_mosaico_url !== producto.imagen_mosaico_url) {
+
                   const updateResponse = await molpiFetch(`productos/${producto.id}`, {
                     method: 'PUT',
                     headers: {
@@ -1991,7 +2030,7 @@ function getClientesHTML() {
                       imagen_mosaico_url: producto.imagen_mosaico_url
                     })
                   });
-                  
+
                   if (updateResponse.ok) {
                     console.log(`Producto podotáctil ${producto.nombre} actualizado en BD`);
                   }
@@ -2002,15 +2041,15 @@ function getClientesHTML() {
             console.error('Error sincronizando productos podotáctiles:', error);
           }
         }
-        
+
         // 12. Configurar event listeners
         const btnNuevoProducto = document.getElementById('btnNuevoProducto');
         if (btnNuevoProducto) {
-          btnNuevoProducto.addEventListener('click', function() {
+          btnNuevoProducto.addEventListener('click', function () {
             mostrarModalProducto();
           });
         }
-        
+
         // Event listeners para los filtros
         const filtroCategoriaElement = document.getElementById('filtroCategoria');
         const filtroSubcategoria = document.getElementById('filtroSubcategoria');
@@ -2019,10 +2058,10 @@ function getClientesHTML() {
         const filtro40x40 = document.getElementById('filtro40x40');
         const filtro50x50 = document.getElementById('filtro50x50');
         const filtroPodotactiles = document.getElementById('filtroPodotactiles');
-        
+
         // Event listeners básicos para filtros
         if (filtroCategoriaElement) {
-          filtroCategoriaElement.addEventListener('change', async function() {
+          filtroCategoriaElement.addEventListener('change', async function () {
             console.log('🔄 Cambio de categoría detectado:', this.value);
             await actualizarFiltroSubcategorias();
             filtrarProductos();
@@ -2031,26 +2070,26 @@ function getClientesHTML() {
         if (filtroSubcategoria) {
           filtroSubcategoria.addEventListener('change', filtrarProductos);
         }
-        
+
         if (buscarProducto) {
           buscarProducto.addEventListener('input', filtrarProductos);
         }
-        
-  // Inicializar filtro de subcategorías una sola vez
-  await actualizarFiltroSubcategorias();
 
-  // Event listeners para filtros rápidos
-        
+        // Inicializar filtro de subcategorías una sola vez
+        await actualizarFiltroSubcategorias();
+
+        // Event listeners para filtros rápidos
+
         if (filtro20x20) {
-          filtro20x20.addEventListener('click', async function() {
+          filtro20x20.addEventListener('click', async function () {
             try {
               // Actualizar botones activos
               document.querySelectorAll('.btn-group .btn').forEach(btn => btn.classList.remove('active'));
               this.classList.add('active');
-              
+
               // Establecer filtro actual
               window.currentFilter = '20x20';
-              
+
               // Cargar productos específicos de línea 20x20
               const response = await fetch(apiUrl('productos/linea/20x20'));
               if (response.ok) {
@@ -2066,17 +2105,17 @@ function getClientesHTML() {
             }
           });
         }
-        
+
         if (filtro40x40) {
-          filtro40x40.addEventListener('click', async function() {
+          filtro40x40.addEventListener('click', async function () {
             try {
               // Actualizar botones activos
               document.querySelectorAll('.btn-group .btn').forEach(btn => btn.classList.remove('active'));
               this.classList.add('active');
-              
+
               // Establecer filtro actual
               window.currentFilter = '40x40';
-              
+
               // Cargar productos específicos de zócalos 40x40
               const response = await fetch(apiUrl('productos/linea/40x40'));
               if (response.ok) {
@@ -2092,17 +2131,17 @@ function getClientesHTML() {
             }
           });
         }
-        
+
         if (filtro50x50) {
-          filtro50x50.addEventListener('click', async function() {
+          filtro50x50.addEventListener('click', async function () {
             try {
               // Actualizar botones activos
               document.querySelectorAll('.btn-group .btn').forEach(btn => btn.classList.remove('active'));
               this.classList.add('active');
-              
+
               // Establecer filtro actual
               window.currentFilter = '50x50';
-              
+
               // Cargar productos específicos de zócalos 50x50
               const response = await fetch(apiUrl('productos/linea/50x50'));
               if (response.ok) {
@@ -2118,24 +2157,24 @@ function getClientesHTML() {
             }
           });
         }
-        
+
         if (filtroPodotactiles) {
-          filtroPodotactiles.addEventListener('click', async function() {
+          filtroPodotactiles.addEventListener('click', async function () {
             try {
               // Actualizar botones activos
               document.querySelectorAll('.btn-group .btn').forEach(btn => btn.classList.remove('active'));
               this.classList.add('active');
-              
+
               // Cargar productos podotáctiles desde la base de datos
               const response = await fetch(apiUrl('productos?incluir_inactivos=true'));
               if (response.ok) {
                 const todosLosProductos = await response.json();
                 let productosPodotactiles = todosLosProductos.filter(p => p.categoria === 'Podotáctiles');
-                
+
                 // Si no hay productos podotáctiles en la BD, crear los predefinidos
                 if (productosPodotactiles.length === 0) {
                   console.log('📝 No se encontraron productos podotáctiles, creando predefinidos...');
-                  
+
                   const productosPredefinidos = [
                     {
                       id: 200,
@@ -2177,42 +2216,42 @@ function getClientesHTML() {
                       activo: 1
                     }
                   ];
-                  
+
                   // Sincronizar productos predefinidos con la base de datos
                   await sincronizarPodotactilesConBD(productosPredefinidos);
-                  
+
                   // Volver a cargar desde la BD para obtener los productos creados
                   const responseRefresh = await fetch(apiUrl('productos?incluir_inactivos=true'));
                   const productosRefresh = await responseRefresh.json();
                   productosPodotactiles = productosRefresh.filter(p => p.categoria === 'Podotáctiles');
-                  
+
                   console.log('✅ Productos podotáctiles creados y cargados:', productosPodotactiles.length);
                 }
-                
+
                 // Guardar estado de filtro actual
                 window.currentFilter = 'Podotáctiles';
-                
+
                 productos = productosPodotactiles;
                 mostrarProductos(productos);
-                
+
                 console.log('🏃‍♂️ Filtro Podotáctiles aplicado, productos cargados:', productosPodotactiles);
               } else {
                 throw new Error('Error al cargar productos desde la base de datos');
               }
-              
+
             } catch (error) {
               console.error('Error mostrando productos podotáctiles:', error);
               showErrorToast('Error al mostrar productos podotáctiles');
             }
           });
         }
-        
+
         // Configurar cambio de categoria en el modal
         const productoCategoria = document.getElementById('productoCategoria');
         if (productoCategoria) {
           productoCategoria.addEventListener('change', cargarSubcategorias);
         }
-        
+
         // Configurar vista previa de imágenes (molde y mosaico)
         function actualizarVistaPrevia() {
           const productoImagen = document.getElementById('productoImagen');
@@ -2221,26 +2260,26 @@ function getClientesHTML() {
           const urlMosaico = productoImagenMosaico ? productoImagenMosaico.value : '';
           mostrarVistaPrevia(urlMolde, urlMosaico);
         }
-        
+
         // Configurar event listeners después de que el modal se cargue
         function configurarEventListenersModal() {
           const productoImagen = document.getElementById('productoImagen');
           const productoImagenMosaico = document.getElementById('productoImagenMosaico');
-          
+
           if (productoImagen) {
             productoImagen.removeEventListener('input', actualizarVistaPrevia); // Remover listener anterior si existe
             productoImagen.addEventListener('input', actualizarVistaPrevia);
           }
-          
+
           if (productoImagenMosaico) {
             productoImagenMosaico.removeEventListener('input', actualizarVistaPrevia); // Remover listener anterior si existe
             productoImagenMosaico.addEventListener('input', actualizarVistaPrevia);
           }
-          
+
           // Event listeners para archivos de imagen del molde
           const productoImagenFile = document.getElementById('productoImagenFile');
           if (productoImagenFile) {
-            productoImagenFile.addEventListener('change', function() {
+            productoImagenFile.addEventListener('change', function () {
               const file = this.files[0];
               if (file) {
                 if (!file.type.startsWith('image/')) {
@@ -2253,13 +2292,13 @@ function getClientesHTML() {
                   this.value = '';
                   return;
                 }
-                
+
                 document.getElementById('archivoEstadoMolde').style.display = 'block';
                 document.getElementById('productoImagen').placeholder = 'Archivo: ' + file.name;
-                
+
                 // Mostrar vista previa
                 const reader = new FileReader();
-                reader.onload = function(e) {
+                reader.onload = function (e) {
                   const urlMolde = e.target.result;
                   const urlMosaico = document.getElementById('productoImagenMosaico').value;
                   mostrarVistaPrevia(urlMolde, urlMosaico);
@@ -2268,11 +2307,11 @@ function getClientesHTML() {
               }
             });
           }
-          
+
           // Event listeners para archivos de imagen del mosaico  
           const productoImagenMosaicoFile = document.getElementById('productoImagenMosaicoFile');
           if (productoImagenMosaicoFile) {
-            productoImagenMosaicoFile.addEventListener('change', function() {
+            productoImagenMosaicoFile.addEventListener('change', function () {
               const file = this.files[0];
               if (file) {
                 if (!file.type.startsWith('image/')) {
@@ -2285,13 +2324,13 @@ function getClientesHTML() {
                   this.value = '';
                   return;
                 }
-                
+
                 document.getElementById('archivoEstadoMosaico').style.display = 'block';
                 document.getElementById('productoImagenMosaico').placeholder = 'Archivo: ' + file.name;
-                
+
                 // Mostrar vista previa
                 const reader = new FileReader();
-                reader.onload = function(e) {
+                reader.onload = function (e) {
                   const urlMolde = document.getElementById('productoImagen').value || '';
                   const urlMosaico = e.target.result;
                   mostrarVistaPrevia(urlMolde, urlMosaico);
@@ -2300,11 +2339,11 @@ function getClientesHTML() {
               }
             });
           }
-          
+
           // Event listeners para archivos de podotáctiles
           const podotactilImagenMoldeFile = document.getElementById('podotactilImagenMoldeFile');
           if (podotactilImagenMoldeFile) {
-            podotactilImagenMoldeFile.addEventListener('change', function() {
+            podotactilImagenMoldeFile.addEventListener('change', function () {
               const file = this.files[0];
               if (file) {
                 if (!file.type.startsWith('image/')) {
@@ -2317,13 +2356,13 @@ function getClientesHTML() {
                   this.value = '';
                   return;
                 }
-                
+
                 document.getElementById('archivoEstadoMoldePodotactil').style.display = 'block';
                 document.getElementById('podotactilImagenMolde').placeholder = 'Archivo: ' + file.name;
-                
+
                 // Mostrar vista previa
                 const reader = new FileReader();
-                reader.onload = function(e) {
+                reader.onload = function (e) {
                   const podotactilMoldeImg = document.getElementById('podotactilMoldeImg');
                   if (podotactilMoldeImg) {
                     podotactilMoldeImg.src = e.target.result;
@@ -2335,10 +2374,10 @@ function getClientesHTML() {
               }
             });
           }
-          
+
           const podotactilImagenMosaicoFile = document.getElementById('podotactilImagenMosaicoFile');
           if (podotactilImagenMosaicoFile) {
-            podotactilImagenMosaicoFile.addEventListener('change', function() {
+            podotactilImagenMosaicoFile.addEventListener('change', function () {
               const file = this.files[0];
               if (file) {
                 if (!file.type.startsWith('image/')) {
@@ -2351,13 +2390,13 @@ function getClientesHTML() {
                   this.value = '';
                   return;
                 }
-                
+
                 document.getElementById('archivoEstadoMosaicoPodotactil').style.display = 'block';
                 document.getElementById('podotactilImagenMosaico').placeholder = 'Archivo: ' + file.name;
-                
+
                 // Mostrar vista previa
                 const reader = new FileReader();
-                reader.onload = function(e) {
+                reader.onload = function (e) {
                   const podotactilMosaicoImg = document.getElementById('podotactilMosaicoImg');
                   const sinMosaicoPodotactil = document.getElementById('sinMosaicoPodotactil');
                   if (podotactilMosaicoImg && sinMosaicoPodotactil) {
@@ -2371,26 +2410,26 @@ function getClientesHTML() {
             });
           }
         }
-        
+
         // Configurar formulario
         const formProducto = document.getElementById('formProducto');
         if (formProducto) {
-          formProducto.addEventListener('submit', function(e) {
+          formProducto.addEventListener('submit', function (e) {
             e.preventDefault();
             guardarProducto();
           });
         }
-        
+
         // Configurar formulario de podotáctiles
         const formEditarPodotactil = document.getElementById('formEditarPodotactil');
         if (formEditarPodotactil) {
-          formEditarPodotactil.addEventListener('submit', function(e) {
+          formEditarPodotactil.addEventListener('submit', function (e) {
             e.preventDefault();
             guardarPodotactil();
           });
         }
-        
-  // La inicialización de productos ya se realiza en initComponenteProductos()
+
+        // La inicialización de productos ya se realiza en initComponenteProductos()
 
         console.log('=== Componente productos inicializado correctamente ===');
       }
@@ -2480,14 +2519,14 @@ function getClientesHTML() {
 
       function initProductosScript() {
         console.log('initProductosScript called - loading data directly');
-        
+
         // Cargar categorías, subcategorías y productos
-  cargarCategorias();
-  // Inicializar subcategorías del filtro sin duplicar
-  // (evitar repoblado redundante)
+        cargarCategorias();
+        // Inicializar subcategorías del filtro sin duplicar
+        // (evitar repoblado redundante)
         cargarProductos();
       }
-      
+
       // Funciones del ABM de productos
       function cargarCategorias() {
         fetch(apiUrl('categorias'))
@@ -2495,7 +2534,7 @@ function getClientesHTML() {
           .then(categoriasData => {
             // Guardar categorías en variable global
             categorias = categoriasData;
-            
+
             const selectCategoria = document.getElementById('filtroCategoria');
             if (selectCategoria) {
               // Limpiar primero para evitar acumulación
@@ -2508,8 +2547,8 @@ function getClientesHTML() {
                   }
                 });
                 // Agregar especial si falta
-                if (![...opcionesExistentes].includes('Podotáctiles') && !categorias.some(c=>c.nombre==='Podotáctiles')) {
-                  selectCategoria.appendChild(new Option('Podotáctiles','Podotáctiles'));
+                if (![...opcionesExistentes].includes('Podotáctiles') && !categorias.some(c => c.nombre === 'Podotáctiles')) {
+                  selectCategoria.appendChild(new Option('Podotáctiles', 'Podotáctiles'));
                 }
                 selectCategoria.dataset._llenadoCategorias = '1';
               }
@@ -2517,19 +2556,19 @@ function getClientesHTML() {
           })
           .catch(error => console.error('Error cargando categorías:', error));
       }
-      
-  // (Definición duplicada de cargarSubcategorias eliminada; ahora se usa la versión unificada superior)
-      
+
+      // (Definición duplicada de cargarSubcategorias eliminada; ahora se usa la versión unificada superior)
+
       // Variables para evitar cargas múltiples
       let cargandoProductos = false;
       let filtrandoProductos = false;
       let categorias = []; // Variable global para categorías
-      
+
       function cargarProductos() {
         if (cargandoProductos) return;
         cargandoProductos = true;
-        
-  fetch(apiUrl('productos'))
+
+        fetch(apiUrl('productos'))
           .then(response => response.json())
           .then(data => {
             console.log('Datos recibidos:', data);
@@ -2552,14 +2591,14 @@ function getClientesHTML() {
             cargandoProductos = false;
           });
       }
-      
+
       function mostrarProductos(productos) {
         const tabla = document.getElementById('tablaProductos');
         if (!tabla) {
           console.error('No se encontró el elemento tablaProductos');
           return;
         }
-        
+
         // Obtener la tabla completa y asegurar que tenga thead
         const tablaCompleta = tabla.closest('table');
         if (tablaCompleta) {
@@ -2569,7 +2608,7 @@ function getClientesHTML() {
             thead = document.createElement('thead');
             tablaCompleta.insertBefore(thead, tabla);
           }
-          
+
           // Asegurar que el thead tenga los títulos correctos
           thead.innerHTML = `
             <tr>
@@ -2584,42 +2623,42 @@ function getClientesHTML() {
               <th style="min-width: 200px; width: 200px;">Acciones</th>
             </tr>
           `;
-          
+
           thead.style.display = 'table-header-group';
           console.log('✅ Thead creado/actualizado con títulos');
         }
-        
+
         // Limpiar tabla explícitamente
         tabla.innerHTML = '';
-        
+
         // Validar que productos sea un array
         if (!Array.isArray(productos)) {
           console.error('Error: productos no es un array:', productos);
           tabla.innerHTML = '<tr><td colspan="9" class="text-center text-danger">Error: formato de datos incorrecto</td></tr>';
           return;
         }
-        
+
         console.log('Mostrando productos:', productos.length);
         if (productos.length > 0) {
           console.log('Primer producto:', productos[0]);
         }
-        
+
         if (productos.length === 0) {
           tabla.innerHTML = '<tr><td colspan="9" class="text-center">No hay productos disponibles</td></tr>';
           return;
         }
-        
+
         // Crear filas de productos de manera más segura
         const filas = productos.map(producto => `
           <tr>
             <td>${producto.id}</td>
             <td>
-              ${producto.imagen_url ? 
-                `<img src="${producto.imagen_url}" alt="${producto.nombre}" 
+              ${producto.imagen_url ?
+            `<img src="${producto.imagen_url}" alt="${producto.nombre}" 
                      style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px; border: 1px solid #ddd;" 
-                     onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'60\\' height=\\'60\\' viewBox=\\'0 0 24 24\\' fill=\\'%23ccc\\'%3E%3Cpath d=\\'M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z\\'/%3E%3C/svg%3E'; this.title='Error cargando imagen';">` : 
-                '<div style="width: 60px; height: 60px; background: #f8f9fa; border: 1px solid #ddd; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #6c757d; font-size: 12px;">Sin imagen</div>'
-              }
+                     onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'60\\' height=\\'60\\' viewBox=\\'0 0 24 24\\' fill=\\'%23ccc\\'%3E%3Cpath d=\\'M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z\\'/%3E%3C/svg%3E'; this.title='Error cargando imagen';">` :
+            '<div style="width: 60px; height: 60px; background: #f8f9fa; border: 1px solid #ddd; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #6c757d; font-size: 12px;">Sin imagen</div>'
+          }
             </td>
             <td><strong>${producto.nombre}</strong></td>
             <td><span class="badge badge-info">${producto.categoria || 'Sin categoría'}</span></td>
@@ -2639,24 +2678,24 @@ function getClientesHTML() {
             </td>
           </tr>
         `).join('');
-        
+
         tabla.innerHTML = filas;
       }
-      
+
       function filtrarProductos() {
         if (filtrandoProductos) return;
         filtrandoProductos = true;
-        
+
         // Obtener valores de los filtros
         const categoria = document.getElementById('filtroCategoria').value;
         const subcategoria = document.getElementById('filtroSubcategoria').value;
         const linea = document.getElementById('filtroLinea').value;
         const busqueda = document.getElementById('buscarProducto').value.toLowerCase();
-        
+
         console.log('🔍 Filtrando productos:', { categoria, subcategoria, linea, busqueda });
-        
+
         // Cargar productos y aplicar filtros
-  fetch(apiUrl('productos'))
+        fetch(apiUrl('productos'))
           .then(response => response.json())
           .then(data => {
             console.log('📦 Datos recibidos:', data);
@@ -2664,7 +2703,7 @@ function getClientesHTML() {
             const productos = Array.isArray(data) ? data : (data.productos || []);
             console.log('📦 Productos procesados:', productos.length);
             let productosFiltrados = productos;
-            
+
             // Filtrar por categoría
             if (categoria && categoria !== '') {
               productosFiltrados = productosFiltrados.filter(p => {
@@ -2674,32 +2713,32 @@ function getClientesHTML() {
               });
               console.log(`📊 Después de filtrar por categoría "${categoria}": ${productosFiltrados.length} productos`);
             }
-            
+
             // Filtrar por subcategoría
             if (subcategoria && subcategoria !== '') {
-              productosFiltrados = productosFiltrados.filter(p => 
+              productosFiltrados = productosFiltrados.filter(p =>
                 p.subcategoria === subcategoria
               );
               console.log(`📊 Después de filtrar por subcategoría "${subcategoria}": ${productosFiltrados.length} productos`);
             }
-            
+
             // Filtrar por línea de mosaicos
             if (linea && linea !== '') {
-              productosFiltrados = productosFiltrados.filter(p => 
+              productosFiltrados = productosFiltrados.filter(p =>
                 p.subcategoria === linea
               );
               console.log(`📊 Después de filtrar por línea "${linea}": ${productosFiltrados.length} productos`);
             }
-            
+
             // Filtrar por búsqueda de texto
             if (busqueda && busqueda !== '') {
-              productosFiltrados = productosFiltrados.filter(p => 
+              productosFiltrados = productosFiltrados.filter(p =>
                 p.nombre.toLowerCase().includes(busqueda) ||
                 (p.descripcion && p.descripcion.toLowerCase().includes(busqueda))
               );
               console.log(`📊 Después de filtrar por búsqueda "${busqueda}": ${productosFiltrados.length} productos`);
             }
-            
+
             console.log(`✅ Productos filtrados: ${productosFiltrados.length} de ${productos.length}`);
             mostrarProductos(productosFiltrados);
           })
@@ -2710,25 +2749,25 @@ function getClientesHTML() {
             filtrandoProductos = false;
           });
       }
-      
-  function limpiarFiltros() {
+
+      function limpiarFiltros() {
         console.log('🧹 Limpiando filtros...');
         document.getElementById('filtroCategoria').value = '';
         document.getElementById('filtroSubcategoria').value = '';
         document.getElementById('filtroLinea').value = '';
         document.getElementById('buscarProducto').value = '';
-  // Repoblar subcategorías según todas las categorías (sin duplicados)
-  actualizarFiltroSubcategorias();
+        // Repoblar subcategorías según todas las categorías (sin duplicados)
+        actualizarFiltroSubcategorias();
         cargarProductos(); // Cargar todos los productos
       }
-      
-  // Eliminado: versiones antiguas de mostrarModalProducto/editarProducto/eliminarProducto
+
+      // Eliminado: versiones antiguas de mostrarModalProducto/editarProducto/eliminarProducto
 
       // ========= Componente de Promociones =========
       async function loadPromocionesComponent() {
         try {
           console.log('Loading promociones component...');
-          
+
           contentArea.innerHTML = `
             <div class="admin-header mb-4">
               <h1 style="font-size: 2.2rem;"><i class="fa fa-bullhorn mr-3"></i> Gestión de Promociones</h1>
@@ -2850,22 +2889,22 @@ function getClientesHTML() {
               </div>
             </div>
           `;
-          
+
           // Insertar modal en el DOM
           document.body.insertAdjacentHTML('beforeend', modalHTML);
-          
+
           // Configurar event listeners del modal
           configurarEventListenersModal();
-          
+
           function configurarEventListenersModal() {
             // Vista previa de imagen
             const inputImagen = document.getElementById('promocionImagen');
             const inputImagenFile = document.getElementById('promocionImagenFile');
             const previewImagen = document.getElementById('previewImagenPromocion');
             const vistaPrevia = document.getElementById('vistaPreviaPromocion');
-            
+
             if (inputImagen) {
-              inputImagen.addEventListener('input', function() {
+              inputImagen.addEventListener('input', function () {
                 if (this.value) {
                   previewImagen.src = this.value;
                   vistaPrevia.style.display = 'block';
@@ -2874,12 +2913,12 @@ function getClientesHTML() {
                 }
               });
             }
-            
+
             if (inputImagenFile) {
-              inputImagenFile.addEventListener('change', function() {
+              inputImagenFile.addEventListener('change', function () {
                 if (this.files && this.files[0]) {
                   const reader = new FileReader();
-                  reader.onload = function(e) {
+                  reader.onload = function (e) {
                     previewImagen.src = e.target.result;
                     vistaPrevia.style.display = 'block';
                     // Limpiar URL manual si se selecciona archivo
@@ -2889,50 +2928,50 @@ function getClientesHTML() {
                 }
               });
             }
-            
+
             // Manejar envío del formulario
             const formPromocion = document.getElementById('formPromocion');
             if (formPromocion) {
-              formPromocion.addEventListener('submit', function(e) {
+              formPromocion.addEventListener('submit', function (e) {
                 e.preventDefault();
                 guardarPromocion();
               });
             }
-            
+
             // Limpiar modal al cerrarse
-            $('#modalPromocion').on('hidden.bs.modal', function() {
+            $('#modalPromocion').on('hidden.bs.modal', function () {
               limpiarModalPromocion();
             });
           }
-          
+
           function limpiarModalPromocion() {
             const form = document.getElementById('formPromocion');
             if (form) form.reset();
-            
+
             document.getElementById('promocionId').value = '';
             document.getElementById('modalPromocionLabel').textContent = 'Nueva Promoción';
             document.getElementById('vistaPreviaPromocion').style.display = 'none';
-            
+
             const btnGuardar = document.getElementById('btnGuardarPromocion');
             if (btnGuardar) {
               btnGuardar.innerHTML = '<i class="fa fa-save"></i> Guardar Promoción';
             }
           }
-          
+
           // Funciones de promociones integradas
-          window.renderPromocionRow = function(promocion) {
+          window.renderPromocionRow = function (promocion) {
             console.log('🔍 Renderizando promoción ID:', promocion.id, 'Título:', promocion.titulo);
-            
+
             // Construir HTML por partes para debugging
             const imagenUrl = promocion.imagen || 'img/placeholder.jpg';
-            const estadoBadge = promocion.activo ? 
-              '<span class="badge badge-success">Activo</span>' : 
+            const estadoBadge = promocion.activo ?
+              '<span class="badge badge-success">Activo</span>' :
               '<span class="badge badge-secondary">Inactivo</span>';
-            
-            const fechaCreacion = promocion.fecha_creacion ? 
-              new Date(promocion.fecha_creacion).toLocaleDateString() : 
+
+            const fechaCreacion = promocion.fecha_creacion ?
+              new Date(promocion.fecha_creacion).toLocaleDateString() :
               'Sin fecha';
-            
+
             // Construir cada celda individualmente
             const celda1 = `<td><img src="${imagenUrl}" alt="Promoción" style="width: 50px; height: 50px; object-fit: cover;" onerror="this.src='img/placeholder.jpg'"></td>`;
             const celda2 = `<td><strong>${promocion.titulo || 'Sin título'}</strong></td>`;
@@ -2949,17 +2988,17 @@ function getClientesHTML() {
                 </button>
               </div>
             </td>`;
-            
+
             const html = `<tr>${celda1}${celda2}${celda3}${celda4}${celda5}${celda6}</tr>`;
-            
+
             console.log('✅ Celda 6 (Acciones):', celda6);
             console.log('✅ HTML completo de la fila:', html);
             console.log('✅ Número de celdas TD:', (html.match(/<td/g) || []).length);
-            
+
             return html;
           };
 
-          window.cargarPromociones = async function() {
+          window.cargarPromociones = async function () {
             try {
               console.log('🔄 Cargando promociones...');
               const tbody = document.getElementById('promocionesTableBody');
@@ -2967,11 +3006,11 @@ function getClientesHTML() {
                 console.error('❌ No se encontró tbody promocionesTableBody');
                 return;
               }
-              
+
               console.log('📡 Haciendo fetch a /promociones/admin...');
               const response = await molpiFetch('promociones/admin');
               console.log('📡 Response status:', response.status);
-              
+
               if (!response.ok) {
                 console.log('⚠️ Response no OK, intentando con datos de prueba...');
                 // Si falla, usar datos de prueba para mostrar la tabla
@@ -2998,7 +3037,7 @@ function getClientesHTML() {
                 console.log('🔍 HTML completo generado:', htmlGenerado);
                 console.log('🔍 Longitud del HTML:', htmlGenerado.length);
                 tbody.innerHTML = htmlGenerado;
-                
+
                 // Verificar después de insertar
                 setTimeout(() => {
                   console.log('🔍 Verificando después de insertar...');
@@ -3011,10 +3050,10 @@ function getClientesHTML() {
                     console.log('🔍 Última celda:', ultimaCelda ? ultimaCelda.outerHTML : 'NO ENCONTRADA');
                   }
                 }, 100);
-                
+
                 return;
               }
-              
+
               const promociones = await response.json();
               console.log('📦 Promociones recibidas:', promociones);
               console.log('📦 Tipo de datos:', typeof promociones, Array.isArray(promociones));
@@ -3022,16 +3061,16 @@ function getClientesHTML() {
                 console.log('📦 Primera promoción:', promociones[0]);
                 console.log('📦 Campos disponibles:', Object.keys(promociones[0]));
               }
-              
+
               tbody.innerHTML = (promociones && promociones.length)
                 ? promociones.map(renderPromocionRow).join('')
                 : '<tr><td colspan="6" class="text-center text-muted">No hay promociones registradas</td></tr>';
-                
+
               console.log('✅ Promociones cargadas exitosamente, HTML generado:', tbody.innerHTML.length + ' caracteres');
               console.log('🔍 HTML generado:', tbody.innerHTML);
               console.log('🔍 Elemento tbody:', tbody);
               console.log('🔍 ¿Tbody está visible?', tbody.offsetHeight > 0);
-              
+
               // Verificar número de columnas en el HTML generado
               const firstRow = tbody.querySelector('tr');
               if (firstRow) {
@@ -3041,7 +3080,7 @@ function getClientesHTML() {
                   console.log(`🔍 Columna ${index}:`, col.outerHTML.substring(0, 100) + '...');
                 });
               }
-              
+
               // Forzar actualización del DOM
               setTimeout(() => {
                 console.log('🔄 Verificando después de timeout...');
@@ -3054,9 +3093,9 @@ function getClientesHTML() {
             }
           };
 
-          window.editarPromocion = function(id) {
+          window.editarPromocion = function (id) {
             console.log('✏️ Editando promoción con ID:', id);
-            
+
             // Buscar la promoción en los datos cargados
             molpiFetch(`promociones/admin`)
               .then(response => response.json())
@@ -3066,21 +3105,21 @@ function getClientesHTML() {
                   showErrorToast('Promoción no encontrada');
                   return;
                 }
-                
+
                 // Precargar datos en el modal
                 document.getElementById('promocionId').value = promocion.id;
                 document.getElementById('promocionTitulo').value = promocion.titulo || '';
                 document.getElementById('promocionImagen').value = promocion.imagen || '';
                 document.getElementById('promocionCartillaPdf').value = promocion.cartilla_pdf || '';
                 document.getElementById('promocionActivo').value = promocion.activo ? '1' : '0';
-                
+
                 // Configurar fecha de creación
                 if (promocion.fecha_creacion) {
                   const fecha = new Date(promocion.fecha_creacion);
                   const fechaISO = fecha.toISOString().split('T')[0];
                   document.getElementById('promocionFechaCreacion').value = fechaISO;
                 }
-                
+
                 // Mostrar vista previa si hay imagen
                 if (promocion.imagen) {
                   const previewImagen = document.getElementById('previewImagenPromocion');
@@ -3088,17 +3127,17 @@ function getClientesHTML() {
                   previewImagen.src = promocion.imagen;
                   vistaPrevia.style.display = 'block';
                 }
-                
+
                 // Cambiar título del modal
                 document.getElementById('modalPromocionLabel').textContent = 'Editar Promoción';
                 const btnGuardar = document.getElementById('btnGuardarPromocion');
                 if (btnGuardar) {
                   btnGuardar.innerHTML = '<i class="fa fa-save"></i> Actualizar Promoción';
                 }
-                
+
                 // Mostrar modal
                 $('#modalPromocion').modal('show');
-                
+
                 console.log('Promoción cargada para edición:', promocion);
               })
               .catch(error => {
@@ -3107,23 +3146,23 @@ function getClientesHTML() {
               });
           };
 
-          window.eliminarPromocion = function(id) {
+          window.eliminarPromocion = function (id) {
             console.log('🗑️ Eliminando promoción con ID:', id);
-            
+
             // Buscar la promoción para mostrar su nombre en la confirmación
             molpiFetch(`promociones/admin`)
               .then(response => response.json())
               .then(promociones => {
                 const promocion = promociones.find(p => p.id == id);
                 const nombrePromocion = promocion ? promocion.titulo : `la promoción #${id}`;
-                
+
                 showDeleteConfirmation({
                   title: 'Eliminar Promoción',
                   message: `¿Estás seguro de que quieres eliminar "${nombrePromocion}"?`,
                   subMessage: 'Esta acción no se puede deshacer.',
                   confirmText: 'Sí, Eliminar',
                   cancelText: 'Cancelar',
-                  onConfirm: async function() {
+                  onConfirm: async function () {
                     try {
                       const response = await molpiFetch(`promociones/${id}`, {
                         method: 'DELETE',
@@ -3131,7 +3170,7 @@ function getClientesHTML() {
                           'Content-Type': 'application/json'
                         }
                       });
-                      
+
                       if (response.ok) {
                         showSuccessToast('Promoción eliminada exitosamente');
                         // Recargar la lista de promociones
@@ -3156,7 +3195,7 @@ function getClientesHTML() {
                   subMessage: 'Esta acción no se puede deshacer.',
                   confirmText: 'Sí, Eliminar',
                   cancelText: 'Cancelar',
-                  onConfirm: async function() {
+                  onConfirm: async function () {
                     try {
                       const response = await molpiFetch(`promociones/${id}`, {
                         method: 'DELETE',
@@ -3164,7 +3203,7 @@ function getClientesHTML() {
                           'Content-Type': 'application/json'
                         }
                       });
-                      
+
                       if (response.ok) {
                         showSuccessToast('Promoción eliminada exitosamente');
                         cargarPromociones();
@@ -3181,28 +3220,28 @@ function getClientesHTML() {
               });
           };
 
-          window.abrirModalNuevaPromocion = function() {
+          window.abrirModalNuevaPromocion = function () {
             console.log('➕ Abriendo modal nueva promoción');
             limpiarModalPromocion();
             $('#modalPromocion').modal('show');
           };
 
           // Función para guardar promoción (crear o actualizar)
-          window.guardarPromocion = async function() {
+          window.guardarPromocion = async function () {
             const form = document.getElementById('formPromocion');
             const formData = new FormData(form);
-            
+
             const promocionId = document.getElementById('promocionId').value;
             const isEditing = promocionId && promocionId !== '';
-            
+
             const btnGuardar = document.getElementById('btnGuardarPromocion');
             const originalText = btnGuardar.innerHTML;
-            
+
             try {
               // Mostrar loading en el botón
               btnGuardar.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Guardando...';
               btnGuardar.disabled = true;
-              
+
               // Preparar datos
               const promocionData = {
                 titulo: formData.get('titulo'),
@@ -3211,7 +3250,7 @@ function getClientesHTML() {
                 activo: parseInt(formData.get('activo')),
                 fecha_creacion: formData.get('fecha_creacion')
               };
-              
+
               // Manejar archivos de imagen si se seleccionó uno
               const fileImagen = document.getElementById('promocionImagenFile').files[0];
               if (fileImagen) {
@@ -3219,18 +3258,18 @@ function getClientesHTML() {
                 // Por ahora, usamos la URL manual
                 console.log('Archivo de imagen seleccionado:', fileImagen.name);
               }
-              
+
               // Manejar archivos PDF si se seleccionó uno
               const filePdf = document.getElementById('promocionPdfFile').files[0];
               if (filePdf) {
                 // Aquí podrías implementar la subida de archivo si tienes endpoint para ello
                 console.log('Archivo PDF seleccionado:', filePdf.name);
               }
-              
+
               // Decidir si es CREATE o UPDATE
               const url = isEditing ? `/promociones/${promocionId}` : '/promociones';
               const method = isEditing ? 'PUT' : 'POST';
-              
+
               const response = await fetch(url, {
                 method: method,
                 headers: {
@@ -3238,21 +3277,21 @@ function getClientesHTML() {
                 },
                 body: JSON.stringify(promocionData)
               });
-              
+
               if (response.ok) {
                 const mensaje = isEditing ? 'Promoción actualizada exitosamente' : 'Promoción creada exitosamente';
                 showSuccessToast(mensaje);
-                
+
                 // Cerrar modal y recargar lista
                 $('#modalPromocion').modal('hide');
                 cargarPromociones();
-                
+
                 console.log('Promoción guardada:', promocionData);
               } else {
                 const errorData = await response.text();
                 showErrorToast('Error al guardar la promoción: ' + errorData);
               }
-              
+
             } catch (error) {
               console.error('Error guardando promoción:', error);
               showErrorToast('Error al guardar la promoción');
@@ -3262,44 +3301,44 @@ function getClientesHTML() {
               btnGuardar.disabled = false;
             }
           };
-          
+
           // Cargar promociones inmediatamente
           cargarPromociones();
-          
+
           // Configurar búsqueda de promociones
           const buscarPromocionInput = document.getElementById('buscarPromocion');
           if (buscarPromocionInput) {
-            buscarPromocionInput.addEventListener('input', function() {
+            buscarPromocionInput.addEventListener('input', function () {
               filtrarPromociones(this.value);
             });
           }
-          
+
           // Función para filtrar promociones
-          window.filtrarPromociones = function(termino) {
+          window.filtrarPromociones = function (termino) {
             const tbody = document.getElementById('promocionesTableBody');
             if (!tbody) return;
-            
+
             const filas = tbody.querySelectorAll('tr');
-            
+
             filas.forEach(fila => {
               if (fila.cells.length < 2) return; // Saltar filas de carga o vacías
-              
+
               const titulo = fila.cells[1].textContent.toLowerCase();
               const estado = fila.cells[3].textContent.toLowerCase();
               const fecha = fila.cells[4].textContent.toLowerCase();
-              
+
               const coincide = titulo.includes(termino.toLowerCase()) ||
-                              estado.includes(termino.toLowerCase()) ||
-                              fecha.includes(termino.toLowerCase());
-              
+                estado.includes(termino.toLowerCase()) ||
+                fecha.includes(termino.toLowerCase());
+
               fila.style.display = coincide ? '' : 'none';
             });
-            
+
             // Mostrar mensaje si no hay resultados
-            const filasVisibles = Array.from(filas).filter(fila => 
+            const filasVisibles = Array.from(filas).filter(fila =>
               fila.style.display !== 'none' && fila.cells.length >= 2
             );
-            
+
             if (filasVisibles.length === 0 && termino) {
               tbody.innerHTML = `
                 <tr>
@@ -3311,9 +3350,9 @@ function getClientesHTML() {
               `;
             }
           };
-          
+
           console.log('Promociones component loaded successfully');
-          
+
         } catch (error) {
           console.error('Error loading promociones component:', error);
           contentArea.innerHTML = `
@@ -3330,7 +3369,7 @@ function getClientesHTML() {
       }
 
       // Manejar clics en enlaces dentro del contenido dinámico
-      document.addEventListener('click', function(e) {
+      document.addEventListener('click', function (e) {
         if (e.target && e.target.matches('a[data-section]')) {
           const section = e.target.getAttribute('data-section');
           const sidebarLink = document.querySelector('#adminSidebar a[data-section="' + section + '"]');
@@ -3348,21 +3387,21 @@ function getClientesHTML() {
         try {
           console.log('Fetching testimonios component...');
           const response = await fetch(apiUrl('admin/component/testimonios'));
-          
+
           if (!response.ok) {
             throw new Error('HTTP error! status: ' + response.status);
           }
-          
+
           const html = await response.text();
           contentArea.innerHTML = html;
           console.log('Testimonios component loaded successfully');
-          
+
           // Inicializar funcionalidad del componente después de cargar
           setTimeout(() => {
             console.log('Iniciando carga de testimonios...');
             initComponenteTestimonios();
           }, 100);
-          
+
         } catch (error) {
           console.error('Error loading testimonios component:', error);
           contentArea.innerHTML = `
@@ -3378,41 +3417,41 @@ function getClientesHTML() {
       // Función para inicializar completamente el componente testimonios
       async function initComponenteTestimonios() {
         console.log('=== Iniciando componente testimonios ===');
-        
+
         // Variables locales para el componente
         let testimonios = [];
         let testimonioEditando = null;
-        
+
         // 1. Cargar testimonios al inicializar
         await cargarTestimonios();
-        
+
         // 2. Event listeners del formulario
         const formTestimonio = document.getElementById('formTestimonio');
         if (formTestimonio) {
-          formTestimonio.addEventListener('submit', async function(e) {
+          formTestimonio.addEventListener('submit', async function (e) {
             e.preventDefault();
             await guardarTestimonio();
           });
         }
-        
+
         // 3. Event listeners de filtros
         const buscarTestimonio = document.getElementById('buscarTestimonio');
         const filtroEstado = document.getElementById('filtroEstado');
-        
+
         if (buscarTestimonio) {
           buscarTestimonio.addEventListener('input', filtrarTestimonios);
         }
-        
+
         if (filtroEstado) {
           filtroEstado.addEventListener('change', filtrarTestimonios);
         }
-        
+
         // 4. Contador de caracteres en textarea
         const testimonioTexto = document.getElementById('testimonioTexto');
         const contadorCaracteres = document.getElementById('contadorCaracteres');
-        
+
         if (testimonioTexto && contadorCaracteres) {
-          testimonioTexto.addEventListener('input', function() {
+          testimonioTexto.addEventListener('input', function () {
             contadorCaracteres.textContent = this.value.length;
             if (this.value.length > 450) {
               contadorCaracteres.style.color = '#dc3545';
@@ -3421,12 +3460,12 @@ function getClientesHTML() {
             }
           });
         }
-        
+
         // 5. Resetear modal al cerrarse
-        $('#modalTestimonio').on('hidden.bs.modal', function() {
+        $('#modalTestimonio').on('hidden.bs.modal', function () {
           resetearFormulario();
         });
-        
+
         // Funciones del componente
         async function cargarTestimonios() {
           try {
@@ -3443,18 +3482,18 @@ function getClientesHTML() {
             }
           }
         }
-        
+
         function mostrarTestimonios(testimoniosAMostrar) {
           const tbody = document.getElementById('tablaTestimonios');
           if (!tbody) return;
-          
+
           tbody.innerHTML = '';
-          
+
           if (testimoniosAMostrar.length === 0) {
             tbody.innerHTML = '<tr><td colspan="7" class="text-center">No hay testimonios para mostrar</td></tr>';
             return;
           }
-          
+
           testimoniosAMostrar.forEach(testimonio => {
             const row = document.createElement('tr');
             row.innerHTML = `
@@ -3497,41 +3536,41 @@ function getClientesHTML() {
             tbody.appendChild(row);
           });
         }
-        
+
         function filtrarTestimonios() {
           const buscar = (document.getElementById('buscarTestimonio')?.value || '').toLowerCase();
           const estado = document.getElementById('filtroEstado')?.value;
-          
+
           let testimoniosFiltrados = testimonios;
-          
+
           if (buscar) {
-            testimoniosFiltrados = testimoniosFiltrados.filter(t => 
+            testimoniosFiltrados = testimoniosFiltrados.filter(t =>
               t.nombre.toLowerCase().includes(buscar) ||
               t.empresa.toLowerCase().includes(buscar) ||
               t.testimonio.toLowerCase().includes(buscar)
             );
           }
-          
+
           if (estado !== '') {
-            testimoniosFiltrados = testimoniosFiltrados.filter(t => 
+            testimoniosFiltrados = testimoniosFiltrados.filter(t =>
               t.activo.toString() === estado
             );
           }
-          
+
           mostrarTestimonios(testimoniosFiltrados);
         }
-        
+
         async function guardarTestimonio() {
           // Prevenir múltiples envíos
           const btnGuardar = document.querySelector('#formTestimonio button[type="submit"]');
           if (btnGuardar.disabled) {
             return; // Ya se está procesando
           }
-          
+
           btnGuardar.disabled = true;
           const textoOriginal = btnGuardar.innerHTML;
           btnGuardar.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Guardando...';
-          
+
           try {
             const id = document.getElementById('testimonioId').value;
             const nombre = document.getElementById('testimonioNombre').value;
@@ -3540,12 +3579,12 @@ function getClientesHTML() {
             const imagen = document.getElementById('testimonioImagen').value;
             const orden = parseInt(document.getElementById('testimonioOrden').value) || 1;
             const activo = document.getElementById('testimonioActivo').checked ? 1 : 0;
-            
+
             if (!nombre || !empresa || !testimonio) {
               showToast('Por favor complete todos los campos requeridos', 'error');
               return;
             }
-            
+
             const datos = {
               nombre,
               empresa,
@@ -3554,7 +3593,7 @@ function getClientesHTML() {
               orden,
               activo
             };
-            
+
             let response;
             if (id) {
               // Actualizar
@@ -3571,12 +3610,12 @@ function getClientesHTML() {
                 body: JSON.stringify(datos)
               });
             }
-            
+
             if (response.ok) {
               $('#modalTestimonio').modal('hide');
               await cargarTestimonios();
               showToast(id ? 'Testimonio actualizado exitosamente' : 'Testimonio creado exitosamente', 'success');
-              
+
               // Notificar a la página principal sobre el cambio
               try {
                 // Intentar notificar a ventanas abiertas del sitio principal
@@ -3600,13 +3639,13 @@ function getClientesHTML() {
             btnGuardar.innerHTML = textoOriginal;
           }
         }
-        
-        window.editarTestimonio = function(id) {
+
+        window.editarTestimonio = function (id) {
           const testimonio = testimonios.find(t => t.id === id);
           if (!testimonio) return;
-          
+
           testimonioEditando = testimonio;
-          
+
           document.getElementById('testimonioId').value = testimonio.id;
           document.getElementById('testimonioNombre').value = testimonio.nombre;
           document.getElementById('testimonioEmpresa').value = testimonio.empresa;
@@ -3614,50 +3653,50 @@ function getClientesHTML() {
           document.getElementById('testimonioImagen').value = testimonio.imagen;
           document.getElementById('testimonioOrden').value = testimonio.orden;
           document.getElementById('testimonioActivo').checked = testimonio.activo;
-          
+
           // Actualizar contador de caracteres
           const contadorCaracteres = document.getElementById('contadorCaracteres');
           if (contadorCaracteres) {
             contadorCaracteres.textContent = testimonio.testimonio.length;
           }
-          
+
           document.getElementById('modalTitle').textContent = 'Editar Testimonio';
           document.getElementById('btnGuardarTexto').textContent = 'Actualizar Testimonio';
-          
+
           $('#modalTestimonio').modal('show');
         };
-        
-        window.eliminarTestimonio = async function(id) {
+
+        window.eliminarTestimonio = async function (id) {
           const testimonio = testimonios.find(t => t.id === id);
           if (!testimonio) return;
-          
+
           // Configurar el modal de confirmación
           const deleteMessage = document.getElementById('deleteTestimonioMessage');
           if (deleteMessage) {
             deleteMessage.textContent = '¿Está seguro de eliminar el testimonio de ' + testimonio.nombre + '?';
           }
-          
+
           // Configurar el botón de confirmación
           const confirmBtn = document.getElementById('confirmDeleteTestimonioBtn');
           if (confirmBtn) {
             // Limpiar eventos anteriores
             const newConfirmBtn = confirmBtn.cloneNode(true);
             confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
-            
+
             // Agregar nuevo evento
-            newConfirmBtn.addEventListener('click', async function() {
+            newConfirmBtn.addEventListener('click', async function () {
               // Cerrar el modal de confirmación
               $('#deleteTestimonioConfirmModal').modal('hide');
-              
+
               try {
                 const response = await fetch(apiUrl('testimonios/' + id), {
                   method: 'DELETE'
                 });
-                
+
                 if (response.ok) {
                   await cargarTestimonios();
                   showToast('Testimonio eliminado exitosamente', 'success');
-                  
+
                   // Notificar a la página principal sobre el cambio
                   try {
                     window.postMessage({
@@ -3677,32 +3716,32 @@ function getClientesHTML() {
               }
             });
           }
-          
+
           // Mostrar el modal de confirmación
           $('#deleteTestimonioConfirmModal').modal('show');
         };
-        
+
         function resetearFormulario() {
           document.getElementById('formTestimonio').reset();
           document.getElementById('testimonioId').value = '';
           document.getElementById('testimonioImagen').value = 'img/clients/client-1.png';
           document.getElementById('testimonioActivo').checked = true;
-          
+
           const contadorCaracteres = document.getElementById('contadorCaracteres');
           if (contadorCaracteres) {
             contadorCaracteres.textContent = '0';
             contadorCaracteres.style.color = '#6c757d';
           }
-          
+
           document.getElementById('modalTitle').textContent = 'Agregar Testimonio';
           document.getElementById('btnGuardarTexto').textContent = 'Guardar Testimonio';
-          
+
           testimonioEditando = null;
         }
-        
+
         // Función global para recargar testimonios
         window.cargarTestimonios = cargarTestimonios;
-        
+
         console.log('=== Componente testimonios inicializado correctamente ===');
       }
 
@@ -3721,8 +3760,8 @@ function getClientesHTML() {
           loadProductosComponent();
         } else if (hash === 'promociones') {
           loadPromocionesComponent();
-        /*} else if (hash === 'testimonios') {
-          loadTestimoniosComponent();*/
+          /*} else if (hash === 'testimonios') {
+            loadTestimoniosComponent();*/
         } else {
           contentArea.innerHTML = `
             <div class="alert alert-warning">
@@ -3742,7 +3781,8 @@ function getClientesHTML() {
   </script>
 
   <!-- Modal para Productos -->
-  <div class="modal fade" id="modalProducto" tabindex="-1" role="dialog" aria-labelledby="modalProductoTitle" aria-hidden="true">
+  <div class="modal fade" id="modalProducto" tabindex="-1" role="dialog" aria-labelledby="modalProductoTitle"
+    aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
       <div class="modal-content">
         <div class="modal-header">
@@ -3754,7 +3794,7 @@ function getClientesHTML() {
         <div class="modal-body">
           <form id="formProducto">
             <input type="hidden" id="productoId" name="id">
-            
+
             <div class="row">
               <div class="col-md-6">
                 <div class="form-group">
@@ -3765,7 +3805,8 @@ function getClientesHTML() {
               <div class="col-md-6">
                 <div class="form-group">
                   <label for="productoCategoria">Categoría *</label>
-                  <select class="form-control" id="productoCategoria" name="categoria" required onchange="cargarSubcategorias()">
+                  <select class="form-control" id="productoCategoria" name="categoria" required
+                    onchange="cargarSubcategorias()">
                     <option value="">Seleccionar categoría</option>
                     <option value="Pisos y Zócalos">Pisos y Zócalos</option>
                     <option value="Revestimientos">Revestimientos</option>
@@ -3806,30 +3847,35 @@ function getClientesHTML() {
               <div class="col-md-6">
                 <div class="form-group">
                   <label for="productoPrecio">Precio en $ *</label>
-                  <input type="number" class="form-control" id="productoPrecio" name="precio" step="0.01" min="0" required>
+                  <input type="number" class="form-control" id="productoPrecio" name="precio" step="0.01" min="0"
+                    required>
                 </div>
               </div>
               <div class="col-md-6">
                 <div class="form-group">
                   <label for="productoPrecioUsd">Precio en U$D</label>
-                  <input type="number" class="form-control" id="productoPrecioUsd" name="precio_usd" step="0.01" min="0">
+                  <input type="number" class="form-control" id="productoPrecioUsd" name="precio_usd" step="0.01"
+                    min="0">
                 </div>
               </div>
             </div>
 
             <div class="form-group">
               <label for="productoImagen">URL de Imagen del Molde</label>
-              <input type="url" class="form-control" id="productoImagen" name="imagen_url" placeholder="https://ejemplo.com/imagen-molde.jpg">
+              <input type="url" class="form-control" id="productoImagen" name="imagen_url"
+                placeholder="https://ejemplo.com/imagen-molde.jpg">
             </div>
 
             <div class="form-group">
               <label for="productoImagenMosaico">URL de Imagen del Mosaico</label>
-              <input type="url" class="form-control" id="productoImagenMosaico" name="imagen_mosaico_url" placeholder="https://ejemplo.com/imagen-mosaico.jpg">
+              <input type="url" class="form-control" id="productoImagenMosaico" name="imagen_mosaico_url"
+                placeholder="https://ejemplo.com/imagen-mosaico.jpg">
             </div>
 
             <div class="form-group">
               <label for="productoPdf">URL del Catálogo PDF</label>
-              <input type="url" class="form-control" id="productoPdf" name="pdf_url" placeholder="https://ejemplo.com/catalogo.pdf">
+              <input type="url" class="form-control" id="productoPdf" name="pdf_url"
+                placeholder="https://ejemplo.com/catalogo.pdf">
             </div>
 
             <!-- Vista Previa -->
@@ -3838,15 +3884,19 @@ function getClientesHTML() {
               <div id="vistaPrevia" class="d-flex justify-content-around align-items-center p-3 border rounded">
                 <div class="text-center">
                   <h6>Molde</h6>
-                  <img id="previewMolde" src="" alt="Preview Molde" style="max-width: 150px; max-height: 150px; display: none;" class="img-thumbnail">
-                  <div id="previewMoldeEmpty" class="bg-light d-flex align-items-center justify-content-center" style="width: 150px; height: 150px;">
+                  <img id="previewMolde" src="" alt="Preview Molde"
+                    style="max-width: 150px; max-height: 150px; display: none;" class="img-thumbnail">
+                  <div id="previewMoldeEmpty" class="bg-light d-flex align-items-center justify-content-center"
+                    style="width: 150px; height: 150px;">
                     <span class="text-muted">Sin imagen</span>
                   </div>
                 </div>
                 <div class="text-center">
                   <h6>Mosaico</h6>
-                  <img id="previewMosaico" src="" alt="Preview Mosaico" style="max-width: 150px; max-height: 150px; display: none;" class="img-thumbnail">
-                  <div id="previewMosaicoEmpty" class="bg-light d-flex align-items-center justify-content-center" style="width: 150px; height: 150px;">
+                  <img id="previewMosaico" src="" alt="Preview Mosaico"
+                    style="max-width: 150px; max-height: 150px; display: none;" class="img-thumbnail">
+                  <div id="previewMosaicoEmpty" class="bg-light d-flex align-items-center justify-content-center"
+                    style="width: 150px; height: 150px;">
                     <span class="text-muted">Sin imagen</span>
                   </div>
                 </div>
@@ -3863,7 +3913,8 @@ function getClientesHTML() {
   </div>
 
   <!-- Modal de confirmación general para eliminaciones -->
-  <div class="modal fade" id="deleteConfirmModal" tabindex="-1" role="dialog" aria-labelledby="deleteConfirmModalLabel" aria-hidden="true">
+  <div class="modal fade" id="deleteConfirmModal" tabindex="-1" role="dialog" aria-labelledby="deleteConfirmModalLabel"
+    aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
       <div class="modal-content">
         <div class="modal-header bg-danger text-white">
@@ -3881,7 +3932,8 @@ function getClientesHTML() {
               <i class="fa fa-trash-o" style="font-size: 48px; color: #dc3545;"></i>
             </div>
             <h5 class="mb-3" id="deleteConfirmMessage">¿Estás seguro de eliminar este elemento?</h5>
-            <p class="text-muted mb-0" id="deleteConfirmDescription">Esta acción no se puede deshacer. El elemento será eliminado permanentemente del sistema.</p>
+            <p class="text-muted mb-0" id="deleteConfirmDescription">Esta acción no se puede deshacer. El elemento será
+              eliminado permanentemente del sistema.</p>
           </div>
         </div>
         <div class="modal-footer justify-content-center">
@@ -3905,21 +3957,24 @@ function getClientesHTML() {
     .promociones-component .table-responsive {
       overflow-x: auto;
     }
-    
+
     .promociones-component table {
       table-layout: fixed;
       width: 100%;
-      min-width: 1000px; /* Reducido pero manteniendo expansión */
-      font-size: 14px; /* Tamaño más moderado */
+      min-width: 1000px;
+      /* Reducido pero manteniendo expansión */
+      font-size: 14px;
+      /* Tamaño más moderado */
     }
-    
+
     .promociones-component th,
     .promociones-component td {
-      padding: 0.9rem; /* Padding más moderado */
+      padding: 0.9rem;
+      /* Padding más moderado */
       vertical-align: middle;
       border-bottom: 1px solid #dee2e6;
     }
-    
+
     .promociones-component thead th {
       background-color: #f8f9fa;
       border-bottom: 2px solid #dee2e6;
@@ -3929,116 +3984,149 @@ function getClientesHTML() {
       top: 0;
       z-index: 10;
     }
-    
+
     /* Anchos específicos de columnas optimizados */
-    .promociones-component th:nth-child(1) { width: 110px; } /* Imagen */
-    .promociones-component th:nth-child(2) { width: 280px; } /* Título */
-    .promociones-component th:nth-child(3) { width: 130px; } /* Archivos */
-    .promociones-component th:nth-child(4) { width: 110px; } /* Estado */
-    .promociones-component th:nth-child(5) { width: 130px; } /* Fecha */
-    .promociones-component th:nth-child(6) { width: 240px; } /* Acciones */
-    
+    .promociones-component th:nth-child(1) {
+      width: 110px;
+    }
+
+    /* Imagen */
+    .promociones-component th:nth-child(2) {
+      width: 280px;
+    }
+
+    /* Título */
+    .promociones-component th:nth-child(3) {
+      width: 130px;
+    }
+
+    /* Archivos */
+    .promociones-component th:nth-child(4) {
+      width: 110px;
+    }
+
+    /* Estado */
+    .promociones-component th:nth-child(5) {
+      width: 130px;
+    }
+
+    /* Fecha */
+    .promociones-component th:nth-child(6) {
+      width: 240px;
+    }
+
+    /* Acciones */
+
     .promociones-component .d-flex {
       display: flex !important;
       align-items: center;
-      gap: 0.6rem; /* Espacio moderado entre botones */
+      gap: 0.6rem;
+      /* Espacio moderado entre botones */
     }
-    
+
     .promociones-component .btn-sm {
-      padding: 0.5rem 0.9rem; /* Botones más proporcionados */
-      font-size: 0.85rem; /* Texto bien legible pero no excesivo */
+      padding: 0.5rem 0.9rem;
+      /* Botones más proporcionados */
+      font-size: 0.85rem;
+      /* Texto bien legible pero no excesivo */
       display: inline-block !important;
       visibility: visible !important;
-      min-width: 85px; /* Ancho mínimo reducido */
+      min-width: 85px;
+      /* Ancho mínimo reducido */
     }
-    
+
     .promociones-component .acciones button {
       display: inline-block !important;
       visibility: visible !important;
       opacity: 1 !important;
       margin-right: 0.5rem;
     }
-    
+
     .promociones-component .btn-outline-primary {
       color: #007bff;
       border-color: #007bff;
       background-color: transparent;
-      border-width: 1px; /* Bordes más sutiles */
+      border-width: 1px;
+      /* Bordes más sutiles */
     }
-    
+
     .promociones-component .btn-outline-primary:hover {
       color: white;
       background-color: #007bff;
       border-color: #007bff;
       transform: translateY(-1px);
-      box-shadow: 0 2px 4px rgba(0,123,255,0.2);
+      box-shadow: 0 2px 4px rgba(0, 123, 255, 0.2);
     }
-    
+
     .promociones-component .btn-outline-danger {
       color: #dc3545;
       border-color: #dc3545;
       background-color: transparent;
       border-width: 1px;
     }
-    
+
     .promociones-component .btn-outline-danger:hover {
       color: white;
       background-color: #dc3545;
       border-color: #dc3545;
       transform: translateY(-1px);
-      box-shadow: 0 2px 4px rgba(220,53,69,0.2);
+      box-shadow: 0 2px 4px rgba(220, 53, 69, 0.2);
     }
-    
+
     /* Estilos adicionales para mejor presentación */
     .promociones-component .badge {
-      font-size: 0.8rem; /* Badges proporcionados */
+      font-size: 0.8rem;
+      /* Badges proporcionados */
       padding: 0.4rem 0.7rem;
       font-weight: 500;
     }
-    
+
     .promociones-component img {
-      width: 70px; /* Imágenes más proporcionadas */
+      width: 70px;
+      /* Imágenes más proporcionadas */
       height: 70px;
       object-fit: cover;
       border-radius: 6px;
       border: 1px solid #dee2e6;
     }
-    
+
     .promociones-component .card {
       border: none;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     }
-    
+
     .promociones-component .card-header {
       background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
       border-bottom: 2px solid #dee2e6;
     }
-    
+
     .promociones-component .table-hover tbody tr:hover {
       background-color: #f8f9fa;
       transition: background-color 0.15s ease;
     }
-    
+
     /* Debugging específico para promociones */
     .promociones-component .acciones {
       min-width: 240px !important;
     }
-    
+
     /* Responsividad mejorada */
     @media (max-width: 1400px) {
       .promociones-component table {
         min-width: 900px;
       }
     }
-    
+
     @media (max-width: 1200px) {
       .promociones-component table {
         min-width: 800px;
       }
+
       .promociones-component th,
       .promociones-component td {
         padding: 0.7rem;
       }
+
       .promociones-component .btn-sm {
         padding: 0.4rem 0.7rem;
         font-size: 0.8rem;
@@ -4051,4 +4139,5 @@ function getClientesHTML() {
   <!-- Script para asegurar que el campo Estado funcione correctamente -->
   <script src="js/campo-estado.js?v=20250807_1245"></script>
 </body>
+
 </html>
