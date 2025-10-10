@@ -1130,6 +1130,26 @@ def not_found(error):
 def internal_error(error):
     return jsonify({'error': 'Error interno del servidor'}), 500
 
+# ========= Promover a producción =========
+import subprocess
+
+@app.route('/api/promover-a-produccion', methods=['POST'])
+@login_required
+def promover_a_produccion():
+    """Ejecuta el script de promoción de UAT a producción"""
+    try:
+        script_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'promover-a-prod.sh'))
+        if not os.path.exists(script_path):
+            return jsonify({'success': False, 'error': f'Script no encontrado: {script_path}'}), 500
+        # Ejecutar el script
+        result = subprocess.run([script_path], capture_output=True, text=True)
+        if result.returncode == 0:
+            return jsonify({'success': True, 'output': result.stdout})
+        else:
+            return jsonify({'success': False, 'error': result.stderr, 'output': result.stdout}), 500
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
 # ========= Main =========
 if __name__ == '__main__':
     app.run(debug=True)

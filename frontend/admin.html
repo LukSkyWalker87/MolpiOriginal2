@@ -315,6 +315,8 @@
     <a href="#" data-section="productos" class="active">📦 Productos</a>
     <a href="#" data-section="promociones">📢 Promociones</a>
     <a href="#" data-section="testimonios">💬 Testimonios</a>
+  <!-- Botón de pasaje a producción solo visible en UAT -->
+  <a href="#" id="btnPasajeProduccion" style="background:#17a2b8;margin-top:20px;display:none">🚀 Pasaje a producción</a>
       <!-- Botón de salir -->
   <a href="/" class="exit-button">🚪 SALIR</a>
   </div>
@@ -434,6 +436,37 @@ ${resultados.some(r => r.includes('/health') && r.includes('✓')) ?
       console.log('API URL:', window.env ? window.env.API_URL : 'UNDEFINED');
       
       // ========== FUNCIONES PARA NOTIFICACIONES TOAST ==========
+      // Mostrar el botón solo si estamos en UAT
+      if (window.location.hostname.startsWith('uat.') || (window.env && window.env.ENTORNO === 'uat')) {
+        document.getElementById('btnPasajeProduccion').style.display = 'block';
+      }
+
+      // Evento para el botón de pasaje a producción
+      const btnPasaje = document.getElementById('btnPasajeProduccion');
+      if (btnPasaje) {
+        btnPasaje.addEventListener('click', function(e) {
+          e.preventDefault();
+          if (confirm('¿Seguro que quieres promover los cambios de UAT a producción?')) {
+            // Llamar al endpoint de backend para promover
+            fetch(window.env.API_URL + '/api/promover-a-produccion', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              credentials: 'include'
+            })
+            .then(resp => resp.json())
+            .then(data => {
+              if (data.success) {
+                showSuccessToast('¡Pasaje a producción realizado!');
+              } else {
+                showErrorToast('Error en el pasaje: ' + (data.error || 'Desconocido'));
+              }
+            })
+            .catch(err => {
+              showErrorToast('Error de red: ' + err.message);
+            });
+          }
+        });
+      }
       
       function showToast(message, type = 'success', duration = 4000) {
         const toastContainer = document.getElementById('toastContainer');

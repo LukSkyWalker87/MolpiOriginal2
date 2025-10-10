@@ -87,8 +87,19 @@
   <link rel="stylesheet" href="css/general.css">
   <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700&display=swap" rel="stylesheet">
 
+  <!-- Configuración del entorno -->
+  <script src="env.js"></script>
+
   <!-- Helper centralizado para construir URLs de la API -->
   <script>
+    // Código para mostrar/ocultar el botón de pasaje a producción
+    document.addEventListener('DOMContentLoaded', function() {
+      const btnPasajeProduccion = document.querySelector('.btn-pasaje-produccion');
+      if (window.env && window.env.ENTORNO === 'uat') {
+        btnPasajeProduccion.style.display = 'block';
+      }
+    });
+
     // Permite sobreescribir window.API_BASE antes de cargar este archivo si hace falta
     window.API_BASE = window.API_BASE || window.location.origin;
     function apiUrl(path) {
@@ -295,6 +306,24 @@
       font-size: 1.8em;
       text-align: center;
       margin-bottom: 30px;
+    }
+    
+    .btn-pasaje-produccion {
+      display: none;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 5px;
+      margin-bottom: 20px;
+      width: 100%;
+      font-weight: 600;
+      transition: background-color 0.3s;
+    }
+
+    .btn-pasaje-produccion:hover {
+      background-color: #218838;
+      color: white;
       font-weight: bold;
     }
 
@@ -435,7 +464,11 @@
     <a href="#" data-section="productos" class="active">📦 Productos</a>
     <a href="#" data-section="promociones">📢 Promociones</a>
     <!-- <a href="#" data-section="testimonios">💬 Testimonios</a> -->
-      <!-- Botón de salir -->
+    <!-- Botón de pasaje a producción solo visible en UAT -->
+    <button class="btn-pasaje-produccion" style="margin-top: 20px;" onclick="iniciarPasajeAProduccion()">
+      <i class="fa fa-rocket"></i> Pasaje a Producción
+    </button>
+    <!-- Botón de salir -->
   <a href="index.html" class="exit-button">🚪 SALIR</a>
   </div>
 
@@ -448,6 +481,32 @@
   
   
   <script>
+    // Función para iniciar el pasaje a producción
+    async function iniciarPasajeAProduccion() {
+      if (!confirm('¿Estás seguro de que deseas iniciar el pasaje a producción? Esta acción no se puede deshacer.')) {
+        return;
+      }
+
+      try {
+        const response = await molpiFetch('/api/pasaje-produccion', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (response.ok) {
+          alert('¡Pasaje a producción completado exitosamente!');
+        } else {
+          const data = await response.json();
+          alert('Error al realizar el pasaje a producción: ' + (data.message || 'Error desconocido'));
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Error al intentar realizar el pasaje a producción');
+      }
+    }
+
     document.addEventListener("DOMContentLoaded", function () {
       console.log('Admin panel JavaScript loaded');
 
@@ -627,6 +686,41 @@
       }
       
       // ========== FIN FUNCIÓN CONFIRMACIONES ==========
+      
+      // ========== BOTÓN PASAJE A PRODUCCIÓN (UAT) ==========
+      // Mostrar el botón solo si estamos en UAT
+      if (window.location.hostname.startsWith('uat.') || (window.env && window.env.ENTORNO === 'uat')) {
+        const btnPasaje = document.getElementById('btnPasajeProduccion');
+        if (btnPasaje) {
+          btnPasaje.style.display = 'block';
+          btnPasaje.addEventListener('click', function(e) {
+            e.preventDefault();
+            if (confirm('¿Seguro que quieres promover los cambios de UAT a producción?\n\nEsto copiará toda la base de datos de UAT a producción.')) {
+              // Llamar al endpoint de backend para promover
+              fetch(apiUrl('/api/promover-a-produccion'), {
+                method: 'POST',
+                headers: { 
+                  'Content-Type': 'application/json',
+                  'Authorization': 'Bearer ' + getAccessToken()
+                },
+                credentials: 'include'
+              })
+              .then(resp => resp.json())
+              .then(data => {
+                if (data.success) {
+                  showSuccessToast('¡Pasaje a producción realizado exitosamente!');
+                } else {
+                  showErrorToast('Error en el pasaje: ' + (data.error || 'Desconocido'));
+                }
+              })
+              .catch(err => {
+                showErrorToast('Error de red: ' + err.message);
+              });
+            }
+          });
+        }
+      }
+      // ========== FIN BOTÓN PASAJE A PRODUCCIÓN ==========
       
       console.log('Found sidebar links:', sidebarLinks.length);
       console.log('Content area:', contentArea);
