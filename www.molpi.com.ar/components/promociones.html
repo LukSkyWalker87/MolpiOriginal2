@@ -276,13 +276,20 @@ async function cargarPromociones() {
   try {
     const tbody = document.getElementById('promocionesTableBody');
     if (!tbody) return;
-    const response = await fetch('/promociones/admin');
+    
+    const token = localStorage.getItem('token');
+    const response = await fetch('/promociones/admin', {
+      headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+    });
+    
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     const promociones = await response.json();
+    
     tbody.innerHTML = (promociones && promociones.length)
       ? promociones.map(renderPromocionRow).join('')
       : '<tr><td colspan="6" class="text-center text-muted">No hay promociones registradas</td></tr>';
   } catch (error) {
+    console.error('Error cargando promociones:', error);
     const tbody = document.getElementById('promocionesTableBody');
     if (tbody) tbody.innerHTML = '<tr><td colspan="6" class="text-center text-danger">Error: ' + error.message + '</td></tr>';
   }
@@ -297,34 +304,47 @@ async function guardarPromocion(event) {
     btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Guardando...';
     btn.disabled = true;
 
-    let imagenUrl = document.getElementById('promocionImagen').value;
-    let pdfUrl    = document.getElementById('promocionPdf').value;
+    let imagenUrl = '';
+    let pdfUrl = '';
+
+    // Helper para obtener el token
+    const getToken = () => localStorage.getItem('token');
 
     // subir imagen si hay archivo
     const imgFile = document.getElementById('promocionImagenFile');
     if (imgFile && imgFile.files.length) {
-      const fd = new FormData(); fd.append('file', imgFile.files[0]);
-      const up = await fetch('/upload/promocion',{ method:'POST', body:fd });
-      const res= await up.json();
-      if (!up.ok) throw new Error('Error subiendo imagen: '+(res.error||''));
+      const fd = new FormData(); 
+      fd.append('file', imgFile.files[0]);
+      const up = await fetch('/upload/promocion', { 
+        method: 'POST', 
+        headers: { 'Authorization': `Bearer ${getToken()}` },
+        body: fd 
+      });
+      const res = await up.json();
+      if (!up.ok) throw new Error('Error subiendo imagen: ' + (res.error || ''));
       imagenUrl = res.path;
     }
 
     // subir pdf si hay archivo
     const pdfFile = document.getElementById('promocionPdfFile');
     if (pdfFile && pdfFile.files.length) {
-      const fd = new FormData(); fd.append('file', pdfFile.files[0]);
-      const up = await fetch('/upload/promocion',{ method:'POST', body:fd });
-      const res= await up.json();
-      if (!up.ok) throw new Error('Error subiendo PDF: '+(res.error||''));
+      const fd = new FormData(); 
+      fd.append('file', pdfFile.files[0]);
+      const up = await fetch('/upload/promocion', { 
+        method: 'POST', 
+        headers: { 'Authorization': `Bearer ${getToken()}` },
+        body: fd 
+      });
+      const res = await up.json();
+      if (!up.ok) throw new Error('Error subiendo PDF: ' + (res.error || ''));
       pdfUrl = res.path;
     }
 
-    // Ya no requerimos la imagen
+    // Preparar datos de la promoción
     const promocionId = document.getElementById('promocionId').value;
     const data = {
       titulo: document.getElementById('promocionTitulo').value,
-      imagen: imagenUrl,
+      imagen: imagenUrl || null,
       cartilla_pdf: pdfUrl || null,
       activo: document.getElementById('promocionActivo').checked ? 1 : 0
     };
@@ -332,33 +352,41 @@ async function guardarPromocion(event) {
     const url = promocionId ? `/promociones/${promocionId}` : '/promociones';
     const method = promocionId ? 'PUT' : 'POST';
 
-    const token = localStorage.getItem('token');
     const response = await fetch(url, {
       method,
       headers: {
         'Content-Type': 'application/json',
-        ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        'Authorization': `Bearer ${getToken()}`
       },
       body: JSON.stringify(data)
     });
-    const result = await response.json();
-    if (!response.ok) throw new Error(result.error || 'Error al guardar');
+
+    if (!response.ok) {
+      const result = await response.json();
+      throw new Error(result.error || 'Error al guardar');
+    }
 
     showToast(promocionId ? 'Promoción actualizada correctamente' : 'Promoción creada correctamente', 'success');
     $('#promocionModal').modal('hide');
     setTimeout(cargarPromociones, 300);
 
   } catch (e) {
-    console.error(e); showToast('Error: '+e.message, 'error');
+    console.error(e); 
+    showToast('Error: ' + e.message, 'error');
   } finally {
-    btn.innerHTML = originalText; btn.disabled = false;
+    btn.innerHTML = originalText; 
+    btn.disabled = false;
   }
 }
 
 // ===== EDITAR =====
 async function editarPromocion(id) {
   try {
-    const response = await fetch('/promociones/admin');
+    const token = localStorage.getItem('token');
+    const response = await fetch('/promociones/admin', {
+      headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+    });
+    
     const promociones = await response.json();
     const p = promociones.find(x => x.id === id);
     if (!p) { showToast('Promoción no encontrada', 'error'); return; }
@@ -434,7 +462,6 @@ function inicializarPromociones() {
     if (!file.type.startsWith('image/')) { showToast('Seleccione una imagen válida', 'error'); this.value=''; return; }
     if (file.size > 5*1024*1024)       { showToast('Imagen muy grande (máx. 5MB)', 'error'); this.value=''; return; }
     document.getElementById('archivoEstadoImagen').classList.remove('d-none');
-    document.getElementById('promocionImagen').placeholder = 'Archivo: ' + file.name;
     const reader = new FileReader();
     reader.onload = e => {
       const prev = document.getElementById('imagenPreview');
@@ -451,31 +478,11 @@ function inicializarPromociones() {
     if (file.type !== 'application/pdf'){ showToast('Seleccione un PDF válido', 'error'); this.value=''; return; }
     if (file.size > 10*1024*1024)       { showToast('PDF muy grande (máx. 10MB)', 'error'); this.value=''; return; }
     document.getElementById('archivoEstadoPdf').classList.remove('d-none');
-    document.getElementById('promocionPdf').placeholder = 'Archivo: ' + file.name;
     const pdfPrev = document.getElementById('pdfPreview');
     const pdfName = document.getElementById('pdfFileName');
     const pdfLink = document.getElementById('pdfPreviewLink');
     pdfName.textContent = file.name;
     pdfLink.href = URL.createObjectURL(file);
-    pdfPrev.classList.remove('d-none');
-  });
-
-  // preview por URL imagen
-  document.getElementById('promocionImagen')?.addEventListener('input', function(){
-    if (!this.value) return;
-    const prev = document.getElementById('imagenPreview');
-    const img  = document.getElementById('imagenPreviewImg');
-    img.src = this.value; prev.classList.remove('d-none');
-  });
-
-  // preview por URL pdf
-  document.getElementById('promocionPdf')?.addEventListener('input', function(){
-    if (!this.value) return;
-    const pdfPrev = document.getElementById('pdfPreview');
-    const pdfName = document.getElementById('pdfFileName');
-    const pdfLink = document.getElementById('pdfPreviewLink');
-    pdfName.textContent = this.value.split('/').pop();
-    pdfLink.href = this.value;
     pdfPrev.classList.remove('d-none');
   });
 

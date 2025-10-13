@@ -1,6 +1,7 @@
 # ========= IMPORTS Y CONFIGURACIÓN INICIAL =========
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
+from werkzeug.utils import secure_filename
 import os
 import sqlite3
 import json
@@ -106,6 +107,7 @@ def upload_producto():
     # Devolver ruta relativa para el frontend
     relative_path = os.path.relpath(file_path, os.path.dirname(__file__))
     return jsonify({'path': relative_path.replace('\\', '/')})
+
 # ========= CORS - Configuración para PythonAnywhere =========
 # CORS configurado correctamente
 CORS(app, resources={r"/*": {
@@ -1068,6 +1070,42 @@ def get_promociones_admin():
     
     conn.close()
     return jsonify(promociones)
+
+@app.route('/upload/promocion', methods=['POST'])
+@login_required
+def upload_promocion():
+    """Subir imágenes o PDFs para promociones"""
+    if 'file' not in request.files:
+        return jsonify({'error': 'No file part'}), 400
+    
+    file = request.files['file']
+    if not file or not file.filename:
+        return jsonify({'error': 'No selected file'}), 400
+    
+    filename = file.filename
+    
+    # Validar tipo de archivo
+    allowed_extensions = {'.jpg', '.jpeg', '.png', '.gif', '.pdf'}
+    file_ext = os.path.splitext(filename)[1].lower()
+    
+    if file_ext not in allowed_extensions:
+        return jsonify({'error': f'Tipo de archivo no permitido: {file_ext}'}), 400
+    
+    # Guardar archivo con timestamp para evitar colisiones
+    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+    safe_filename = secure_filename(filename)
+    filename_with_timestamp = f"promo_{timestamp}_{safe_filename}"
+    
+    # Carpeta de uploads
+    upload_folder = os.path.join(os.path.dirname(__file__), '..', 'www.molpi.com.ar', 'img', 'promociones')
+    os.makedirs(upload_folder, exist_ok=True)
+    
+    file_path = os.path.join(upload_folder, filename_with_timestamp)
+    file.save(file_path)
+    
+    # Devolver ruta relativa desde la raíz del sitio web
+    relative_path = f'img/promociones/{filename_with_timestamp}'
+    return jsonify({'path': relative_path})
 
 # ========= Categorías y Subcategorías =========
 @app.route('/api/categorias', methods=['GET'])
