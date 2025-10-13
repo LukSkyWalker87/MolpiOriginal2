@@ -1,24 +1,23 @@
-version: '3.8'
-
 services:
   molpi-app:
     build: .
     ports:
-      - "8082:8082"
+      - "127.0.0.1:8080:8080"
     environment:
       - FLASK_ENV=production
-      - PORT=8082
+      - PORT=8080
     volumes:
-      - ./Python/molpi.db:/app/backend/molpi.db
+      - ./backend/molpi.db:/app/backend/molpi.db
+      - ./backend/data:/app/backend/data
     restart: unless-stopped
     
-  # Opcional: Nginx como proxy reverso
-  nginx:
-    image: nginx:alpine
-    ports:
-      - "80:80"
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf
-    depends_on:
-      - molpi-app
-    restart: unless-stopped
+  # Nginx deshabilitado - usando nginx del host
+  # nginx:
+  #   image: nginx:alpine
+  #   ports:
+  #     - "80:80"
+  #   volumes:
+  #     - ./nginx.conf:/etc/nginx/nginx.conf
+  #   depends_on:
+  #     - molpi-app
+  #   restart: unless-stopped
