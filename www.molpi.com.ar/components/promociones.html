@@ -106,7 +106,7 @@
       <h6 class="mb-0"><i class="fa fa-bullhorn mr-2"></i>Gestión de Promociones</h6>
       <div class="toolbar d-flex align-items-center">
         <input id="buscarPromocion" class="form-control mr-2" placeholder="Buscar promociones...">
-        <button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#promocionModal" onclick="limpiarFormulario()">
+        <button id="btnNuevaPromocion" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#promocionModal">
           <i class="fa fa-plus"></i> Nuevo
         </button>
       </div>
@@ -454,6 +454,10 @@ function inicializarPromociones() {
   // listeners form
   const form = document.getElementById('promocionForm');
   form?.addEventListener('submit', guardarPromocion);
+
+  // botón nueva promoción
+  const btnNueva = document.getElementById('btnNuevaPromocion');
+  btnNueva?.addEventListener('click', limpiarFormulario);
 
   // file imagen
   const fileInput = document.getElementById('promocionImagenFile');
