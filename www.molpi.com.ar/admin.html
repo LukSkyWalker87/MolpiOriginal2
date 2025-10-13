@@ -2768,137 +2768,49 @@
         try {
           console.log('Loading promociones component...');
 
+          // Cargar el componente real desde el backend con cache buster
+          const timestamp = new Date().getTime();
+          const response = await fetch(apiUrl(`admin/component/promociones?v=${timestamp}`));
+          const componentHTML = await response.text();
+
           contentArea.innerHTML = `
             <div class="admin-header mb-4">
               <h1 style="font-size: 2.2rem;"><i class="fa fa-bullhorn mr-3"></i> Gestión de Promociones</h1>
               <p class="mb-0 text-muted" style="font-size: 1rem;">Administra las promociones y ofertas especiales</p>
             </div>
+            ${componentHTML}
+          `;
+          // El componente ya incluye todos los scripts y event listeners necesarios
+          console.log('✅ Componente de promociones cargado exitosamente');
 
-            <div class="promociones-component">
-              <div class="card shadow-sm">
-                <div class="card-header d-flex justify-content-between align-items-center" style="padding: 1.5rem;">
-                  <h5 class="mb-0" style="font-size: 1.2rem;"><i class="fa fa-bullhorn mr-2"></i>Gestión de Promociones</h5>
-                  <div class="toolbar d-flex align-items-center">
-                    <input id="buscarPromocion" class="form-control mr-3" placeholder="Buscar promociones..." style="width: 350px; height: 42px; font-size: 0.95rem; padding: 0.6rem 0.9rem;">
-                    <button class="btn btn-primary" onclick="abrirModalNuevaPromocion()" style="padding: 0.6rem 1.2rem; font-size: 0.95rem;">
-                      <i class="fa fa-plus mr-2"></i> Nueva Promoción
-                    </button>
-                  </div>
-                </div>
-
-                <div class="card-body" style="padding: 1.5rem;">
-                  <div class="table-responsive">
-                    <table class="table table-striped table-hover">
-                      <thead class="thead-light">
-                        <tr>
-                          <th style="font-size: 0.9rem; padding: 0.9rem; width: 110px;">Imagen</th>
-                          <th style="font-size: 0.9rem; padding: 0.9rem; width: 280px;">Título</th>
-                          <th style="font-size: 0.9rem; padding: 0.9rem; width: 130px;">Archivos</th>
-                          <th style="font-size: 0.9rem; padding: 0.9rem; width: 110px;">Estado</th>
-                          <th style="font-size: 0.9rem; padding: 0.9rem; width: 130px;">Fecha</th>
-                          <th style="min-width: 240px; width: 240px; font-size: 0.9rem; padding: 0.9rem;">Acciones</th>
-                        </tr>
-                      </thead>
-                      <tbody id="promocionesTableBody">
-                        <tr><td colspan="6" class="text-center">Cargando promociones...</td></tr>
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              </div>
+        } catch (error) {
+          console.error('❌ Error cargando componente de promociones:', error);
+          contentArea.innerHTML = `
+            <div class="alert alert-danger">
+              <h4><i class="fa fa-exclamation-triangle mr-2"></i>Error</h4>
+              <p>No se pudo cargar el componente de promociones. Por favor, recarga la página.</p>
+              <pre>${error.message}</pre>
             </div>
           `;
+        }
+      }
 
-          // Agregar modal de edición de promociones
-          const modalHTML = `
-            <!-- Modal Editar/Crear Promoción -->
-            <div class="modal fade" id="modalPromocion" tabindex="-1" role="dialog" aria-labelledby="modalPromocionLabel" aria-hidden="true">
-              <div class="modal-dialog modal-lg" role="document">
-                <div class="modal-content">
-                  <div class="modal-header">
-                    <h5 class="modal-title" id="modalPromocionLabel">Nueva Promoción</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                      <span aria-hidden="true">&times;</span>
-                    </button>
-                  </div>
-                  <form id="formPromocion">
-                    <div class="modal-body">
-                      <input type="hidden" id="promocionId" name="id">
-                      
-                      <div class="row">
-                        <div class="col-md-12 mb-3">
-                          <label for="promocionTitulo">Título de la Promoción *</label>
-                          <input type="text" class="form-control" id="promocionTitulo" name="titulo" required>
-                        </div>
-                      </div>
-                      
-                      <div class="row">
-                        <div class="col-md-6 mb-3">
-                          <label for="promocionImagen">URL de la Imagen</label>
-                          <input type="url" class="form-control" id="promocionImagen" name="imagen" placeholder="https://ejemplo.com/imagen.jpg">
-                        </div>
-                        <div class="col-md-6 mb-3">
-                          <label for="promocionImagenFile">O subir imagen</label>
-                          <input type="file" class="form-control-file" id="promocionImagenFile" accept="image/*">
-                        </div>
-                      </div>
-                      
-                      <div class="row">
-                        <div class="col-md-6 mb-3">
-                          <label for="promocionCartillaPdf">URL del PDF</label>
-                          <input type="url" class="form-control" id="promocionCartillaPdf" name="cartilla_pdf" placeholder="https://ejemplo.com/archivo.pdf">
-                        </div>
-                        <div class="col-md-6 mb-3">
-                          <label for="promocionPdfFile">O subir PDF</label>
-                          <input type="file" class="form-control-file" id="promocionPdfFile" accept=".pdf">
-                        </div>
-                      </div>
-                      
-                      <div class="row">
-                        <div class="col-md-6 mb-3">
-                          <label for="promocionActivo">Estado</label>
-                          <select class="form-control" id="promocionActivo" name="activo">
-                            <option value="1">Activo</option>
-                            <option value="0">Inactivo</option>
-                          </select>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                          <label for="promocionFechaCreacion">Fecha de Creación</label>
-                          <input type="date" class="form-control" id="promocionFechaCreacion" name="fecha_creacion">
-                        </div>
-                      </div>
-                      
-                      <!-- Vista previa de la imagen -->
-                      <div class="row" id="vistaPreviaPromocion" style="display: none;">
-                        <div class="col-12 mb-3">
-                          <label>Vista Previa de la Imagen</label>
-                          <div class="border rounded p-3 text-center">
-                            <img id="previewImagenPromocion" src="" alt="Vista previa" style="max-width: 200px; max-height: 150px; object-fit: cover;">
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="modal-footer">
-                      <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-                      <button type="submit" class="btn btn-primary" id="btnGuardarPromocion">
-                        <i class="fa fa-save"></i> Guardar Promoción
-                      </button>
-                    </div>
-                  </form>
-                </div>
-              </div>
-            </div>
-          `;
+      // Manejar clics en enlaces dentro del contenido dinámico
+      document.addEventListener('click', function (e) {
+        if (e.target && e.target.matches('a[data-section]')) {
+          const section = e.target.getAttribute('data-section');
+          const sidebarLink = document.querySelector('#adminSidebar a[data-section="' + section + '"]');
+          if (sidebarLink) {
+            sidebarLink.click();
+          }
+        }
+      });
 
-          // Insertar modal en el DOM
-          document.body.insertAdjacentHTML('beforeend', modalHTML);
-
-          // Configurar event listeners del modal
-          configurarEventListenersModal();
-
-          function configurarEventListenersModal() {
-            // Vista previa de imagen
-            const inputImagen = document.getElementById('promocionImagen');
+      // Manejar navegación con hash
+      // ========= Componente de Testimonios =========
+      // NOTA: Funcionalidad temporalmente deshabilitada en el menú (línea 339)
+      // Para reactivar: descomentar línea del enlace en el sidebar y la condición en el switch (línea ~476)
+      async function loadTestimoniosComponent() {
             const inputImagenFile = document.getElementById('promocionImagenFile');
             const previewImagen = document.getElementById('previewImagenPromocion');
             const vistaPrevia = document.getElementById('vistaPreviaPromocion');
