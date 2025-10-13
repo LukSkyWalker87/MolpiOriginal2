@@ -144,17 +144,17 @@
       </div>
 
       <div class="modal-body">
-        <input type="hidden" id="promocionId">
+        <input type="hidden" id="promocionId" name="id">
 
         <div class="form-group">
           <label for="promocionTitulo">Título</label>
-          <input type="text" id="promocionTitulo" class="form-control" placeholder="Ej: Promo Agosto -25% OFF" required>
+          <input type="text" id="promocionTitulo" name="titulo" class="form-control" placeholder="Ej: Promo Agosto -25% OFF" required>
         </div>
 
         <div class="form-row">
           <div class="form-group col-md-6">
             <label>Imagen (opcional)</label>
-            <input type="file" class="form-control-file mb-2" id="promocionImagenFile" accept="image/*">
+            <input type="file" class="form-control-file mb-2" id="promocionImagenFile" name="imagen_file" accept="image/*">
             <small class="text-muted">Recomendado 1200×400px (opcional)</small>
             <div id="archivoEstadoImagen" class="mt-2 d-none"><span class="badge badge-img">IMG seleccionada</span></div>
             <div id="imagenPreview" class="mt-3 d-none">
@@ -164,7 +164,7 @@
 
           <div class="form-group col-md-6">
             <label>Cartilla PDF (opcional)</label>
-            <input type="file" class="form-control-file mb-2" id="promocionPdfFile" accept=".pdf">
+            <input type="file" class="form-control-file mb-2" id="promocionPdfFile" name="pdf_file" accept=".pdf">
             <div id="archivoEstadoPdf" class="mt-2 d-none"><span class="badge badge-pdf">PDF seleccionado</span></div>
             <div id="pdfPreview" class="mt-3 d-none">
               <div class="alert alert-info py-2 px-3 mb-0">
@@ -177,7 +177,7 @@
 
         <div class="form-group mb-0">
           <div class="custom-control custom-switch">
-            <input type="checkbox" class="custom-control-input" id="promocionActivo" checked>
+            <input type="checkbox" class="custom-control-input" id="promocionActivo" name="activo" checked>
             <label class="custom-control-label" for="promocionActivo">Promoción activa (visible en el sitio)</label>
           </div>
         </div>
@@ -297,10 +297,14 @@ async function cargarPromociones() {
 
 // ===== GUARDAR =====
 async function guardarPromocion(event) {
+  console.log('🔵 guardarPromocion() llamada', event);
   if (event) event.preventDefault();
+  
   const btn = document.getElementById('guardarPromocionBtn');
   const originalText = btn.innerHTML;
+  
   try {
+    console.log('🔵 Iniciando guardado...');
     btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Guardando...';
     btn.disabled = true;
 
@@ -309,10 +313,12 @@ async function guardarPromocion(event) {
 
     // Helper para obtener el token
     const getToken = () => localStorage.getItem('token');
+    console.log('🔵 Token obtenido:', getToken() ? 'Sí' : 'No');
 
     // subir imagen si hay archivo
     const imgFile = document.getElementById('promocionImagenFile');
     if (imgFile && imgFile.files.length) {
+      console.log('🔵 Subiendo imagen...');
       const fd = new FormData(); 
       fd.append('file', imgFile.files[0]);
       const up = await fetch('/upload/promocion', { 
@@ -323,11 +329,13 @@ async function guardarPromocion(event) {
       const res = await up.json();
       if (!up.ok) throw new Error('Error subiendo imagen: ' + (res.error || ''));
       imagenUrl = res.path;
+      console.log('✅ Imagen subida:', imagenUrl);
     }
 
     // subir pdf si hay archivo
     const pdfFile = document.getElementById('promocionPdfFile');
     if (pdfFile && pdfFile.files.length) {
+      console.log('🔵 Subiendo PDF...');
       const fd = new FormData(); 
       fd.append('file', pdfFile.files[0]);
       const up = await fetch('/upload/promocion', { 
@@ -338,6 +346,7 @@ async function guardarPromocion(event) {
       const res = await up.json();
       if (!up.ok) throw new Error('Error subiendo PDF: ' + (res.error || ''));
       pdfUrl = res.path;
+      console.log('✅ PDF subido:', pdfUrl);
     }
 
     // Preparar datos de la promoción
@@ -348,9 +357,13 @@ async function guardarPromocion(event) {
       cartilla_pdf: pdfUrl || null,
       activo: document.getElementById('promocionActivo').checked ? 1 : 0
     };
+    
+    console.log('🔵 Datos a enviar:', data);
 
     const url = promocionId ? `/promociones/${promocionId}` : '/promociones';
     const method = promocionId ? 'PUT' : 'POST';
+    
+    console.log('🔵 Enviando a:', url, 'método:', method);
 
     const response = await fetch(url, {
       method,
@@ -451,13 +464,25 @@ function limpiarFormulario() {
 
 // ===== INIT =====
 function inicializarPromociones() {
+  console.log('🔵 Inicializando promociones...');
+  
   // listeners form
   const form = document.getElementById('promocionForm');
-  form?.addEventListener('submit', guardarPromocion);
+  if (form) {
+    console.log('✅ Formulario encontrado, agregando listener submit');
+    form.addEventListener('submit', guardarPromocion);
+  } else {
+    console.error('❌ Formulario promocionForm NO encontrado');
+  }
 
   // botón nueva promoción
   const btnNueva = document.getElementById('btnNuevaPromocion');
-  btnNueva?.addEventListener('click', limpiarFormulario);
+  if (btnNueva) {
+    console.log('✅ Botón nueva promoción encontrado');
+    btnNueva.addEventListener('click', limpiarFormulario);
+  } else {
+    console.error('❌ Botón btnNuevaPromocion NO encontrado');
+  }
 
   // file imagen
   const fileInput = document.getElementById('promocionImagenFile');
@@ -506,5 +531,11 @@ function inicializarPromociones() {
   cargarPromociones();
 }
 
-document.addEventListener('DOMContentLoaded', () => setTimeout(inicializarPromociones, 100));
+// Ejecutar inmediatamente cuando se carga el componente (ya que se carga vía AJAX)
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => setTimeout(inicializarPromociones, 100));
+} else {
+  // DOM ya está listo, ejecutar inmediatamente
+  setTimeout(inicializarPromociones, 100);
+}
 </script>
