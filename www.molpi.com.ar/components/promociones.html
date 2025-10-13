@@ -252,20 +252,26 @@ function renderPromocionRow(promocion){
     ? new Date(promocion.fecha_creacion).toLocaleDateString('es-AR')
     : '-';
 
+  // Imagen o placeholder
+  const imagenHtml = promocion.imagen 
+    ? `<img class="thumb" src="${promocion.imagen}" alt="${promocion.titulo}" onerror="this.style.display='none';">`
+    : '<div class="thumb d-flex align-items-center justify-content-center bg-light text-muted"><i class="fa fa-image"></i></div>';
+
   return `
-    <tr>
-      <td>
-        <img class="thumb" src="${promocion.imagen || ''}" alt=""
-             onerror="this.src=''; this.outerHTML='<span class=&quot;text-muted&quot;>Sin imagen</span>';">
-      </td>
-      <td>${promocion.titulo || '<em>Sin título</em>'}</td>
+    <tr data-id="${promocion.id}">
+      <td>${imagenHtml}</td>
+      <td><strong>${promocion.titulo || '<em>Sin título</em>'}</strong></td>
       <td>${archivos}</td>
       <td>${estado}</td>
       <td>${fecha}</td>
       <td class="text-right acciones">
         <div class="btn-group">
-          <button class="btn btn-sm btn-outline-primary" onclick="editarPromocion(${promocion.id})"><i class="fa fa-edit"></i> Editar</button>
-          <button class="btn btn-sm btn-outline-danger"  onclick="eliminarPromocion(${promocion.id})"><i class="fa fa-trash"></i> Eliminar</button>
+          <button class="btn btn-sm btn-outline-primary btn-editar" data-id="${promocion.id}">
+            <i class="fa fa-edit"></i> Editar
+          </button>
+          <button class="btn btn-sm btn-outline-danger btn-eliminar" data-id="${promocion.id}">
+            <i class="fa fa-trash"></i> Eliminar
+          </button>
         </div>
       </td>
     </tr>`;
@@ -526,6 +532,27 @@ function inicializarPromociones() {
       tr.style.display = titulo.includes(q) ? '' : 'none';
     });
   });
+
+  // Event delegation para botones de editar y eliminar
+  const tbody = document.getElementById('promocionesTableBody');
+  if (tbody) {
+    tbody.addEventListener('click', function(e) {
+      const target = e.target.closest('button');
+      if (!target) return;
+
+      const id = parseInt(target.getAttribute('data-id'));
+      if (!id) return;
+
+      if (target.classList.contains('btn-editar')) {
+        console.log('🔵 Editando promoción ID:', id);
+        editarPromocion(id);
+      } else if (target.classList.contains('btn-eliminar')) {
+        console.log('🔵 Eliminando promoción ID:', id);
+        eliminarPromocion(id);
+      }
+    });
+    console.log('✅ Event delegation configurado para botones de tabla');
+  }
 
   // cargar
   cargarPromociones();
