@@ -218,6 +218,8 @@
 <div id="toastContainer" class="toast-container"></div>
 
 <script>
+console.log('🟢🟢🟢 SCRIPT DE PROMOCIONES CARGADO! 🟢🟢🟢');
+
 // ===== TOASTS =====
 function showToast(message, type = 'success', duration = 4000) {
   const toastContainer = document.getElementById('toastContainer');
@@ -302,17 +304,27 @@ async function cargarPromociones() {
 }
 
 // ===== GUARDAR =====
-async function guardarPromocion(event) {
-  console.log('🔵 guardarPromocion() llamada', event);
-  if (event) event.preventDefault();
+window.guardarPromocion = async function guardarPromocion(event) {
+  console.log('🟢🟢🟢 guardarPromocion() EJECUTADA!', event);
+  console.log('🔵 Event type:', event?.type);
+  console.log('🔵 Event target:', event?.target);
+  
+  if (event) {
+    event.preventDefault();
+    console.log('✅ preventDefault llamado');
+  }
   
   const btn = document.getElementById('guardarPromocionBtn');
-  const originalText = btn.innerHTML;
+  console.log('🔵 Botón guardar encontrado:', btn);
+  
+  const originalText = btn ? btn.innerHTML : '';
   
   try {
     console.log('🔵 Iniciando guardado...');
-    btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Guardando...';
-    btn.disabled = true;
+    if (btn) {
+      btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Guardando...';
+      btn.disabled = true;
+    }
 
     let imagenUrl = '';
     let pdfUrl = '';
@@ -390,11 +402,14 @@ async function guardarPromocion(event) {
     setTimeout(cargarPromociones, 300);
 
   } catch (e) {
-    console.error(e); 
+    console.error('❌ ERROR en guardarPromocion:', e); 
     showToast('Error: ' + e.message, 'error');
   } finally {
-    btn.innerHTML = originalText; 
-    btn.disabled = false;
+    console.log('🔵 Finally: restaurando botón');
+    if (btn) {
+      btn.innerHTML = originalText; 
+      btn.disabled = false;
+    }
   }
 }
 
@@ -471,14 +486,28 @@ function limpiarFormulario() {
 // ===== INIT =====
 function inicializarPromociones() {
   console.log('🔵 Inicializando promociones...');
+  console.log('🔵 Estado del DOM:', document.readyState);
   
   // listeners form
   const form = document.getElementById('promocionForm');
+  console.log('🔵 Buscando formulario promocionForm...', form);
+  
   if (form) {
     console.log('✅ Formulario encontrado, agregando listener submit');
-    form.addEventListener('submit', guardarPromocion);
+    
+    // Remover listener anterior si existe
+    form.removeEventListener('submit', guardarPromocion);
+    
+    // Agregar nuevo listener
+    form.addEventListener('submit', function(e) {
+      console.log('🟢 SUBMIT EVENT DISPARADO!', e);
+      guardarPromocion(e);
+    });
+    
+    console.log('✅ Listener submit agregado correctamente');
   } else {
     console.error('❌ Formulario promocionForm NO encontrado');
+    console.log('❌ Elementos disponibles:', document.querySelectorAll('[id]'));
   }
 
   // botón nueva promoción
