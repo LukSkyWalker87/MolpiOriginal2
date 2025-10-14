@@ -241,6 +241,8 @@ function showToast(message, type = 'success', duration = 4000) {
 
 // ===== RENDER ROW (look Productos) =====
 function renderPromocionRow(promocion){
+  console.log('🔵 Renderizando promoción:', promocion);
+  
   const estado = promocion.activo
     ? '<span class="badge estado-activo">Activo</span>'
     : '<span class="badge estado-inactivo">Inactivo</span>';
@@ -259,7 +261,7 @@ function renderPromocionRow(promocion){
     ? `<img class="thumb" src="${promocion.imagen}" alt="${promocion.titulo}" onerror="this.style.display='none';">`
     : '<div class="thumb d-flex align-items-center justify-content-center bg-light text-muted"><i class="fa fa-image"></i></div>';
 
-  return `
+  const html = `
     <tr data-id="${promocion.id}">
       <td>${imagenHtml}</td>
       <td><strong>${promocion.titulo || '<em>Sin título</em>'}</strong></td>
@@ -277,27 +279,49 @@ function renderPromocionRow(promocion){
         </div>
       </td>
     </tr>`;
+    
+  console.log('✅ HTML generado para promoción ID', promocion.id);
+  return html;
 }
 
 // ===== CARGAR =====
 async function cargarPromociones() {
+  console.log('🔵 cargarPromociones() llamada');
   try {
     const tbody = document.getElementById('promocionesTableBody');
-    if (!tbody) return;
+    console.log('🔵 tbody encontrado:', tbody);
+    if (!tbody) {
+      console.error('❌ No se encontró tbody promocionesTableBody');
+      return;
+    }
     
     const token = localStorage.getItem('token');
+    console.log('🔵 Token:', token ? 'Presente' : 'Ausente');
+    
+    console.log('🔵 Haciendo fetch a /promociones/admin...');
     const response = await fetch('/promociones/admin', {
       headers: token ? { 'Authorization': `Bearer ${token}` } : {}
     });
     
+    console.log('🔵 Response status:', response.status);
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    const promociones = await response.json();
     
-    tbody.innerHTML = (promociones && promociones.length)
-      ? promociones.map(renderPromocionRow).join('')
-      : '<tr><td colspan="6" class="text-center text-muted">No hay promociones registradas</td></tr>';
+    const promociones = await response.json();
+    console.log('🔵 Promociones recibidas:', promociones);
+    console.log('🔵 Número de promociones:', promociones?.length);
+    
+    if (promociones && promociones.length) {
+      console.log('🔵 Renderizando', promociones.length, 'promociones...');
+      const html = promociones.map(renderPromocionRow).join('');
+      console.log('🔵 HTML generado (primeros 200 chars):', html.substring(0, 200));
+      tbody.innerHTML = html;
+      console.log('✅ Promociones renderizadas en tbody');
+    } else {
+      console.log('⚠️ No hay promociones, mostrando mensaje vacío');
+      tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">No hay promociones registradas</td></tr>';
+    }
   } catch (error) {
-    console.error('Error cargando promociones:', error);
+    console.error('❌ Error cargando promociones:', error);
     const tbody = document.getElementById('promocionesTableBody');
     if (tbody) tbody.innerHTML = '<tr><td colspan="6" class="text-center text-danger">Error: ' + error.message + '</td></tr>';
   }
