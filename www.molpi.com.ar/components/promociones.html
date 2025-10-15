@@ -257,6 +257,22 @@
 console.log('🟢🟢🟢 SCRIPT DE PROMOCIONES CARGADO! 🟢🟢🟢');
 console.log('🔵 Timestamp:', new Date().toISOString());
 
+// ===== VERIFICAR AUTENTICACIÓN AL CARGAR =====
+function verificarAutenticacion() {
+  const token = localStorage.getItem('token');
+  console.log('🔵 Verificando autenticación... Token:', token ? 'Presente' : 'NO HAY TOKEN');
+  
+  if (!token) {
+    console.error('❌ No hay token de autenticación');
+    showToast('Sesión expirada. Redirigiendo al login...', 'error', 3000);
+    setTimeout(() => {
+      window.location.href = '/admin';
+    }, 3000);
+    return false;
+  }
+  return true;
+}
+
 // ===== TOASTS =====
 window.showToast = function showToast(message, type = 'success', duration = 4000) {
   const toastContainer = document.getElementById('toastContainer');
@@ -585,6 +601,12 @@ window.inicializarPromociones = function inicializarPromociones() {
   console.log('🟢 inicializarPromociones() LLAMADA');
   console.log('🔵 Inicializando promociones...');
   console.log('🔵 Estado del DOM:', document.readyState);
+  
+  // Verificar autenticación antes de hacer nada
+  if (!verificarAutenticacion()) {
+    console.error('❌ No hay autenticación, abortando inicialización');
+    return;
+  }
   
   // listeners form
   const form = document.getElementById('promocionForm');
