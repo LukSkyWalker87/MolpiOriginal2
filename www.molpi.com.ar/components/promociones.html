@@ -219,9 +219,10 @@
 
 <script>
 console.log('🟢🟢🟢 SCRIPT DE PROMOCIONES CARGADO! 🟢🟢🟢');
+console.log('🔵 Timestamp:', new Date().toISOString());
 
 // ===== TOASTS =====
-function showToast(message, type = 'success', duration = 4000) {
+window.showToast = function showToast(message, type = 'success', duration = 4000) {
   const toastContainer = document.getElementById('toastContainer');
   const toastId = 'toast-' + Date.now();
   const toastHTML = `
@@ -240,7 +241,7 @@ function showToast(message, type = 'success', duration = 4000) {
 }
 
 // ===== RENDER ROW (look Productos) =====
-function renderPromocionRow(promocion){
+window.renderPromocionRow = function renderPromocionRow(promocion){
   console.log('🔵 Renderizando promoción:', promocion);
   
   const estado = promocion.activo
@@ -285,7 +286,7 @@ function renderPromocionRow(promocion){
 }
 
 // ===== CARGAR =====
-async function cargarPromociones() {
+window.cargarPromociones = async function cargarPromociones() {
   console.log('🔵 cargarPromociones() llamada');
   try {
     const tbody = document.getElementById('promocionesTableBody');
@@ -438,7 +439,7 @@ window.guardarPromocion = async function guardarPromocion(event) {
 }
 
 // ===== EDITAR =====
-async function editarPromocion(id) {
+window.editarPromocion = async function editarPromocion(id) {
   try {
     const token = localStorage.getItem('token');
     const response = await fetch('/promociones/admin', {
@@ -476,7 +477,7 @@ async function editarPromocion(id) {
 }
 
 // ===== ELIMINAR =====
-function eliminarPromocion(id) {
+window.eliminarPromocion = function eliminarPromocion(id) {
   $('#deleteConfirmModal').modal('show');
   $('#confirmDeleteBtn').off('click').on('click', async function(){
     $('#deleteConfirmModal').modal('hide');
@@ -497,7 +498,7 @@ function eliminarPromocion(id) {
 }
 
 // ===== LIMPIAR FORM =====
-function limpiarFormulario() {
+window.limpiarFormulario = function limpiarFormulario() {
   document.getElementById('promocionForm').reset();
   document.getElementById('promocionId').value = '';
   document.getElementById('promocionModalLabel').textContent = 'Agregar Nueva Promoción';
@@ -508,7 +509,8 @@ function limpiarFormulario() {
 }
 
 // ===== INIT =====
-function inicializarPromociones() {
+window.inicializarPromociones = function inicializarPromociones() {
+  console.log('🟢 inicializarPromociones() LLAMADA');
   console.log('🔵 Inicializando promociones...');
   console.log('🔵 Estado del DOM:', document.readyState);
   
@@ -618,4 +620,14 @@ if (document.readyState === 'loading') {
   // DOM ya está listo, ejecutar inmediatamente
   setTimeout(inicializarPromociones, 100);
 }
+
+// Verificar que todas las funciones están disponibles
+console.log('🔵 Verificando funciones globales:');
+console.log('  - window.guardarPromocion:', typeof window.guardarPromocion);
+console.log('  - window.editarPromocion:', typeof window.editarPromocion);
+console.log('  - window.eliminarPromocion:', typeof window.eliminarPromocion);
+console.log('  - window.cargarPromociones:', typeof window.cargarPromociones);
+console.log('  - window.limpiarFormulario:', typeof window.limpiarFormulario);
+console.log('  - window.inicializarPromociones:', typeof window.inicializarPromociones);
+console.log('✅ Script de promociones completamente cargado');
 </script>
