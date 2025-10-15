@@ -389,8 +389,16 @@ window.guardarPromocion = async function guardarPromocion(event) {
     let pdfUrl = '';
 
     // Helper para obtener el token
-    const getToken = () => localStorage.getItem('token');
-    console.log('🔵 Token obtenido:', getToken() ? 'Sí' : 'No');
+    const getToken = () => {
+      const token = localStorage.getItem('token');
+      console.log('🔵 Token obtenido:', token ? `${token.substring(0, 20)}...` : 'NO HAY TOKEN');
+      if (!token) {
+        throw new Error('No hay token de autenticación. Por favor, inicia sesión nuevamente.');
+      }
+      return token;
+    };
+    
+    const token = getToken(); // Validar token al inicio
 
     // subir imagen si hay archivo
     const imgFile = document.getElementById('promocionImagenFile');
@@ -400,7 +408,7 @@ window.guardarPromocion = async function guardarPromocion(event) {
       fd.append('file', imgFile.files[0]);
       const up = await fetch('/upload/promocion', { 
         method: 'POST', 
-        headers: { 'Authorization': `Bearer ${getToken()}` },
+        headers: { 'Authorization': `Bearer ${token}` },
         body: fd 
       });
       const res = await up.json();
@@ -417,7 +425,7 @@ window.guardarPromocion = async function guardarPromocion(event) {
       fd.append('file', pdfFile.files[0]);
       const up = await fetch('/upload/promocion', { 
         method: 'POST', 
-        headers: { 'Authorization': `Bearer ${getToken()}` },
+        headers: { 'Authorization': `Bearer ${token}` },
         body: fd 
       });
       const res = await up.json();
@@ -446,13 +454,22 @@ window.guardarPromocion = async function guardarPromocion(event) {
       method,
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${getToken()}`
+        'Authorization': `Bearer ${token}`
       },
       body: JSON.stringify(data)
     });
 
+    console.log('🔵 Response status:', response.status);
+    
     if (!response.ok) {
       const result = await response.json();
+      console.error('❌ Error del servidor:', result);
+      
+      // Si es error 401, el token es inválido
+      if (response.status === 401) {
+        throw new Error('Sesión expirada. Por favor, inicia sesión nuevamente.');
+      }
+      
       throw new Error(result.error || 'Error al guardar');
     }
 
