@@ -534,16 +534,37 @@ window.eliminarPromocion = function eliminarPromocion(id) {
     $('#deleteConfirmModal').modal('hide');
     try{
       const token = localStorage.getItem('token');
+      console.log('🔵 Eliminando promoción ID:', id);
+      console.log('🔵 Token:', token ? `${token.substring(0, 20)}...` : 'NO HAY TOKEN');
+      
+      if (!token) {
+        throw new Error('No hay token de autenticación. Por favor, inicia sesión nuevamente.');
+      }
+      
       const r = await fetch(`/promociones/${id}`, {
         method: 'DELETE',
-        headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+        headers: { 'Authorization': `Bearer ${token}` }
       });
+      
+      console.log('🔵 Response status:', r.status);
+      
+      if (!r.ok) {
+        const j = await r.json();
+        console.error('❌ Error del servidor:', j);
+        
+        if (r.status === 401) {
+          throw new Error('Sesión expirada. Por favor, inicia sesión nuevamente.');
+        }
+        
+        throw new Error(j.error || 'Error al eliminar');
+      }
+      
       const j = await r.json();
-      if (!r.ok) throw new Error(j.error||'Error al eliminar');
       showToast('Promoción eliminada correctamente', 'success');
       cargarPromociones();
     }catch(e){
-      console.error(e); showToast('Error al eliminar la promoción', 'error');
+      console.error('❌ Error eliminando:', e);
+      showToast('Error: ' + e.message, 'error');
     }
   });
 }
