@@ -2780,8 +2780,32 @@
             </div>
             ${componentHTML}
           `;
-          // El componente ya incluye todos los scripts y event listeners necesarios
+          
           console.log('✅ Componente de promociones cargado exitosamente');
+          
+          // Los scripts dentro de innerHTML no se ejecutan automáticamente
+          // Necesitamos ejecutar manualmente la función de inicialización
+          // Esperamos un momento para que el DOM se actualice
+          setTimeout(() => {
+            if (typeof window.inicializarPromociones === 'function') {
+              console.log('🔄 Ejecutando inicializarPromociones() manualmente...');
+              window.inicializarPromociones();
+            } else {
+              console.error('❌ window.inicializarPromociones no está disponible');
+              // Cargar el script manualmente
+              const scripts = contentArea.querySelectorAll('script');
+              scripts.forEach(script => {
+                const newScript = document.createElement('script');
+                if (script.src) {
+                  newScript.src = script.src;
+                } else {
+                  newScript.textContent = script.textContent;
+                }
+                document.body.appendChild(newScript);
+              });
+            }
+          }, 100);
+          
 
         } catch (error) {
           console.error('❌ Error cargando componente de promociones:', error);

@@ -36,7 +36,24 @@
 .promociones-component .form-group label{ font-weight:600; color:#4a5568; font-size:.9rem; }
 .promociones-component .form-control{ border:2px solid #e2e8f0; border-radius:8px; }
 .promociones-component .form-control:focus{ border-color:#667eea; box-shadow:0 0 0 3px rgba(102,126,234,.12); }
-.promociones-component .preview-img{ max-height:200px; border:2px solid #e2e8f0; border-radius:8px; }
+
+/* Preview dentro del modal - específico y con !important para evitar que sea pisado */
+#promocionModal #imagenPreview{
+  max-width: 100% !important;
+  max-height: 220px !important;
+  overflow: hidden !important;
+}
+
+#promocionModal .preview-img{
+  display: block !important;
+  max-width: 100% !important;
+  max-height: 120px !important;   /* altura controlada */
+  width: auto !important;
+  height: auto !important;
+  object-fit: contain !important;
+  border: 2px solid #e2e8f0 !important;
+  border-radius: 8px !important;
+}
 
 /* Toasts */
 .toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; }
@@ -50,54 +67,73 @@
 .custom-toast .close:hover { opacity: 1; }
 </style>
 
-<!-- OVERRIDES – hacer la grilla menos chica -->
+<!-- OVERRIDES – mismo estilo que productos -->
 <style>
-/* más aire en el card */
+/* Card con buen padding */
 .promociones-component .card-body{ padding:1rem !important; }
 
-/* buscar + botones un poco más grandes */
-.promociones-component .toolbar .form-control{ height:42px; font-size:.95rem; }
-.promociones-component .btn-sm{ padding:.45rem .75rem; font-size:.9rem; }
+/* Toolbar espacioso */
+.promociones-component .toolbar .form-control{ height:46px; font-size:1.05rem; }
+.promociones-component .btn-sm{ padding:.5rem .85rem; font-size:.95rem; }
 
-/* tipografías y paddings de tabla más grandes */
-.promociones-component .table{ font-size:.95rem; }
+/* Tabla con buen espaciado como productos */
+.promociones-component .table{ 
+  margin:0; 
+  font-size:1.08rem;
+}
+
 .promociones-component .table thead th{
-  font-size:.85rem;
-  padding:.65rem .85rem;
+  background:#f8f9fa; 
+  border-bottom:2px solid #dee2e6; 
+  color:#495057;
+  font-weight:600; 
+  font-size:1.05rem; 
+  padding:.85rem 1rem; 
+  white-space:nowrap;
 }
+
 .promociones-component .table td{
-  padding:.65rem .85rem;
+  padding:.85rem 1rem; 
+  vertical-align:middle; 
+  border-top:1px solid #eef1f4; 
+  white-space:nowrap;
 }
 
-/* miniaturas más grandes */
-.promociones-component .thumb{
-  width:110px;   /* antes 76 */
-  height:66px;   /* antes 46 */
-  border-radius:8px;
-}
-
-/* badges más legibles */
-.promociones-component .badge{
-  font-size:.75rem;
-  padding:.4em .6em;
-}
-
-/* botones de acciones con ancho y altura cómodos */
-.promociones-component .acciones .btn{
-  min-width:96px;
-  padding:.45rem .7rem;
-  font-size:.9rem;
-}
-
-/* fila hover apenas más notorio */
+/* Hover agradable */
 .promociones-component .table tbody tr:hover{ background:#f3f6fb; }
 
-/* en pantallas grandes, subimos un poquito más */
-@media (min-width:1200px){
-  .promociones-component .table{ font-size:1rem; }
-  .promociones-component .table thead th{ font-size:.9rem; }
-  .promociones-component .thumb{ width:120px; height:72px; }
+/* Miniaturas igual que productos */
+.promociones-component .thumb{
+  width:150px;
+  height:90px;
+  border-radius:6px;
 }
+
+/* Badges con buen tamaño */
+.promociones-component .badge{
+  font-size:.8rem;
+  padding:.45em .65em;
+  display: inline-block;
+  margin-right: 4px;
+}
+
+/* Botones con buen espacio */
+.promociones-component .acciones .btn{
+  min-width:108px;
+  padding:.5rem .8rem;
+  font-size:.95rem;
+  margin-right: 3px;
+}
+
+/* En pantallas grandes, un poco más */
+@media (min-width:1200px){
+  .promociones-component .table{ font-size:1.12rem; }
+  .promociones-component .table thead th{ font-size:1.1rem; }
+  .promociones-component .thumb{ width:164px; height:98px; }
+}
+
+/* Rayado suave manteniendo hover agradable */
+.promociones-component .table-striped tbody tr:nth-of-type(odd){ background-color: rgba(0,0,0,.035); }
 </style>
 
 <div class="promociones-component">
@@ -122,7 +158,7 @@
               <th>Archivos</th>
               <th>Estado</th>
               <th>Fecha</th>
-              <th class="text-right">Acciones</th>
+              <th>Acciones</th>
             </tr>
           </thead>
           <tbody id="promocionesTableBody">
@@ -158,7 +194,7 @@
             <small class="text-muted">Recomendado 1200×400px (opcional)</small>
             <div id="archivoEstadoImagen" class="mt-2 d-none"><span class="badge badge-img">IMG seleccionada</span></div>
             <div id="imagenPreview" class="mt-3 d-none">
-              <img id="imagenPreviewImg" class="preview-img" alt="Vista previa">
+              <img id="imagenPreviewImg" class="preview-img img-fluid" alt="Vista previa">
             </div>
           </div>
 
@@ -249,12 +285,12 @@ window.renderPromocionRow = function renderPromocionRow(promocion){
     : '<span class="badge estado-inactivo">Inactivo</span>';
 
   const archivos = `
-    <span class="badge ${promocion.imagen ? 'badge-img' : 'badge-soft'} mr-1"><i class="fa fa-image"></i> IMG</span>
+    <span class="badge ${promocion.imagen ? 'badge-img' : 'badge-soft'}"><i class="fa fa-image"></i> IMG</span>
     <span class="badge ${promocion.cartilla_pdf ? 'badge-pdf' : 'badge-soft'}"><i class="fa fa-file-pdf-o"></i> PDF</span>
   `;
 
   const fecha = promocion.fecha_creacion
-    ? new Date(promocion.fecha_creacion).toLocaleDateString('es-AR')
+    ? new Date(promocion.fecha_creacion).toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric' })
     : '-';
 
   // Imagen o placeholder
@@ -269,15 +305,13 @@ window.renderPromocionRow = function renderPromocionRow(promocion){
       <td>${archivos}</td>
       <td>${estado}</td>
       <td>${fecha}</td>
-      <td class="text-right acciones">
-        <div class="btn-group">
-          <button class="btn btn-sm btn-outline-primary btn-editar" data-id="${promocion.id}">
-            <i class="fa fa-edit"></i> Editar
-          </button>
-          <button class="btn btn-sm btn-outline-danger btn-eliminar" data-id="${promocion.id}">
-            <i class="fa fa-trash"></i> Eliminar
-          </button>
-        </div>
+      <td class="acciones">
+        <button class="btn btn-sm btn-outline-primary btn-editar" data-id="${promocion.id}">
+          <i class="fa fa-edit"></i> Editar
+        </button>
+        <button class="btn btn-sm btn-outline-danger btn-eliminar" data-id="${promocion.id}">
+          <i class="fa fa-trash"></i> Eliminar
+        </button>
       </td>
     </tr>`;
     
