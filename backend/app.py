@@ -1026,24 +1026,44 @@ def update_promocion(promocion_id):
 @app.route('/promociones/<int:promocion_id>', methods=['DELETE'])
 @login_required
 def delete_promocion(promocion_id):
-    """Eliminar promoción"""
+    """Eliminar promoción permanentemente (DELETE real)"""
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    
+    # Obtener archivos antes de eliminar para borrarlos del sistema
+    cursor.execute('SELECT imagen, cartilla_pdf FROM promociones WHERE id = ?', (promocion_id,))
+    promocion = cursor.fetchone()
+    if not promocion:
+        conn.close()
+        return jsonify({'error': 'Promoción no encontrada'}), 404
+    
+    # Eliminar registro de la base de datos
+    cursor.execute('DELETE FROM promociones WHERE id = ?', (promocion_id,))
+    
+    conn.commit()
+    conn.close()
+    
+    return jsonify({'message': 'Promoción eliminada permanentemente'})
+
+@app.route('/api/promociones/<int:promocion_id>/deactivate', methods=['PUT'])
+@app.route('/promociones/<int:promocion_id>/deactivate', methods=['PUT'])
+@login_required
+def deactivate_promocion(promocion_id):
+    """Marcar promoción como inactiva (soft delete)"""
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     
     cursor.execute('SELECT id FROM promociones WHERE id = ?', (promocion_id,))
     if not cursor.fetchone():
+        conn.close()
         return jsonify({'error': 'Promoción no encontrada'}), 404
     
-    cursor.execute('''
-        UPDATE promociones 
-        SET activo = 0, fecha_modificacion = CURRENT_TIMESTAMP
-        WHERE id = ?
-    ''', (promocion_id,))
+    cursor.execute('UPDATE promociones SET activo = 0 WHERE id = ?', (promocion_id,))
     
     conn.commit()
     conn.close()
     
-    return jsonify({'message': 'Promoción eliminada exitosamente'})
+    return jsonify({'message': 'Promoción desactivada exitosamente'})
 
 @app.route('/api/promociones/admin', methods=['GET'])
 @app.route('/promociones/admin', methods=['GET'])
