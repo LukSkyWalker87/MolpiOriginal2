@@ -384,14 +384,20 @@ window.cargarPromociones = async function cargarPromociones() {
       return;
     }
     
-    const token = localStorage.getItem('molpi_access_token');
-    console.log('🔵 Token:', token ? 'Presente' : 'Ausente');
+    console.log('🔵 Usando molpiFetch para obtener promociones...');
     
-    const url = buildApiUrl('/promociones/admin');
-    console.log('🔵 Haciendo fetch a', url);
-    const response = await fetch(url, {
-      headers: token ? { 'Authorization': `Bearer ${token}` } : {}
-    });
+    // Usar molpiFetch de admin.html si está disponible, si no usar fetch directo
+    let response;
+    if (typeof window.molpiFetch === 'function') {
+      console.log('✅ molpiFetch disponible');
+      response = await window.molpiFetch('/promociones/admin');
+    } else {
+      console.warn('⚠️ molpiFetch NO disponible, usando fetch directo');
+      const token = window.molpi_current_token || localStorage.getItem('molpi_access_token');
+      response = await fetch(buildApiUrl('/promociones/admin'), {
+        headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+      });
+    }
     
     console.log('🔵 Response status:', response.status);
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -443,17 +449,9 @@ window.guardarPromocion = async function guardarPromocion(event) {
     let imagenUrl = '';
     let pdfUrl = '';
 
-    // Helper para obtener el token
-    const getToken = () => {
-      const token = localStorage.getItem('molpi_access_token');
-      console.log('🔵 Token obtenido:', token ? `${token.substring(0, 20)}...` : 'NO HAY TOKEN');
-      if (!token) {
-        throw new Error('No hay token de autenticación. Por favor, inicia sesión nuevamente.');
-      }
-      return token;
-    };
-    
-    const token = getToken(); // Validar token al inicio
+    if (typeof window.molpiFetch !== 'function') {
+      throw new Error('molpiFetch no está disponible. Por favor, inicia sesión nuevamente.');
+    }
 
     // subir imagen si hay archivo
     const imgFile = document.getElementById('promocionImagenFile');
@@ -461,10 +459,8 @@ window.guardarPromocion = async function guardarPromocion(event) {
       console.log('🔵 Subiendo imagen...');
       const fd = new FormData(); 
       fd.append('file', imgFile.files[0]);
-      const uploadUrl = buildApiUrl('/upload/promocion', { token });
-      const up = await fetch(uploadUrl, { 
+      const up = await window.molpiFetch('/upload/promocion', { 
         method: 'POST', 
-        headers: { 'Authorization': `Bearer ${token}` },
         body: fd 
       });
       const res = await up.json();
@@ -479,10 +475,8 @@ window.guardarPromocion = async function guardarPromocion(event) {
       console.log('🔵 Subiendo PDF...');
       const fd = new FormData(); 
       fd.append('file', pdfFile.files[0]);
-      const uploadUrl = buildApiUrl('/upload/promocion', { token });
-      const up = await fetch(uploadUrl, { 
+      const up = await window.molpiFetch('/upload/promocion', { 
         method: 'POST', 
-        headers: { 'Authorization': `Bearer ${token}` },
         body: fd 
       });
       const res = await up.json();
@@ -504,15 +498,11 @@ window.guardarPromocion = async function guardarPromocion(event) {
 
     const endpoint = promocionId ? `/promociones/${promocionId}` : '/promociones';
     const method = promocionId ? 'PUT' : 'POST';
-    const requestUrl = buildApiUrl(endpoint, { token });
-    
-    console.log('🔵 Enviando a:', requestUrl, 'método:', method);
 
-    const response = await fetch(requestUrl, {
+    const response = await window.molpiFetch(endpoint, {
       method,
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
+        'Content-Type': 'application/json'
       },
       body: JSON.stringify(data)
     });
@@ -550,12 +540,13 @@ window.guardarPromocion = async function guardarPromocion(event) {
 // ===== EDITAR =====
 window.editarPromocion = async function editarPromocion(id) {
   try {
-    const token = localStorage.getItem('molpi_access_token');
-    const url = buildApiUrl('/promociones/admin');
-    const response = await fetch(url, {
-      headers: token ? { 'Authorization': `Bearer ${token}` } : {}
-    });
+    console.log('🔵 Editando promoción ID:', id);
     
+    if (typeof window.molpiFetch !== 'function') {
+      throw new Error('molpiFetch no está disponible. Por favor, inicia sesión nuevamente.');
+    }
+    
+    const response = await window.molpiFetch('/promociones/admin');
     const promociones = await response.json();
     const p = promociones.find(x => x.id === id);
     if (!p) { showToast('Promoción no encontrada', 'error'); return; }
@@ -592,27 +583,15 @@ window.eliminarPromocion = function eliminarPromocion(id) {
   $('#confirmDeleteBtn').off('click').on('click', async function(){
     $('#deleteConfirmModal').modal('hide');
     try{
-      console.log('🟢🟢🟢 INICIANDO ELIMINACIÓN 🟢🟢🟢');
-      console.log('🔵 window.molpi_current_token:', window.molpi_current_token ? `${window.molpi_current_token.substring(0,20)}...` : 'VACIO');
-      console.log('🔵 localStorage.molpi_access_token:', localStorage.getItem('molpi_access_token'));
+      console.log('🟢🟢🟢 INICIANDO ELIMINACIÓN 🟢🟢🟢 ID:', id);
       
-      const token = window.molpi_current_token || localStorage.getItem('molpi_access_token');
-      console.log('🔵 Eliminando promoción ID:', id);
-      console.log('🔵 Token final:', token ? `${token.substring(0, 20)}...` : 'NO HAY TOKEN ❌❌❌');
-      
-      // Construir URL con token como respaldo
-      const url = buildApiUrl(`/promociones/${id}`);
-      console.log('🔵 URL de DELETE:', url);
-      
-      const headers = {};
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
+      if (typeof window.molpiFetch !== 'function') {
+        throw new Error('molpiFetch no está disponible. Por favor, inicia sesión nuevamente.');
       }
-      console.log('🔵 Headers:', headers);
       
-      const r = await fetch(url, {
-        method: 'DELETE',
-        headers
+      console.log('✅ molpiFetch disponible, usando para DELETE');
+      const r = await window.molpiFetch(`/promociones/${id}`, {
+        method: 'DELETE'
       });
       
       console.log('🔵 Response status:', r.status);
