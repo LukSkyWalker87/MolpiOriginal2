@@ -254,9 +254,6 @@
 <div id="toastContainer" class="toast-container"></div>
 
 <script>
-console.log('🟢🟢🟢 SCRIPT DE PROMOCIONES CARGADO! 🟢🟢🟢');
-console.log('🔵 Timestamp:', new Date().toISOString());
-
 // ===== TOASTS ===== (Definir primero para que esté disponible)
 window.showToast = function showToast(message, type = 'success', duration = 4000) {
   const toastContainer = document.getElementById('toastContainer');
@@ -296,13 +293,8 @@ function buildApiUrl(path, options = {}) {
     token = window.molpi_current_token || localStorage.getItem('molpi_access_token');
   }
   
-  console.log(`🔵 buildApiUrl(${path}): token=${token ? 'Presente' : 'AUSENTE'} (source: ${options.token ? 'options' : window.molpi_current_token ? 'window.molpi_current_token' : 'localStorage'})`);
-  
   if (token) {
     url.searchParams.set('token', token);
-    console.log(`🟢 Token adjuntado a URL: ${url.toString().substring(0, 120)}...`);
-  } else {
-    console.warn(`🟡 ADVERTENCIA: No hay token para ${path}`);
   }
   return url.toString();
 }
@@ -310,7 +302,6 @@ function buildApiUrl(path, options = {}) {
 // ===== VERIFICAR AUTENTICACIÓN =====
 function verificarAutenticacion() {
   const token = localStorage.getItem('molpi_access_token');
-  console.log('🔵 Verificando autenticación... Token:', token ? `Presente (${token.substring(0, 20)}...)` : 'NO HAY TOKEN ❌');
   
   if (!token || token === 'null' || token === 'undefined') {
     console.error('❌ No hay token válido de autenticación');
@@ -319,20 +310,17 @@ function verificarAutenticacion() {
     alert('⚠️ Sesión expirada o no iniciada.\n\nSerás redirigido al login en 2 segundos...');
     
     setTimeout(() => {
-      console.log('🔄 Redirigiendo a /admin...');
       window.location.href = '/admin';
     }, 2000);
     
     return false;
   }
   
-  console.log('✅ Token válido encontrado');
   return true;
 }
 
 // ===== RENDER ROW (look Productos) =====
 window.renderPromocionRow = function renderPromocionRow(promocion){
-  console.log('🔵 Renderizando promoción:', promocion);
   
   const estado = promocion.activo
     ? '<span class="badge estado-activo">Activo</span>'
@@ -369,27 +357,21 @@ window.renderPromocionRow = function renderPromocionRow(promocion){
       </td>
     </tr>`;
     
-  console.log('✅ HTML generado para promoción ID', promocion.id);
   return html;
 }
 
 // ===== CARGAR =====
 window.cargarPromociones = async function cargarPromociones() {
-  console.log('🔵 cargarPromociones() llamada');
   try {
     const tbody = document.getElementById('promocionesTableBody');
-    console.log('🔵 tbody encontrado:', tbody);
     if (!tbody) {
       console.error('❌ No se encontró tbody promocionesTableBody');
       return;
     }
     
-    console.log('🔵 Usando molpiFetch para obtener promociones...');
-    
     // Usar molpiFetch de admin.html si está disponible, si no usar fetch directo
     let response;
     if (typeof window.molpiFetch === 'function') {
-      console.log('✅ molpiFetch disponible');
       response = await window.molpiFetch('/promociones/admin');
     } else {
       console.warn('⚠️ molpiFetch NO disponible, usando fetch directo');
@@ -399,21 +381,14 @@ window.cargarPromociones = async function cargarPromociones() {
       });
     }
     
-    console.log('🔵 Response status:', response.status);
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     
     const promociones = await response.json();
-    console.log('🔵 Promociones recibidas:', promociones);
-    console.log('🔵 Número de promociones:', promociones?.length);
     
     if (promociones && promociones.length) {
-      console.log('🔵 Renderizando', promociones.length, 'promociones...');
       const html = promociones.map(renderPromocionRow).join('');
-      console.log('🔵 HTML generado (primeros 200 chars):', html.substring(0, 200));
       tbody.innerHTML = html;
-      console.log('✅ Promociones renderizadas en tbody');
     } else {
-      console.log('⚠️ No hay promociones, mostrando mensaje vacío');
       tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">No hay promociones registradas</td></tr>';
     }
   } catch (error) {
@@ -425,22 +400,14 @@ window.cargarPromociones = async function cargarPromociones() {
 
 // ===== GUARDAR =====
 window.guardarPromocion = async function guardarPromocion(event) {
-  console.log('🟢🟢🟢 guardarPromocion() EJECUTADA!', event);
-  console.log('🔵 Event type:', event?.type);
-  console.log('🔵 Event target:', event?.target);
-  
   if (event) {
     event.preventDefault();
-    console.log('✅ preventDefault llamado');
   }
   
   const btn = document.getElementById('guardarPromocionBtn');
-  console.log('🔵 Botón guardar encontrado:', btn);
-  
   const originalText = btn ? btn.innerHTML : '';
   
   try {
-    console.log('🔵 Iniciando guardado...');
     if (btn) {
       btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Guardando...';
       btn.disabled = true;
@@ -456,7 +423,6 @@ window.guardarPromocion = async function guardarPromocion(event) {
     // subir imagen si hay archivo
     const imgFile = document.getElementById('promocionImagenFile');
     if (imgFile && imgFile.files.length) {
-      console.log('🔵 Subiendo imagen...');
       const fd = new FormData(); 
       fd.append('file', imgFile.files[0]);
       const up = await window.molpiFetch('/upload/promocion', { 
@@ -466,13 +432,11 @@ window.guardarPromocion = async function guardarPromocion(event) {
       const res = await up.json();
       if (!up.ok) throw new Error('Error subiendo imagen: ' + (res.error || ''));
       imagenUrl = res.path;
-      console.log('✅ Imagen subida:', imagenUrl);
     }
 
     // subir pdf si hay archivo
     const pdfFile = document.getElementById('promocionPdfFile');
     if (pdfFile && pdfFile.files.length) {
-      console.log('🔵 Subiendo PDF...');
       const fd = new FormData(); 
       fd.append('file', pdfFile.files[0]);
       const up = await window.molpiFetch('/upload/promocion', { 
@@ -482,7 +446,6 @@ window.guardarPromocion = async function guardarPromocion(event) {
       const res = await up.json();
       if (!up.ok) throw new Error('Error subiendo PDF: ' + (res.error || ''));
       pdfUrl = res.path;
-      console.log('✅ PDF subido:', pdfUrl);
     }
 
     // Preparar datos de la promoción
@@ -493,8 +456,6 @@ window.guardarPromocion = async function guardarPromocion(event) {
       cartilla_pdf: pdfUrl || null,
       activo: document.getElementById('promocionActivo').checked ? 1 : 0
     };
-    
-    console.log('🔵 Datos a enviar:', data);
 
     const endpoint = promocionId ? `/promociones/${promocionId}` : '/promociones';
     const method = promocionId ? 'PUT' : 'POST';
@@ -506,8 +467,6 @@ window.guardarPromocion = async function guardarPromocion(event) {
       },
       body: JSON.stringify(data)
     });
-
-    console.log('🔵 Response status:', response.status);
     
     if (!response.ok) {
       const result = await response.json();
@@ -529,7 +488,6 @@ window.guardarPromocion = async function guardarPromocion(event) {
     console.error('❌ ERROR en guardarPromocion:', e); 
     showToast('Error: ' + e.message, 'error');
   } finally {
-    console.log('🔵 Finally: restaurando botón');
     if (btn) {
       btn.innerHTML = originalText; 
       btn.disabled = false;
@@ -540,7 +498,6 @@ window.guardarPromocion = async function guardarPromocion(event) {
 // ===== EDITAR =====
 window.editarPromocion = async function editarPromocion(id) {
   try {
-    console.log('🔵 Editando promoción ID:', id);
     
     if (typeof window.molpiFetch !== 'function') {
       throw new Error('molpiFetch no está disponible. Por favor, inicia sesión nuevamente.');
@@ -583,22 +540,17 @@ window.eliminarPromocion = function eliminarPromocion(id) {
   $('#confirmDeleteBtn').off('click').on('click', async function(){
     $('#deleteConfirmModal').modal('hide');
     try{
-      console.log('🟢🟢🟢 INICIANDO ELIMINACIÓN 🟢🟢🟢 ID:', id);
       
       if (typeof window.molpiFetch !== 'function') {
         throw new Error('molpiFetch no está disponible. Por favor, inicia sesión nuevamente.');
       }
       
-      console.log('✅ molpiFetch disponible, usando para DELETE');
       const r = await window.molpiFetch(`/promociones/${id}`, {
         method: 'DELETE'
       });
       
-      console.log('🔵 Response status:', r.status);
-      
       if (!r.ok) {
         const j = await r.json();
-        console.error('❌ Error del servidor:', j);
         
         if (r.status === 401) {
           throw new Error('Sesión expirada. Por favor, inicia sesión nuevamente.');
@@ -630,40 +582,24 @@ window.limpiarFormulario = function limpiarFormulario() {
 
 // ===== INIT =====
 window.inicializarPromociones = function inicializarPromociones() {
-  console.log('🟢 inicializarPromociones() LLAMADA');
-  console.log('🔵 Inicializando promociones...');
-  console.log('🔵 Estado del DOM:', document.readyState);
-  console.log('🔵 localStorage.molpi_access_token:', localStorage.getItem('molpi_access_token') ? `Presente (${localStorage.getItem('molpi_access_token').substring(0,20)}...)` : 'VACIO/NULL');
-  console.log('🔵 Todas las keys en localStorage:', Object.keys(localStorage));
   
-  // Nota: Ya no verificamos autenticación aquí porque buildApiUrl la obtiene del localStorage automáticamente
-  
-  // listeners form
   const form = document.getElementById('promocionForm');
-  console.log('🔵 Buscando formulario promocionForm...', form);
   
   if (form) {
-    console.log('✅ Formulario encontrado, agregando listener submit');
     
-    // Remover listener anterior si existe
     form.removeEventListener('submit', guardarPromocion);
     
-    // Agregar nuevo listener
     form.addEventListener('submit', function(e) {
-      console.log('🟢 SUBMIT EVENT DISPARADO!', e);
       guardarPromocion(e);
     });
     
-    console.log('✅ Listener submit agregado correctamente');
   } else {
     console.error('❌ Formulario promocionForm NO encontrado');
-    console.log('❌ Elementos disponibles:', document.querySelectorAll('[id]'));
   }
 
   // botón nueva promoción
   const btnNueva = document.getElementById('btnNuevaPromocion');
   if (btnNueva) {
-    console.log('✅ Botón nueva promoción encontrado');
     btnNueva.addEventListener('click', limpiarFormulario);
   } else {
     console.error('❌ Botón btnNuevaPromocion NO encontrado');
@@ -723,14 +659,11 @@ window.inicializarPromociones = function inicializarPromociones() {
       if (!id) return;
 
       if (target.classList.contains('btn-editar')) {
-        console.log('🔵 Editando promoción ID:', id);
         editarPromocion(id);
       } else if (target.classList.contains('btn-eliminar')) {
-        console.log('🔵 Eliminando promoción ID:', id);
         eliminarPromocion(id);
       }
     });
-    console.log('✅ Event delegation configurado para botones de tabla');
   }
 
   // cargar
@@ -745,13 +678,4 @@ if (document.readyState === 'loading') {
   setTimeout(inicializarPromociones, 100);
 }
 
-// Verificar que todas las funciones están disponibles
-console.log('🔵 Verificando funciones globales:');
-console.log('  - window.guardarPromocion:', typeof window.guardarPromocion);
-console.log('  - window.editarPromocion:', typeof window.editarPromocion);
-console.log('  - window.eliminarPromocion:', typeof window.eliminarPromocion);
-console.log('  - window.cargarPromociones:', typeof window.cargarPromociones);
-console.log('  - window.limpiarFormulario:', typeof window.limpiarFormulario);
-console.log('  - window.inicializarPromociones:', typeof window.inicializarPromociones);
-console.log('✅ Script de promociones completamente cargado');
 </script>
