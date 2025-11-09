@@ -987,20 +987,25 @@ def update_promocion(promocion_id):
             return jsonify({'error': 'No se enviaron datos JSON válidos'}), 400
             
         titulo = data.get('titulo', '')
-        imagen = data.get('imagen', '')
-        cartilla_pdf = data.get('cartilla_pdf', '')
+        imagen = data.get('imagen')
+        cartilla_pdf = data.get('cartilla_pdf')
         activo = data.get('activo', 1)
-        
-        if not imagen:
-            return jsonify({'error': 'La imagen es requerida'}), 400
         
         conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
         
-        cursor.execute('SELECT id FROM promociones WHERE id = ?', (promocion_id,))
-        if not cursor.fetchone():
+        # Obtener promoción actual
+        cursor.execute('SELECT imagen, cartilla_pdf FROM promociones WHERE id = ?', (promocion_id,))
+        promocion_actual = cursor.fetchone()
+        if not promocion_actual:
             conn.close()
             return jsonify({'error': 'Promoción no encontrada'}), 404
+        
+        # Si no se envió nueva imagen/pdf, mantener las actuales
+        if imagen is None or imagen == '':
+            imagen = promocion_actual[0]
+        if cartilla_pdf is None or cartilla_pdf == '':
+            cartilla_pdf = promocion_actual[1]
         
         cursor.execute('''
             UPDATE promociones 
