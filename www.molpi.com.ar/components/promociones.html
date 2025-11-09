@@ -281,6 +281,17 @@ window.showToast = function showToast(message, type = 'success', duration = 4000
   $(toastElement).on('hidden.bs.toast', function(){ toastElement.remove(); });
 }
 
+// Helper centralizado para construir URLs absolutas y adjuntar el token via querystring como respaldo
+function buildApiUrl(path, options = {}) {
+  const baseOrigin = (window.API_BASE && window.API_BASE.trim()) || (window.env && window.env.API_URL) || window.location.origin;
+  const normalizedPath = path.startsWith('/') ? path : `/${path}`;
+  const url = new URL(normalizedPath, baseOrigin);
+  if (options.token) {
+    url.searchParams.set('token', options.token);
+  }
+  return url.toString();
+}
+
 // ===== VERIFICAR AUTENTICACIÓN =====
 function verificarAutenticacion() {
   const token = localStorage.getItem('molpi_access_token');
@@ -361,8 +372,9 @@ window.cargarPromociones = async function cargarPromociones() {
     const token = localStorage.getItem('molpi_access_token');
     console.log('🔵 Token:', token ? 'Presente' : 'Ausente');
     
-    console.log('🔵 Haciendo fetch a /promociones/admin...');
-    const response = await fetch('/promociones/admin', {
+    const url = buildApiUrl('/promociones/admin');
+    console.log('🔵 Haciendo fetch a', url);
+    const response = await fetch(url, {
       headers: token ? { 'Authorization': `Bearer ${token}` } : {}
     });
     
@@ -434,7 +446,8 @@ window.guardarPromocion = async function guardarPromocion(event) {
       console.log('🔵 Subiendo imagen...');
       const fd = new FormData(); 
       fd.append('file', imgFile.files[0]);
-      const up = await fetch('/upload/promocion', { 
+      const uploadUrl = buildApiUrl('/upload/promocion', { token });
+      const up = await fetch(uploadUrl, { 
         method: 'POST', 
         headers: { 'Authorization': `Bearer ${token}` },
         body: fd 
@@ -451,7 +464,8 @@ window.guardarPromocion = async function guardarPromocion(event) {
       console.log('🔵 Subiendo PDF...');
       const fd = new FormData(); 
       fd.append('file', pdfFile.files[0]);
-      const up = await fetch('/upload/promocion', { 
+      const uploadUrl = buildApiUrl('/upload/promocion', { token });
+      const up = await fetch(uploadUrl, { 
         method: 'POST', 
         headers: { 'Authorization': `Bearer ${token}` },
         body: fd 
@@ -473,12 +487,13 @@ window.guardarPromocion = async function guardarPromocion(event) {
     
     console.log('🔵 Datos a enviar:', data);
 
-    const url = promocionId ? `/promociones/${promocionId}` : '/promociones';
+    const endpoint = promocionId ? `/promociones/${promocionId}` : '/promociones';
     const method = promocionId ? 'PUT' : 'POST';
+    const requestUrl = buildApiUrl(endpoint, { token });
     
-    console.log('🔵 Enviando a:', url, 'método:', method);
+    console.log('🔵 Enviando a:', requestUrl, 'método:', method);
 
-    const response = await fetch(url, {
+    const response = await fetch(requestUrl, {
       method,
       headers: {
         'Content-Type': 'application/json',
@@ -521,7 +536,8 @@ window.guardarPromocion = async function guardarPromocion(event) {
 window.editarPromocion = async function editarPromocion(id) {
   try {
     const token = localStorage.getItem('molpi_access_token');
-    const response = await fetch('/promociones/admin', {
+    const url = buildApiUrl('/promociones/admin');
+    const response = await fetch(url, {
       headers: token ? { 'Authorization': `Bearer ${token}` } : {}
     });
     
@@ -569,7 +585,8 @@ window.eliminarPromocion = function eliminarPromocion(id) {
         throw new Error('No hay token de autenticación. Por favor, inicia sesión nuevamente.');
       }
       
-      const r = await fetch(`/promociones/${id}`, {
+      const url = buildApiUrl(`/promociones/${id}`, { token });
+      const r = await fetch(url, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
