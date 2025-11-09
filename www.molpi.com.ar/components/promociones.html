@@ -286,8 +286,10 @@ function buildApiUrl(path, options = {}) {
   const baseOrigin = (window.API_BASE && window.API_BASE.trim()) || (window.env && window.env.API_URL) || window.location.origin;
   const normalizedPath = path.startsWith('/') ? path : `/${path}`;
   const url = new URL(normalizedPath, baseOrigin);
-  if (options.token) {
-    url.searchParams.set('token', options.token);
+  // Si no se especifica token en options, intentar obtenerlo del localStorage
+  const token = options.token || localStorage.getItem('molpi_access_token');
+  if (token) {
+    url.searchParams.set('token', token);
   }
   return url.toString();
 }
@@ -581,14 +583,18 @@ window.eliminarPromocion = function eliminarPromocion(id) {
       console.log('🔵 Eliminando promoción ID:', id);
       console.log('🔵 Token:', token ? `${token.substring(0, 20)}...` : 'NO HAY TOKEN');
       
-      if (!token) {
-        throw new Error('No hay token de autenticación. Por favor, inicia sesión nuevamente.');
+      // Construir URL con token como respaldo
+      const url = buildApiUrl(`/promociones/${id}`);
+      console.log('🔵 URL de DELETE:', url);
+      
+      const headers = {};
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
       }
       
-      const url = buildApiUrl(`/promociones/${id}`, { token });
       const r = await fetch(url, {
         method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${token}` }
+        headers
       });
       
       console.log('🔵 Response status:', r.status);
@@ -630,12 +636,10 @@ window.inicializarPromociones = function inicializarPromociones() {
   console.log('🟢 inicializarPromociones() LLAMADA');
   console.log('🔵 Inicializando promociones...');
   console.log('🔵 Estado del DOM:', document.readyState);
+  console.log('🔵 localStorage.molpi_access_token:', localStorage.getItem('molpi_access_token') ? `Presente (${localStorage.getItem('molpi_access_token').substring(0,20)}...)` : 'VACIO/NULL');
+  console.log('🔵 Todas las keys en localStorage:', Object.keys(localStorage));
   
-  // Verificar autenticación antes de hacer nada
-  if (!verificarAutenticacion()) {
-    console.error('❌ No hay autenticación, abortando inicialización');
-    return;
-  }
+  // Nota: Ya no verificamos autenticación aquí porque buildApiUrl la obtiene del localStorage automáticamente
   
   // listeners form
   const form = document.getElementById('promocionForm');
