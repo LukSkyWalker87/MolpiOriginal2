@@ -2787,6 +2787,11 @@
           // Necesitamos ejecutar manualmente la función de inicialización
           // Esperamos un momento para que el DOM se actualice
           setTimeout(() => {
+            // ⚠️ INYECTAR TOKEN EN VARIABLE GLOBAL ANTES DE EJECUTAR EL COMPONENTE
+            const token = getAccessToken();
+            console.log('📌 Inyectando token en window.molpi_current_token:', token ? `${token.substring(0, 20)}...` : 'VACIO');
+            window.molpi_current_token = token;
+            
             if (typeof window.inicializarPromociones === 'function') {
               console.log('🔄 Ejecutando inicializarPromociones() manualmente...');
               window.inicializarPromociones();

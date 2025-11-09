@@ -286,12 +286,21 @@ function buildApiUrl(path, options = {}) {
   const baseOrigin = (window.API_BASE && window.API_BASE.trim()) || (window.env && window.env.API_URL) || window.location.origin;
   const normalizedPath = path.startsWith('/') ? path : `/${path}`;
   const url = new URL(normalizedPath, baseOrigin);
-  // Si no se especifica token en options, intentar obtenerlo del localStorage
-  const token = options.token || localStorage.getItem('molpi_access_token');
-  console.log(`🔵 buildApiUrl(${path}): token=${token ? 'Presente' : 'AUSENTE'}`);
+  
+  // Intentar obtener token en este orden:
+  // 1. Si viene en options
+  // 2. Si hay en window.molpi_current_token (inyectado desde admin.html)
+  // 3. Si hay en localStorage
+  let token = options.token;
+  if (!token) {
+    token = window.molpi_current_token || localStorage.getItem('molpi_access_token');
+  }
+  
+  console.log(`🔵 buildApiUrl(${path}): token=${token ? 'Presente' : 'AUSENTE'} (source: ${options.token ? 'options' : window.molpi_current_token ? 'window.molpi_current_token' : 'localStorage'})`);
+  
   if (token) {
     url.searchParams.set('token', token);
-    console.log(`🟢 Token adjuntado a URL: ${url.toString().substring(0, 100)}...`);
+    console.log(`🟢 Token adjuntado a URL: ${url.toString().substring(0, 120)}...`);
   } else {
     console.warn(`🟡 ADVERTENCIA: No hay token para ${path}`);
   }
@@ -584,12 +593,12 @@ window.eliminarPromocion = function eliminarPromocion(id) {
     $('#deleteConfirmModal').modal('hide');
     try{
       console.log('🟢🟢🟢 INICIANDO ELIMINACIÓN 🟢🟢🟢');
-      console.log('🔵 localStorage keys:', Object.keys(localStorage));
+      console.log('🔵 window.molpi_current_token:', window.molpi_current_token ? `${window.molpi_current_token.substring(0,20)}...` : 'VACIO');
       console.log('🔵 localStorage.molpi_access_token:', localStorage.getItem('molpi_access_token'));
       
-      const token = localStorage.getItem('molpi_access_token');
+      const token = window.molpi_current_token || localStorage.getItem('molpi_access_token');
       console.log('🔵 Eliminando promoción ID:', id);
-      console.log('🔵 Token:', token ? `${token.substring(0, 20)}...` : 'NO HAY TOKEN ❌❌❌');
+      console.log('🔵 Token final:', token ? `${token.substring(0, 20)}...` : 'NO HAY TOKEN ❌❌❌');
       
       // Construir URL con token como respaldo
       const url = buildApiUrl(`/promociones/${id}`);
