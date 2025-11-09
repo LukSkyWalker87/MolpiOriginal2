@@ -288,8 +288,12 @@ function buildApiUrl(path, options = {}) {
   const url = new URL(normalizedPath, baseOrigin);
   // Si no se especifica token en options, intentar obtenerlo del localStorage
   const token = options.token || localStorage.getItem('molpi_access_token');
+  console.log(`🔵 buildApiUrl(${path}): token=${token ? 'Presente' : 'AUSENTE'}`);
   if (token) {
     url.searchParams.set('token', token);
+    console.log(`🟢 Token adjuntado a URL: ${url.toString().substring(0, 100)}...`);
+  } else {
+    console.warn(`🟡 ADVERTENCIA: No hay token para ${path}`);
   }
   return url.toString();
 }
@@ -579,9 +583,13 @@ window.eliminarPromocion = function eliminarPromocion(id) {
   $('#confirmDeleteBtn').off('click').on('click', async function(){
     $('#deleteConfirmModal').modal('hide');
     try{
+      console.log('🟢🟢🟢 INICIANDO ELIMINACIÓN 🟢🟢🟢');
+      console.log('🔵 localStorage keys:', Object.keys(localStorage));
+      console.log('🔵 localStorage.molpi_access_token:', localStorage.getItem('molpi_access_token'));
+      
       const token = localStorage.getItem('molpi_access_token');
       console.log('🔵 Eliminando promoción ID:', id);
-      console.log('🔵 Token:', token ? `${token.substring(0, 20)}...` : 'NO HAY TOKEN');
+      console.log('🔵 Token:', token ? `${token.substring(0, 20)}...` : 'NO HAY TOKEN ❌❌❌');
       
       // Construir URL con token como respaldo
       const url = buildApiUrl(`/promociones/${id}`);
@@ -591,6 +599,7 @@ window.eliminarPromocion = function eliminarPromocion(id) {
       if (token) {
         headers['Authorization'] = `Bearer ${token}`;
       }
+      console.log('🔵 Headers:', headers);
       
       const r = await fetch(url, {
         method: 'DELETE',
