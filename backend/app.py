@@ -102,11 +102,20 @@ def upload_producto():
     # Guardar archivo
     upload_folder = os.path.join(os.path.dirname(__file__), '..', 'static', 'uploads')
     os.makedirs(upload_folder, exist_ok=True)
-    file_path = os.path.join(upload_folder, str(file.filename))
+    safe_name = secure_filename(str(file.filename))
+    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+    final_name = f"{timestamp}_{safe_name}" if safe_name else f"{timestamp}_archivo"
+    file_path = os.path.join(upload_folder, final_name)
     file.save(file_path)
     # Devolver ruta relativa para el frontend
-    relative_path = os.path.relpath(file_path, os.path.dirname(__file__))
-    return jsonify({'path': relative_path.replace('\\', '/')})
+    return jsonify({'path': f'/static/uploads/{final_name}'})
+
+
+@app.route('/static/uploads/<path:filename>')
+def serve_uploaded_producto(filename):
+    """Servir archivos subidos de productos desde static/uploads."""
+    upload_folder = os.path.join(os.path.dirname(__file__), '..', 'static', 'uploads')
+    return send_from_directory(upload_folder, filename)
 
 # ========= CORS - Configuración para PythonAnywhere =========
 # CORS configurado correctamente

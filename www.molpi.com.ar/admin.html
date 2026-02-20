@@ -952,7 +952,7 @@
               <td>${producto.id}</td>
               <td>
                 ${producto.imagen_url ?
-                `<img src="${producto.imagen_url}" alt="${producto.nombre}" style="width: 60px; height: 60px; object-fit: cover;" class="rounded" onerror="this.src='img/placeholder.png'; this.onerror=null;">` :
+                `<img src="${producto.imagen_url}" alt="${producto.nombre}" style="width: 60px; height: 60px; object-fit: cover;" class="rounded" onerror="this.src='img/placeholder-logo.png'; this.onerror=null;">` :
                 '<span class="text-muted">Sin imagen</span>'
               }
               </td>
@@ -3370,7 +3370,7 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-          <button type="button" class="btn btn-primary" onclick="guardarProducto()">Guardar Producto</button>
+          <button type="submit" class="btn btn-primary" form="formProducto">Guardar Producto</button>
         </div>
       </div>
     </div>
