@@ -1499,12 +1499,12 @@
 
             const token = localStorage.getItem('token');
             const response = await fetch(url, {
-              method: 'POST', // o 'PUT', 'DELETE'
+              method,
               headers: {
                 'Content-Type': 'application/json',
                 'Authorization': 'Bearer ' + token
               },
-              body: JSON.stringify(data)
+              body: JSON.stringify(productoData)
             });
 
             const result = await response.json();
