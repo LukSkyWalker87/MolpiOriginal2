@@ -1497,12 +1497,10 @@
             const url = productoEditando ? `/productos/${productoEditando}` : '/productos';
             const method = productoEditando ? 'PUT' : 'POST';
 
-            const token = localStorage.getItem('token');
-            const response = await fetch(url, {
+            const response = await window.molpiFetch(url, {
               method,
               headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + token
+                'Content-Type': 'application/json'
               },
               body: JSON.stringify(productoData)
             });
@@ -1638,12 +1636,8 @@
             description: 'Esta acción no se puede deshacer. El producto será eliminado permanentemente del sistema.',
             onConfirm: async () => {
               try {
-                const token = localStorage.getItem('token');
-                const response = await fetch(`${window.env.API_URL}/productos/${id}`, {
-                  method: 'DELETE',
-                  headers: {
-                    'Authorization': 'Bearer ' + token
-                  }
+                const response = await window.molpiFetch(`/productos/${id}`, {
+                  method: 'DELETE'
                 });
 
                 if (response.ok) {
