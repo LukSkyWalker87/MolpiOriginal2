@@ -1,0 +1,78 @@
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-12">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Gestión de Productos</h2>
+        <button class="btn btn-primary" onclick="mostrarModalProducto()">
+          <i class="fa fa-plus"></i> Nuevo Producto
+        </button>
+      </div>
+      
+      <!-- Filtros -->
+      <div class="card mb-4">
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-3">
+              <label for="filtroCategoria">Categoría</label>
+              <select id="filtroCategoria" class="form-control">
+                <option value="">Todas las categorías</option>
+              </select>
+            </div>
+            <div class="col-md-3">
+              <label for="filtroSubcategoria">Subcategoría</label>
+              <select id="filtroSubcategoria" class="form-control">
+                <option value="">Todas las subcategorías</option>
+              </select>
+            </div>
+            <div class="col-md-2">
+              <label for="filtroLinea">Línea con Mosaicos</label>
+              <select id="filtroLinea" class="form-control" onchange="filtrarProductos()">
+                <option value="">Todas</option>
+                <option value="Línea 20x20">20x20</option>
+                <option value="Línea 40x40">40x40</option>
+                <option value="Línea 50x50">50x50</option>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label for="buscarProducto">Buscar</label>
+              <div class="input-group">
+                <input type="text" id="buscarProducto" class="form-control" placeholder="Buscar producto..." onkeyup="filtrarProductos()">
+                <div class="input-group-append">
+                  <button class="btn btn-outline-secondary" type="button" onclick="limpiarFiltros()" title="Limpiar filtros">
+                    <i class="fa fa-refresh"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Tabla de productos -->
+      <div class="card">
+        <div class="card-body">
+          <div class="table-responsive" style="overflow-x: auto;">
+            <table class="table table-striped table-sm" style="font-size: 0.80rem; margin-bottom: 0; padding: 0.25rem;">
+              <thead style="position: sticky; top: 0; background-color: #f8f9fa; z-index: 10;">
+                <tr>
+                  <th style="min-width: 45px; padding: 0.4rem 0.3rem;">ID</th>
+                  <th style="min-width: 55px; padding: 0.4rem 0.3rem;">Imagen</th>
+                  <th style="min-width: 140px; padding: 0.4rem 0.3rem;">Producto</th>
+                  <th style="min-width: 90px; padding: 0.4rem 0.3rem;">Categoría</th>
+                  <th style="min-width: 90px; padding: 0.4rem 0.3rem;">Subcategoría</th>
+                  <th style="min-width: 70px; padding: 0.4rem 0.3rem;">Precio $</th>
+                  <th style="min-width: 70px; padding: 0.4rem 0.3rem;">Precio U$D</th>
+                  <th style="min-width: 65px; padding: 0.4rem 0.3rem;">Estado</th>
+                  <th style="min-width: 75px; width: 75px; padding: 0.4rem 0.3rem;">Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="tablaProductos">
+                <!-- Los productos se cargarán aquí -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
