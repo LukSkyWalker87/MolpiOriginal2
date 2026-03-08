@@ -2405,10 +2405,14 @@
           }
         }
 
-        // Configurar formulario
+        // Configurar formulario (remover listeners duplicados primero)
         const formProducto = document.getElementById('formProducto');
         if (formProducto) {
-          formProducto.addEventListener('submit', function (e) {
+          // Clonar el form para remover todos los listeners anteriores
+          const nuevoForm = formProducto.cloneNode(true);
+          formProducto.parentNode.replaceChild(nuevoForm, formProducto);
+          
+          nuevoForm.addEventListener('submit', function (e) {
             e.preventDefault();
             guardarProducto();
           });
@@ -2417,7 +2421,11 @@
         // Configurar formulario de podotáctiles
         const formEditarPodotactil = document.getElementById('formEditarPodotactil');
         if (formEditarPodotactil) {
-          formEditarPodotactil.addEventListener('submit', function (e) {
+          // Clonar el form para remover todos los listeners anteriores
+          const nuevoFormPodo = formEditarPodotactil.cloneNode(true);
+          formEditarPodotactil.parentNode.replaceChild(nuevoFormPodo, formEditarPodotactil);
+          
+          nuevoFormPodo.addEventListener('submit', function (e) {
             e.preventDefault();
             guardarPodotactil();
           });
