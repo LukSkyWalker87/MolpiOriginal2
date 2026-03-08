@@ -949,38 +949,38 @@
             // Detectar si es un producto podotáctil
             const esPodotactil = producto.categoria === 'Podotáctiles' || producto.id.toString().includes('podotactil');
             fila.innerHTML = `
-              <td style="padding: 0.25rem 0.3rem; font-size: 0.75rem;">${producto.id}</td>
-              <td style="padding: 0.25rem 0.3rem;">
+              <td style="padding: 0.35rem 0.4rem; font-size: 0.85rem;">${producto.id}</td>
+              <td style="padding: 0.35rem 0.4rem;">
                 ${producto.imagen_url ?
-                `<img src="${producto.imagen_url}" alt="${producto.nombre}" style="width: 40px; height: 40px; object-fit: cover;" class="rounded" onerror="this.src='img/placeholder-logo.png'; this.onerror=null;">` :
-                '<span style="font-size: 0.7rem;">-</span>'
+                `<img src="${producto.imagen_url}" alt="${producto.nombre}" style="width: 50px; height: 50px; object-fit: cover;" class="rounded" onerror="this.src='img/placeholder-logo.png'; this.onerror=null;">` :
+                '<span style="font-size: 0.8rem;">-</span>'
               }
               </td>
-              <td style="padding: 0.25rem 0.3rem; font-size: 0.75rem; max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                <strong>${producto.nombre.substring(0, 40)}</strong>
+              <td style="padding: 0.35rem 0.4rem; font-size: 0.85rem; max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                <strong>${producto.nombre.substring(0, 50)}</strong>
               </td>
-              <td style="padding: 0.25rem 0.3rem; font-size: 0.7rem;"><span class="badge" style="font-size: 0.65rem; padding: 0.2em 0.4em;">${producto.categoria}</span></td>
-              <td style="padding: 0.25rem 0.3rem; font-size: 0.7rem;"><span class="badge badge-secondary" style="font-size: 0.65rem; padding: 0.2em 0.4em;">${producto.subcategoria}</span></td>
-              <td style="padding: 0.25rem 0.3rem; font-size: 0.75rem;">${producto.precio ? '$' + producto.precio.toFixed(0) : '-'}</td>
-              <td style="padding: 0.25rem 0.3rem; font-size: 0.75rem;">${producto.precio_usd ? 'U$D' + producto.precio_usd.toFixed(0) : '-'}</td>
-              <td style="padding: 0.25rem 0.3rem; text-align: center;">
-                <span class="badge badge-${producto.activo ? 'success' : 'danger'}" style="font-size: 0.65rem; padding: 0.2em 0.4em;">
-                  ${producto.activo ? 'Activo' : 'Inact'}
+              <td style="padding: 0.35rem 0.4rem; font-size: 0.8rem;"><span class="badge" style="font-size: 0.75rem; padding: 0.25em 0.5em;">${producto.categoria}</span></td>
+              <td style="padding: 0.35rem 0.4rem; font-size: 0.8rem;"><span class="badge badge-secondary" style="font-size: 0.75rem; padding: 0.25em 0.5em;">${producto.subcategoria}</span></td>
+              <td style="padding: 0.35rem 0.4rem; font-size: 0.85rem;">${producto.precio ? '$' + producto.precio.toFixed(0) : '-'}</td>
+              <td style="padding: 0.35rem 0.4rem; font-size: 0.85rem;">${producto.precio_usd ? 'U$D' + producto.precio_usd.toFixed(0) : '-'}</td>
+              <td style="padding: 0.35rem 0.4rem; text-align: center;">
+                <span class="badge badge-${producto.activo ? 'success' : 'danger'}" style="font-size: 0.75rem; padding: 0.25em 0.5em;">
+                  ${producto.activo ? 'Activo' : 'Inactivo'}
                 </span>
               </td>
-              <td style="padding: 0.25rem 0.2rem; text-align: center;">
-                <div style="display: flex; gap: 2px; justify-content: center;">
+              <td style="padding: 0.35rem 0.3rem; text-align: center;">
+                <div style="display: flex; gap: 3px; justify-content: center;">
                   ${esPodotactil ?
-                `<button class="btn btn-outline-primary btn-sm btn-editar-podotactil" data-id="${producto.id}" title="Editar" style="padding: 0.2rem 0.3rem; font-size: 0.65rem;">
+                `<button class="btn btn-outline-primary btn-sm btn-editar-podotactil" data-id="${producto.id}" title="Editar" style="padding: 0.3rem 0.4rem; font-size: 0.75rem;">
                       <i class="fa fa-edit"></i>
                     </button>
-                    <button class="btn btn-outline-danger btn-sm btn-eliminar" data-id="${producto.id}" title="Eliminar" style="padding: 0.2rem 0.3rem; font-size: 0.65rem;">
+                    <button class="btn btn-outline-danger btn-sm btn-eliminar" data-id="${producto.id}" title="Eliminar" style="padding: 0.3rem 0.4rem; font-size: 0.75rem;">
                       <i class="fa fa-trash"></i>
                     </button>` :
-                `<button class="btn btn-outline-primary btn-sm btn-editar" data-id="${producto.id}" title="Editar" style="padding: 0.2rem 0.3rem; font-size: 0.65rem;">
+                `<button class="btn btn-outline-primary btn-sm btn-editar" data-id="${producto.id}" title="Editar" style="padding: 0.3rem 0.4rem; font-size: 0.75rem;">
                       <i class="fa fa-edit"></i>
                     </button>
-                    <button class="btn btn-outline-danger btn-sm btn-eliminar" data-id="${producto.id}" title="Eliminar" style="padding: 0.2rem 0.3rem; font-size: 0.65rem;">
+                    <button class="btn btn-outline-danger btn-sm btn-eliminar" data-id="${producto.id}" title="Eliminar" style="padding: 0.3rem 0.4rem; font-size: 0.75rem;">
                       <i class="fa fa-trash"></i>
                     </button>`
               }
