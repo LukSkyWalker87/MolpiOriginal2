@@ -973,17 +973,17 @@
               <td>
                 <div class="btn-group" role="group">
                   ${esPodotactil ?
-                `<button class="btn btn-outline-primary btn-sm btn-editar-podotactil" data-id="${producto.id}" title="Editar">
-                      <i class="fa fa-edit"></i> Editar
+                `<button class="btn btn-outline-primary btn-sm btn-editar-podotactil" data-id="${producto.id}" title="Editar" data-toggle="tooltip">
+                      <i class="fa fa-edit"></i>
                     </button>
-                    <button class="btn btn-outline-danger btn-sm btn-eliminar" data-id="${producto.id}" title="Eliminar">
-                      <i class="fa fa-trash"></i> Eliminar
+                    <button class="btn btn-outline-danger btn-sm btn-eliminar" data-id="${producto.id}" title="Eliminar" data-toggle="tooltip">
+                      <i class="fa fa-trash"></i>
                     </button>` :
-                `<button class="btn btn-outline-primary btn-sm btn-editar" data-id="${producto.id}" title="Editar">
-                      <i class="fa fa-edit"></i> Editar
+                `<button class="btn btn-outline-primary btn-sm btn-editar" data-id="${producto.id}" title="Editar" data-toggle="tooltip">
+                      <i class="fa fa-edit"></i>
                     </button>
-                    <button class="btn btn-outline-danger btn-sm btn-eliminar" data-id="${producto.id}" title="Eliminar">
-                      <i class="fa fa-trash"></i> Eliminar
+                    <button class="btn btn-outline-danger btn-sm btn-eliminar" data-id="${producto.id}" title="Eliminar" data-toggle="tooltip">
+                      <i class="fa fa-trash"></i>
                     </button>`
               }
                 </div>
@@ -1014,6 +1014,11 @@
               editarPodotactil(id);
             });
           });
+
+          // Inicializar tooltips de Bootstrap
+          if (typeof $ !== 'undefined') {
+            $('[data-toggle="tooltip"]').tooltip();
+          }
         }
 
         // 4. Función para filtrar productos
@@ -2503,7 +2508,7 @@
                             <th>Precio en Pesos</th>
                             <th>Precio en Dólares</th>
                             <th>Estado</th>
-                            <th style="min-width: 200px; width: 200px;">Acciones</th>
+                            <th style="min-width: 100px; width: 100px;">Acciones</th>
                           </tr>
                         </thead>
                         <tbody id="tablaProductos">
