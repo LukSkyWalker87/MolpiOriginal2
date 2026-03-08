@@ -2496,19 +2496,19 @@
                 <!-- Tabla de productos -->
                 <div class="card">
                   <div class="card-body">
-                    <div class="table-responsive" style="overflow-x: auto;">
-                      <table class="table table-striped">
-                        <thead>
+                    <div class="table-responsive" style="overflow-x: auto; max-height: 500px; overflow-y: auto;">
+                      <table class="table table-striped table-sm" style="font-size: 0.85rem; margin-bottom: 0;">
+                        <thead style="position: sticky; top: 0; background-color: #f8f9fa; z-index: 10;">
                           <tr>
-                            <th>ID</th>
-                            <th>Imagen</th>
-                            <th>Producto</th>
-                            <th>Categoría</th>
-                            <th>Subcategoría</th>
-                            <th>Precio en Pesos</th>
-                            <th>Precio en Dólares</th>
-                            <th>Estado</th>
-                            <th style="min-width: 100px; width: 100px;">Acciones</th>
+                            <th style="min-width: 50px;">ID</th>
+                            <th style="min-width: 60px;">Imagen</th>
+                            <th style="min-width: 150px;">Producto</th>
+                            <th style="min-width: 100px;">Categoría</th>
+                            <th style="min-width: 100px;">Subcategoría</th>
+                            <th style="min-width: 80px;">Precio $</th>
+                            <th style="min-width: 80px;">Precio U$D</th>
+                            <th style="min-width: 70px;">Estado</th>
+                            <th style="min-width: 80px; width: 80px;">Acciones</th>
                           </tr>
                         </thead>
                         <tbody id="tablaProductos">
@@ -3607,6 +3607,37 @@
       .promociones-component .btn-sm {
         padding: 0.4rem 0.7rem;
         font-size: 0.8rem;
+      }
+    }
+
+    /* Estilos optimizados para tabla de productos - Responsive */
+    .table-sm th,
+    .table-sm td {
+      padding: 0.5rem !important;
+    }
+
+    .table-sm tbody tr:hover {
+      background-color: #f5f5f5;
+    }
+
+    /* Truncar textos largos */
+    .table-sm td:nth-child(3) {
+      max-width: 200px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    @media (max-width: 1920px) {
+      /* En pantallas menores a 1920px, hacer tabla más compacta */
+      .table-sm th,
+      .table-sm td {
+        padding: 0.4rem !important;
+        font-size: 0.8rem;
+      }
+
+      .table-sm td:nth-child(3) {
+        max-width: 150px;
       }
     }
   </style>
