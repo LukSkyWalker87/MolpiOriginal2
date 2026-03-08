@@ -1,72 +1,58 @@
 <div class="container-fluid">
   <div class="row">
     <div class="col-12">
-      <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>Gestión de Productos</h2>
-        <button class="btn btn-primary" onclick="mostrarModalProducto()">
-          <i class="fa fa-plus"></i> Nuevo Producto
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 style="margin: 0; font-size: 1.3rem;">Gestión de Productos</h2>
+        <button class="btn btn-primary btn-sm" onclick="mostrarModalProducto()">
+          <i class="fa fa-plus"></i> Nuevo
         </button>
       </div>
       
-      <!-- Filtros -->
-      <div class="card mb-4">
-        <div class="card-body">
-          <div class="row">
-            <div class="col-md-3">
-              <label for="filtroCategoria">Categoría</label>
-              <select id="filtroCategoria" class="form-control">
-                <option value="">Todas las categorías</option>
+      <!-- Filtros compactos -->
+      <div class="card mb-3" style="margin-bottom: 0.5rem;">
+        <div class="card-body" style="padding: 0.75rem;">
+          <div class="row" style="margin: -0.5rem;">
+            <div class="col-md-3" style="padding: 0.3rem;">
+              <select id="filtroCategoria" class="form-control form-control-sm" style="font-size: 0.75rem; height: 28px;">
+                <option value="">Cat.</option>
               </select>
             </div>
-            <div class="col-md-3">
-              <label for="filtroSubcategoria">Subcategoría</label>
-              <select id="filtroSubcategoria" class="form-control">
-                <option value="">Todas las subcategorías</option>
+            <div class="col-md-3" style="padding: 0.3rem;">
+              <select id="filtroSubcategoria" class="form-control form-control-sm" style="font-size: 0.75rem; height: 28px;">
+                <option value="">Subcat.</option>
               </select>
             </div>
-            <div class="col-md-2">
-              <label for="filtroLinea">Línea con Mosaicos</label>
-              <select id="filtroLinea" class="form-control" onchange="filtrarProductos()">
-                <option value="">Todas</option>
-                <option value="Línea 20x20">20x20</option>
-                <option value="Línea 40x40">40x40</option>
-                <option value="Línea 50x50">50x50</option>
-              </select>
+            <div class="col-md-3" style="padding: 0.3rem;">
+              <input type="text" id="buscarProducto" class="form-control form-control-sm" placeholder="Buscar..." onkeyup="filtrarProductos()" style="font-size: 0.75rem; height: 28px;">
             </div>
-            <div class="col-md-4">
-              <label for="buscarProducto">Buscar</label>
-              <div class="input-group">
-                <input type="text" id="buscarProducto" class="form-control" placeholder="Buscar producto..." onkeyup="filtrarProductos()">
-                <div class="input-group-append">
-                  <button class="btn btn-outline-secondary" type="button" onclick="limpiarFiltros()" title="Limpiar filtros">
-                    <i class="fa fa-refresh"></i>
-                  </button>
-                </div>
-              </div>
+            <div class="col-md-3" style="padding: 0.3rem;">
+              <button class="btn btn-outline-secondary btn-sm btn-block" onclick="limpiarFiltros()" style="font-size: 0.75rem; height: 28px; padding: 0.2rem;">
+                <i class="fa fa-refresh"></i> Limpiar
+              </button>
             </div>
           </div>
         </div>
       </div>
       
-      <!-- Tabla de productos -->
+      <!-- Tabla de productos ultra-compacta -->
       <div class="card">
-        <div class="card-body">
-          <div class="table-responsive" style="overflow-x: auto;">
-            <table class="table table-striped table-sm" style="font-size: 0.80rem; margin-bottom: 0; padding: 0.25rem;">
-              <thead style="position: sticky; top: 0; background-color: #f8f9fa; z-index: 10;">
-                <tr>
-                  <th style="min-width: 45px; padding: 0.4rem 0.3rem;">ID</th>
-                  <th style="min-width: 55px; padding: 0.4rem 0.3rem;">Imagen</th>
-                  <th style="min-width: 140px; padding: 0.4rem 0.3rem;">Producto</th>
-                  <th style="min-width: 90px; padding: 0.4rem 0.3rem;">Categoría</th>
-                  <th style="min-width: 90px; padding: 0.4rem 0.3rem;">Subcategoría</th>
-                  <th style="min-width: 70px; padding: 0.4rem 0.3rem;">Precio $</th>
-                  <th style="min-width: 70px; padding: 0.4rem 0.3rem;">Precio U$D</th>
-                  <th style="min-width: 65px; padding: 0.4rem 0.3rem;">Estado</th>
-                  <th style="min-width: 75px; width: 75px; padding: 0.4rem 0.3rem;">Acciones</th>
+        <div class="card-body" style="padding: 0.5rem;">
+          <div style="overflow-x: auto; max-height: 600px; overflow-y: auto;">
+            <table class="table table-striped table-borderless" style="font-size: 0.75rem; margin-bottom: 0;">
+              <thead style="position: sticky; top: 0; background-color: #f8f9fa; border-bottom: 2px solid #dee2e6;">
+                <tr style="height: 30px;">
+                  <th style="width: 40px; padding: 0.25rem;">ID</th>
+                  <th style="width: 50px; padding: 0.25rem;">Img</th>
+                  <th style="width: 180px; padding: 0.25rem;">Producto</th>
+                  <th style="width: 85px; padding: 0.25rem;">Categoría</th>
+                  <th style="width: 85px; padding: 0.25rem;">Subcat.</th>
+                  <th style="width: 60px; padding: 0.25rem;">$ Pesos</th>
+                  <th style="width: 60px; padding: 0.25rem;">$ USD</th>
+                  <th style="width: 50px; padding: 0.25rem;">Estado</th>
+                  <th style="width: 70px; padding: 0.25rem; text-align: center;">Acciones</th>
                 </tr>
               </thead>
-              <tbody id="tablaProductos">
+              <tbody id="tablaProductos" style="font-size: 0.75rem;">
                 <!-- Los productos se cargarán aquí -->
               </tbody>
             </table>
@@ -76,3 +62,4 @@
     </div>
   </div>
 </div>
+
