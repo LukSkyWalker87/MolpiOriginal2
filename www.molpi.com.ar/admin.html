@@ -949,40 +949,38 @@
             // Detectar si es un producto podotáctil
             const esPodotactil = producto.categoria === 'Podotáctiles' || producto.id.toString().includes('podotactil');
             fila.innerHTML = `
-              <td>${producto.id}</td>
-              <td>
+              <td style="padding: 0.25rem 0.3rem; font-size: 0.75rem;">${producto.id}</td>
+              <td style="padding: 0.25rem 0.3rem;">
                 ${producto.imagen_url ?
-                `<img src="${producto.imagen_url}" alt="${producto.nombre}" style="width: 60px; height: 60px; object-fit: cover;" class="rounded" onerror="this.src='img/placeholder-logo.png'; this.onerror=null;">` :
-                '<span class="text-muted">Sin imagen</span>'
+                `<img src="${producto.imagen_url}" alt="${producto.nombre}" style="width: 40px; height: 40px; object-fit: cover;" class="rounded" onerror="this.src='img/placeholder-logo.png'; this.onerror=null;">` :
+                '<span style="font-size: 0.7rem;">-</span>'
               }
               </td>
-              <td>
-                <strong>${producto.nombre}</strong>
-                ${producto.descripcion ? `<br><small class="text-muted">${producto.descripcion.substring(0, 100)}...</small>` : ''}
-                ${esPodotactil ? '<br><span class="badge badge-warning">Podotáctil</span>' : ''}
+              <td style="padding: 0.25rem 0.3rem; font-size: 0.75rem; max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                <strong>${producto.nombre.substring(0, 40)}</strong>
               </td>
-              <td><span class="badge badge-info">${producto.categoria}</span></td>
-              <td><span class="badge badge-secondary">${producto.subcategoria}</span></td>
-              <td>${producto.precio ? '$' + producto.precio.toFixed(2) : 'No definido'}</td>
-              <td>${producto.precio_usd ? 'U$D ' + producto.precio_usd.toFixed(2) : 'No definido'}</td>
-              <td>
-                <span class="badge badge-${producto.activo ? 'success' : 'danger'}">
-                  ${producto.activo ? 'Activo' : 'Inactivo'}
+              <td style="padding: 0.25rem 0.3rem; font-size: 0.7rem;"><span class="badge" style="font-size: 0.65rem; padding: 0.2em 0.4em;">${producto.categoria}</span></td>
+              <td style="padding: 0.25rem 0.3rem; font-size: 0.7rem;"><span class="badge badge-secondary" style="font-size: 0.65rem; padding: 0.2em 0.4em;">${producto.subcategoria}</span></td>
+              <td style="padding: 0.25rem 0.3rem; font-size: 0.75rem;">${producto.precio ? '$' + producto.precio.toFixed(0) : '-'}</td>
+              <td style="padding: 0.25rem 0.3rem; font-size: 0.75rem;">${producto.precio_usd ? 'U$D' + producto.precio_usd.toFixed(0) : '-'}</td>
+              <td style="padding: 0.25rem 0.3rem; text-align: center;">
+                <span class="badge badge-${producto.activo ? 'success' : 'danger'}" style="font-size: 0.65rem; padding: 0.2em 0.4em;">
+                  ${producto.activo ? 'Activo' : 'Inact'}
                 </span>
               </td>
-              <td>
-                <div class="btn-group" role="group">
+              <td style="padding: 0.25rem 0.2rem; text-align: center;">
+                <div style="display: flex; gap: 2px; justify-content: center;">
                   ${esPodotactil ?
-                `<button class="btn btn-outline-primary btn-sm btn-editar-podotactil" data-id="${producto.id}" title="Editar" data-toggle="tooltip">
+                `<button class="btn btn-outline-primary btn-sm btn-editar-podotactil" data-id="${producto.id}" title="Editar" style="padding: 0.2rem 0.3rem; font-size: 0.65rem;">
                       <i class="fa fa-edit"></i>
                     </button>
-                    <button class="btn btn-outline-danger btn-sm btn-eliminar" data-id="${producto.id}" title="Eliminar" data-toggle="tooltip">
+                    <button class="btn btn-outline-danger btn-sm btn-eliminar" data-id="${producto.id}" title="Eliminar" style="padding: 0.2rem 0.3rem; font-size: 0.65rem;">
                       <i class="fa fa-trash"></i>
                     </button>` :
-                `<button class="btn btn-outline-primary btn-sm btn-editar" data-id="${producto.id}" title="Editar" data-toggle="tooltip">
+                `<button class="btn btn-outline-primary btn-sm btn-editar" data-id="${producto.id}" title="Editar" style="padding: 0.2rem 0.3rem; font-size: 0.65rem;">
                       <i class="fa fa-edit"></i>
                     </button>
-                    <button class="btn btn-outline-danger btn-sm btn-eliminar" data-id="${producto.id}" title="Eliminar" data-toggle="tooltip">
+                    <button class="btn btn-outline-danger btn-sm btn-eliminar" data-id="${producto.id}" title="Eliminar" style="padding: 0.2rem 0.3rem; font-size: 0.65rem;">
                       <i class="fa fa-trash"></i>
                     </button>`
               }
