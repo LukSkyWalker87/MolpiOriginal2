@@ -375,7 +375,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function cargarProductos50x50() {
     // Intentar cargar desde el servidor
-    fetch('http://127.0.0.1:5000/productos/linea/50x50')
+    fetch('/productos/linea/50x50')
         .then(response => response.json())
         .then(productos => {
             // Ordenar productos según el orden de la base de datos (por ID)
@@ -585,7 +585,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function cargarProductos50x50() {
     // Intentar cargar desde el servidor
-    fetch('http://127.0.0.1:5000/productos/linea/50x50')
+    fetch('/productos/linea/50x50')
         .then(response => response.json())
         .then(productos => {
             console.log('Productos 50x50 cargados:', productos);
