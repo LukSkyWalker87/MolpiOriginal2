@@ -525,44 +525,43 @@ function activarAnimaciones() {
 }
 
 function crearProductoHTML(producto, delay) {
-    // Determinar las imágenes basándose en el nombre del producto
-    let imagenMolde = '';
-    let imagenMosaico = '';
-    
-    const nombreLower = producto.nombre.toLowerCase();
-    
-    if (nombreLower.includes('vainilla de 3') || nombreLower === 'vainilla de 3') {
-        imagenMolde = 'img/products/vainilla_de_3_molde.jpg';
-        imagenMosaico = 'img/products/vainilla_de_3_mosaico.png';
-    } else if (nombreLower.includes('vainilla de 4') || nombreLower === 'vainilla de 4') {
-        imagenMolde = 'img/products/vainilla_de_4_molde.jpg';
-        imagenMosaico = 'img/products/vainilla_de_4_mosaico.html'; // Mantener extensión original
-    } else if (nombreLower.includes('vainilla de 5') || nombreLower === 'vainilla de 5') {
-        imagenMolde = 'img/products/vainilla_de_5_molde.jpg';
-        imagenMosaico = 'img/products/vainilla_de_5_mosaico.html'; // Mantener extensión original
-    } else if (nombreLower.includes('vainilla de 6') || nombreLower === 'vainilla de 6') {
-        imagenMolde = 'img/products/vainilla_de_6_molde.jpg';
-        imagenMosaico = 'img/products/vainilla_de_6_mosaico.png';
-    } else if (nombreLower.includes('9 panes') || nombreLower === '9 panes') {
-        imagenMolde = 'img/products/9_panes_molde.jpg';
-        imagenMosaico = 'img/products/9_panes_mosaico.png';
-    } else if (nombreLower.includes('laja 20x20') || nombreLower === 'laja 20x20') {
-        imagenMolde = 'img/products/laja_20_molde.jpg';
-        imagenMosaico = 'img/products/lisa_20_mosaico_b.png';
-    } else if (nombreLower.includes('liso 20x20') || nombreLower === 'liso 20x20') {
-        imagenMolde = 'img/products/lisa_20_molde.jpg';
-        imagenMosaico = 'img/products/lisa_20_mosaico.png';
-    } else if (nombreLower.includes('laja 20x40') || nombreLower === 'laja 20x40') {
-        imagenMolde = 'img/products/laja_n2_40x20_molde.jpg';
-        imagenMosaico = 'img/products/laja_20x40_yeso_mosaico.html';
-    } else if (nombreLower.includes('piedra laja')) {
-        imagenMolde = 'img/products/laja_20_molde.jpg';
-        imagenMosaico = 'img/products/lisa_20_mosaico_b.png';
-    } else {
-        // Usar imagen por defecto o la imagen de la base de datos si existe
-        imagenMolde = producto.imagen_url || 'img/products/default_molde.jpg';
-        imagenMosaico = producto.imagen_url || 'img/products/default_mosaico.png';
-    }
+	// Priorizar imágenes cargadas en admin y usar hardcode solo como fallback.
+	let imagenMolde = producto.imagen_url || '';
+	let imagenMosaico = producto.imagen_mosaico_url || '';
+
+	const nombreLower = producto.nombre.toLowerCase();
+
+	if (nombreLower.includes('vainilla de 3') || nombreLower === 'vainilla de 3') {
+		if (!imagenMolde) imagenMolde = 'img/products/vainilla_de_3_molde.jpg';
+		if (!imagenMosaico) imagenMosaico = 'img/products/vainilla_de_3_mosaico.png';
+	} else if (nombreLower.includes('vainilla de 4') || nombreLower === 'vainilla de 4') {
+		if (!imagenMolde) imagenMolde = 'img/products/vainilla_de_4_molde.jpg';
+		if (!imagenMosaico) imagenMosaico = 'img/products/vainilla_de_4_mosaico.png';
+	} else if (nombreLower.includes('vainilla de 5') || nombreLower === 'vainilla de 5') {
+		if (!imagenMolde) imagenMolde = 'img/products/vainilla_de_5_molde.jpg';
+		if (!imagenMosaico) imagenMosaico = 'img/products/vainilla_de_5_mosaico.png';
+	} else if (nombreLower.includes('vainilla de 6') || nombreLower === 'vainilla de 6') {
+		if (!imagenMolde) imagenMolde = 'img/products/vainilla_de_6_molde.jpg';
+		if (!imagenMosaico) imagenMosaico = 'img/products/vainilla_de_6_mosaico.png';
+	} else if (nombreLower.includes('9 panes') || nombreLower === '9 panes') {
+		if (!imagenMolde) imagenMolde = 'img/products/9_panes_molde.jpg';
+		if (!imagenMosaico) imagenMosaico = 'img/products/9_panes_mosaico.png';
+	} else if (nombreLower.includes('laja 20x20') || nombreLower === 'laja 20x20') {
+		if (!imagenMolde) imagenMolde = 'img/products/laja_20_molde.jpg';
+		if (!imagenMosaico) imagenMosaico = 'img/products/lisa_20_mosaico_b.png';
+	} else if (nombreLower.includes('liso 20x20') || nombreLower === 'liso 20x20') {
+		if (!imagenMolde) imagenMolde = 'img/products/lisa_20_molde.jpg';
+		if (!imagenMosaico) imagenMosaico = 'img/products/lisa_20_mosaico.png';
+	} else if (nombreLower.includes('laja 20x40') || nombreLower === 'laja 20x40') {
+		if (!imagenMolde) imagenMolde = 'img/products/laja_n2_40x20_molde.jpg';
+		if (!imagenMosaico) imagenMosaico = 'img/products/laja_20x40_yeso_mosaico.png';
+	} else if (nombreLower.includes('piedra laja')) {
+		if (!imagenMolde) imagenMolde = 'img/products/laja_20_molde.jpg';
+		if (!imagenMosaico) imagenMosaico = 'img/products/lisa_20_mosaico_b.png';
+	}
+
+	if (!imagenMolde) imagenMolde = 'img/products/default_molde.jpg';
+	if (!imagenMosaico) imagenMosaico = 'img/products/default_mosaico.png';
     
     return `
         <div class="col-md-6 producto-animate" data-delay="${delay}">
