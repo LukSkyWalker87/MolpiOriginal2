@@ -414,7 +414,12 @@
 			   let html = '';
 			// Mostrar solo las subcategorías solicitadas, en el orden deseado
 			const subcategoriasDeseadas = ['Curadores', 'Pigmentos Básicos', 'Pigmentos Concentrados', 'Pigmentos Extra', 'Materiales', 'Desmoldantes', 'Herramientas'];
-			subcategoriasDeseadas.forEach(subcategoria => {
+			const subcategoriasDisponibles = Object.keys(productosPorSubcategoria || {});
+			const subcategoriasExtras = subcategoriasDisponibles
+				.filter(subcategoria => !subcategoriasDeseadas.includes(subcategoria))
+				.sort((a, b) => a.localeCompare(b));
+			const subcategoriasAMostrar = [...subcategoriasDeseadas, ...subcategoriasExtras];
+			subcategoriasAMostrar.forEach(subcategoria => {
 			   const productos = productosPorSubcategoria[subcategoria];
 			   if (productos && productos.length > 0) {
 				   // Filtrar solo productos activos

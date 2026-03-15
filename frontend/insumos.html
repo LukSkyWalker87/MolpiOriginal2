@@ -372,13 +372,21 @@
 
 			// Ordenar subcategorías para mostrar en orden específico
 			const ordenSubcategorias = ['Curadores', 'Pigmentos Básicos', 'Pigmentos Concentrados', 'Pigmentos Extra', 'Materiales', 'Desmoldantes', 'Herramientas'];
+			const subcategoriasDisponibles = Object.keys(productosPorSubcategoria || {});
+			const subcategoriasExtras = subcategoriasDisponibles
+				.filter(subcategoria => !ordenSubcategorias.includes(subcategoria))
+				.sort((a, b) => a.localeCompare(b));
+			const subcategoriasAMostrar = [...ordenSubcategorias, ...subcategoriasExtras];
+			const totalSubcategoriasConProductos = subcategoriasAMostrar.filter(
+				sub => productosPorSubcategoria[sub] && productosPorSubcategoria[sub].length > 0
+			).length;
 
-			ordenSubcategorias.forEach(subcategoria => {
+			subcategoriasAMostrar.forEach(subcategoria => {
 				if (productosPorSubcategoria[subcategoria] && productosPorSubcategoria[subcategoria].length > 0) {
 					const productos = productosPorSubcategoria[subcategoria];
 
 					// Título de subcategoría si hay más de una subcategoría
-					if (ordenSubcategorias.filter(sub => productosPorSubcategoria[sub] && productosPorSubcategoria[sub].length > 0).length > 1) {
+					if (totalSubcategoriasConProductos > 1) {
 						html += `
 								<div class="col-md-12">
 									<h3 class="text-center mb-4">${subcategoria}</h3>

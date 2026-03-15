@@ -409,6 +409,7 @@
 
 		function mostrarProductosOriginal(productosPorSubcategoria) {
 			const container = document.getElementById('productos-container');
+			const productosRenderizados = new Set();
 
 			// Crear un mapa de productos por nombre para facilitar el acceso
 			const productosPorNombre = {};
@@ -454,6 +455,20 @@
 					`;
 			}
 
+			function agregarProductoAHtml(htmlActual, producto, opciones = {}) {
+				if (!producto || productosRenderizados.has(producto.nombre)) {
+					return htmlActual;
+				}
+
+				productosRenderizados.add(producto.nombre);
+				return htmlActual + crearProducto(
+					producto,
+					false,
+					opciones.delayImagen1 || "200",
+					opciones.delayImagen2 || "400"
+				);
+			}
+
 			// Estructura exacta como en el estático
 			let html = '<div class="row">';
 
@@ -462,10 +477,10 @@
 			const mureteCuarcita = buscarProducto('Murete Cuarcita');
 
 			if (similPiedra) {
-				html += crearProducto(similPiedra, true, "200", "400");
+				html = agregarProductoAHtml(html, similPiedra);
 			}
 			if (mureteCuarcita) {
-				html += crearProducto(mureteCuarcita, false, "200", "400");
+				html = agregarProductoAHtml(html, mureteCuarcita);
 			}
 			html += '<div class="col-md-12"><hr></div>';
 
@@ -474,10 +489,13 @@
 			const corteza = buscarProducto('Corteza');
 
 			if (quebracho) {
-				html += crearProducto(quebracho, true, "0", "200");
+				html = agregarProductoAHtml(html, quebracho, {
+					delayImagen1: "0",
+					delayImagen2: "200"
+				});
 			}
 			if (corteza) {
-				html += crearProducto(corteza, false, "200", "400");
+				html = agregarProductoAHtml(html, corteza);
 			}
 			html += '<div class="col-md-12"><hr></div>';
 
@@ -486,10 +504,13 @@
 			const ondas = buscarProducto('Ondas');
 
 			if (trapezoide) {
-				html += crearProducto(trapezoide, true, "0", "200");
+				html = agregarProductoAHtml(html, trapezoide, {
+					delayImagen1: "0",
+					delayImagen2: "200"
+				});
 			}
 			if (ondas) {
-				html += crearProducto(ondas, false, "200", "400");
+				html = agregarProductoAHtml(html, ondas);
 			}
 			html += '<div class="col-md-12"><hr></div>';
 
@@ -498,10 +519,13 @@
 			const tresd = buscarProducto('3D Relieve');
 
 			if (piedraEncastrable) {
-				html += crearProducto(piedraEncastrable, true, "0", "200");
+				html = agregarProductoAHtml(html, piedraEncastrable, {
+					delayImagen1: "0",
+					delayImagen2: "200"
+				});
 			}
 			if (tresd) {
-				html += crearProducto(tresd, false, "200", "400");
+				html = agregarProductoAHtml(html, tresd);
 			}
 
 			// Fila 5: Revestimiento 20x40 y Laja 20x40
@@ -509,10 +533,20 @@
 			const laja20x40 = buscarProducto('Laja 20x40');
 
 			if (revestimiento20x40) {
-				html += crearProducto(revestimiento20x40, true, "200", "400");
+				html = agregarProductoAHtml(html, revestimiento20x40);
 			}
 			if (laja20x40) {
-				html += crearProducto(laja20x40, false, "200", "400");
+				html = agregarProductoAHtml(html, laja20x40);
+			}
+
+			const subcategoriasOrdenadas = Object.keys(productosPorSubcategoria).sort((a, b) => a.localeCompare(b));
+			for (const subcategoria of subcategoriasOrdenadas) {
+				const productosSubcategoria = productosPorSubcategoria[subcategoria] || [];
+				for (const producto of productosSubcategoria) {
+					if (productosRenderizados.has(producto.nombre)) continue;
+					html += '<div class="col-md-12"><hr></div>';
+					html = agregarProductoAHtml(html, producto);
+				}
 			}
 
 			html += '</div>';
