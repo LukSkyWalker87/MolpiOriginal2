@@ -364,6 +364,7 @@
 
 			function mostrarProductosOriginal(productosPorSubcategoria) {
 				const container = document.getElementById('productos-container');
+				const productosRenderizados = new Set();
 				
 				// Crear un mapa de productos por nombre para facilitar el acceso
 				const productosPorNombre = {};
@@ -418,6 +419,21 @@
 					`;
 				}
 
+				function agregarProductoAHtml(htmlActual, producto, opciones = {}) {
+					if (!producto || productosRenderizados.has(producto.nombre)) {
+						return htmlActual;
+					}
+
+					productosRenderizados.add(producto.nombre);
+					return htmlActual + crearProducto(
+						producto,
+						false,
+						opciones.delayImagen1 || "0",
+						opciones.delayImagen2 || "200",
+						opciones.botonPlano || null
+					);
+				}
+
 				// Estructura exacta como en el estático - orden específico de productos
 				let html = '<div class="col-md-12"><h2><strong> </strong></h2></div>';
 				
@@ -426,10 +442,10 @@
 				const bordeRectoDiente = buscarProducto('Borde Recto con Diente');
 				
 				if (travertino50x50) {
-					html += crearProducto(travertino50x50, true, "0", "200");
+					html = agregarProductoAHtml(html, travertino50x50);
 				}
 				if (bordeRectoDiente) {
-					html += crearProducto(bordeRectoDiente, false, "0", "200", {
+					html = agregarProductoAHtml(html, bordeRectoDiente, {
 						url: "pdf/travertino_con_diente.png",
 						texto: "descargar plano"
 					});
@@ -441,10 +457,10 @@
 				const escalon50x32 = buscarProducto('Escalón 50x32cm');
 				
 				if (bordeRecto40x50) {
-					html += crearProducto(bordeRecto40x50, true, "0", "200");
+					html = agregarProductoAHtml(html, bordeRecto40x50);
 				}
 				if (escalon50x32) {
-					html += crearProducto(escalon50x32, false, "0", "200");
+					html = agregarProductoAHtml(html, escalon50x32);
 				}
 				html += '<div class="col-md-12"><hr></div>';
 				
@@ -453,13 +469,13 @@
 				const bordeBallena = buscarProducto('Borde Ballena 40x50x3cm');
 				
 				if (arcoRomano) {
-					html += crearProducto(arcoRomano, true, "0", "200", {
+					html = agregarProductoAHtml(html, arcoRomano, {
 						url: "pdf/arco-romano.jpg",
 						texto: "descargar plano"
 					});
 				}
 				if (bordeBallena) {
-					html += crearProducto(bordeBallena, false, "0", "200");
+					html = agregarProductoAHtml(html, bordeBallena);
 				}
 				html += '<div class="col-md-12"><hr></div>';
 				
@@ -468,10 +484,10 @@
 				const esquineroInvertido = buscarProducto('Esquinero Invertido 40x40cm');
 				
 				if (esquinero50x50) {
-					html += crearProducto(esquinero50x50, true, "0", "200");
+					html = agregarProductoAHtml(html, esquinero50x50);
 				}
 				if (esquineroInvertido) {
-					html += crearProducto(esquineroInvertido, false, "0", "200");
+					html = agregarProductoAHtml(html, esquineroInvertido);
 				}
 				html += '<div class="col-md-12"><hr></div>';
 				
@@ -480,10 +496,10 @@
 				const esquinaRejilla = buscarProducto('Esquina Rejilla 25x25x4cm');
 				
 				if (rejilla50x25) {
-					html += crearProducto(rejilla50x25, true, "0", "200");
+					html = agregarProductoAHtml(html, rejilla50x25);
 				}
 				if (esquinaRejilla) {
-					html += crearProducto(esquinaRejilla, false, "0", "200");
+					html = agregarProductoAHtml(html, esquinaRejilla);
 				}
 				html += '<div class="col-md-12"><hr></div>';
 				
@@ -492,13 +508,13 @@
 				const deckTravertino = buscarProducto('Deck Travertino');
 				
 				if (deckAntideslizante) {
-					html += crearProducto(deckAntideslizante, true, "0", "200", {
+					html = agregarProductoAHtml(html, deckAntideslizante, {
 						url: "pdf/deck_madera_con_diente.png",
 						texto: "descargar plano"
 					});
 				}
 				if (deckTravertino) {
-					html += crearProducto(deckTravertino, false, "0", "200");
+					html = agregarProductoAHtml(html, deckTravertino);
 				}
 				html += '<div class="col-md-12"><hr></div>';
 				
@@ -506,7 +522,20 @@
 				const travertino40x40 = buscarProducto('Travertino Piscina 40x40x2,2cm');
 				
 				if (travertino40x40) {
-					html += crearProducto(travertino40x40, true, "200", "400");
+					html = agregarProductoAHtml(html, travertino40x40, {
+						delayImagen1: "200",
+						delayImagen2: "400"
+					});
+				}
+
+				const subcategoriasOrdenadas = Object.keys(productosPorSubcategoria).sort((a, b) => a.localeCompare(b));
+				for (const subcategoria of subcategoriasOrdenadas) {
+					const productosSubcategoria = productosPorSubcategoria[subcategoria] || [];
+					for (const producto of productosSubcategoria) {
+						if (productosRenderizados.has(producto.nombre)) continue;
+						html += '<div class="col-md-12"><hr></div>';
+						html = agregarProductoAHtml(html, producto);
+					}
 				}
 
 				container.innerHTML = html;
