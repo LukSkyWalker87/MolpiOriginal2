@@ -99,8 +99,8 @@ def upload_producto():
     file = request.files['file']
     if file.filename == '':
         return jsonify({'error': 'No selected file'}), 400
-    # Guardar archivo
-    upload_folder = os.path.join(os.path.dirname(__file__), '..', 'static', 'uploads')
+    # Guardar archivo en carpeta persistente (montada por docker-compose)
+    upload_folder = os.path.join(os.path.dirname(__file__), 'data', 'uploads')
     os.makedirs(upload_folder, exist_ok=True)
     safe_name = secure_filename(str(file.filename))
     timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
@@ -113,9 +113,20 @@ def upload_producto():
 
 @app.route('/static/uploads/<path:filename>')
 def serve_uploaded_producto(filename):
-    """Servir archivos subidos de productos desde static/uploads."""
-    upload_folder = os.path.join(os.path.dirname(__file__), '..', 'static', 'uploads')
-    return send_from_directory(upload_folder, filename)
+    """Servir archivos subidos de productos con fallback a rutas legacy."""
+    base_dir = os.path.dirname(__file__)
+    candidate_dirs = [
+        os.path.join(base_dir, 'data', 'uploads'),
+        os.path.join(base_dir, '..', 'www.molpi.com.ar', 'static', 'uploads'),
+        os.path.join(base_dir, '..', 'static', 'uploads'),
+    ]
+
+    for upload_folder in candidate_dirs:
+        file_path = os.path.join(upload_folder, filename)
+        if os.path.exists(file_path):
+            return send_from_directory(upload_folder, filename)
+
+    return jsonify({'error': 'Archivo no encontrado'}), 404
 
 # ========= CORS - Configuración para PythonAnywhere =========
 # CORS configurado correctamente
