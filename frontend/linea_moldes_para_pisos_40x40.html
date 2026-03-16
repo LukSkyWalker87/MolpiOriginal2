@@ -419,17 +419,41 @@
 			});
 		}
 
+		function normalizarUrlImagen(url) {
+			if (!url || typeof url !== 'string') return '';
+			const limpia = url.trim();
+			if (limpia.endsWith('.pn')) return `${limpia}g`;
+			if (limpia.endsWith('.jpe')) return `${limpia}g`;
+			return limpia;
+		}
+
+		function obtenerFallbackPorProducto(nombre) {
+			const normalizado = (nombre || '').trim().toUpperCase();
+			const porNombre = {
+				'16 PANES LISO': {
+					molde: 'img/products/liso_40_molde.jpg',
+					mosaico: 'img/products/liso_40_mosaico.png'
+				}
+			};
+
+			return porNombre[normalizado] || {
+				molde: 'img/products/default_molde.jpg',
+				mosaico: 'img/products/default_mosaico.png'
+			};
+		}
+
 		function crearProducto40x40HTML(producto, delay) {
 			// Obtener las imágenes del molde y mosaico basándose en la URL de la base de datos
-			let imagenMolde = producto.imagen_url || 'img/products/default_molde.jpg';
-			let imagenMosaico = producto.imagen_mosaico_url || '';
+			const fallback = obtenerFallbackPorProducto(producto.nombre);
+			let imagenMolde = normalizarUrlImagen(producto.imagen_url) || fallback.molde;
+			let imagenMosaico = normalizarUrlImagen(producto.imagen_mosaico_url) || '';
 
 			// Si no viene mosaico en DB, intentar derivarlo desde el molde.
 			if (!imagenMosaico) {
 				if (imagenMolde.includes('_molde.jpg')) {
 					imagenMosaico = imagenMolde.replace('_molde.jpg', '_mosaico.png');
 				} else {
-					imagenMosaico = 'img/products/default_mosaico.png';
+					imagenMosaico = fallback.mosaico;
 				}
 			}
 
@@ -441,8 +465,8 @@
                     <hr>
                 </div>
             </div>
-            <img src="${imagenMolde}" class="custom-product-image-pos-1 _relative img-responsive producto-imagen" data-delay="${delay + 200}" alt />
-            <img src="${imagenMosaico}" class="custom-product-image-pos-5 _absolute img-responsive producto-imagen" data-delay="${delay + 300}" alt />
+			<img src="${imagenMolde}" class="custom-product-image-pos-1 _relative img-responsive producto-imagen" data-delay="${delay + 200}" alt="${producto.nombre}" onerror="this.onerror=null; this.src='${fallback.molde}';" />
+			<img src="${imagenMosaico}" class="custom-product-image-pos-5 _absolute img-responsive producto-imagen" data-delay="${delay + 300}" alt="Mosaico ${producto.nombre}" onerror="this.onerror=null; this.src='${fallback.mosaico}';" />
         </div>
     `;
 		}
