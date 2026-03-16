@@ -425,22 +425,76 @@
 
 			function obtenerFallbackPiscinas(nombre) {
 				const n = (nombre || '').trim().replace(/\.+$/, '').toUpperCase();
-				const fallback = {
-					'SIMIL BALI': {
+				if (n === 'SIMIL BALI') {
+					return {
 						molde: 'img/products/piscina_borderecto_40x50_molde.jpg',
 						mosaico: 'img/products/piscina_borde_ballena_40x50_mosaico.png'
-					},
-					'CONJUNTO ESQUINERO C/DIENTE 50X50': {
+					};
+				}
+
+				if (n.includes('ESQUINERO') && n.includes('DIENTE')) {
+					return {
 						molde: 'img/products/piscina_esquinero_50x50_molde.jpg',
 						mosaico: 'img/products/piscina_esquinero_50x50_mosaico.png'
-					},
-					'TRAVERTINO 50X50X3CM': {
+					};
+				}
+
+				if (n.includes('BALLENA')) {
+					return {
+						molde: 'img/products/piscina_borde_ballena_40x50_molde.jpg',
+						mosaico: 'img/products/piscina_borde_ballena_40x50_mosaico.png'
+					};
+				}
+
+				if (n.includes('RECTO') && n.includes('DIENTE')) {
+					return {
+						molde: 'img/products/piscina_borde_recto_diente_50x50.png',
+						mosaico: 'img/products/piscina_borderecto_40x50_mosaico.png'
+					};
+				}
+
+				if (n.includes('TRAVERTINO')) {
+					return {
 						molde: 'img/products/piscina_travertino_50x50_molde.jpg',
 						mosaico: 'img/products/piscina_travertino_50x50_mosaico.png'
-					}
-				};
+					};
+				}
 
-				return fallback[n] || {
+				if (n.includes('REJILLA')) {
+					return {
+						molde: 'img/products/piscina_rejilla_molde.jpg',
+						mosaico: 'img/products/piscina_rejilla_mosaico.png'
+					};
+				}
+
+				if (n.includes('ESCALON') || n.includes('ESCALÓN')) {
+					return {
+						molde: 'img/products/piscina_escalon_32x18_molde.jpg',
+						mosaico: 'img/products/piscina_escalon_32x18_mosaico.png'
+					};
+				}
+
+				if (n.includes('ARCO')) {
+					return {
+						molde: 'img/products/piscina_arco_romano_molde.jpg',
+						mosaico: 'img/products/piscina_arco_romano_mosaico.png'
+					};
+				}
+
+				if (n.includes('DECK')) {
+					if (n.includes('TRAVERTINO')) {
+						return {
+							molde: 'img/products/piscina_deck_travertino_molde.jpg',
+							mosaico: 'img/products/piscina_deck_travertino_mosaico.png'
+						};
+					}
+					return {
+						molde: 'img/products/deckmadera_antideslizante_molde.jpg',
+						mosaico: 'img/products/deckmadera_antideslizante_mosaico.png'
+					};
+				}
+
+				return {
 					molde: 'img/placeholder-logo.png',
 					mosaico: 'img/placeholder-logo.png'
 				};
