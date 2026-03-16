@@ -365,6 +365,33 @@
 			function mostrarProductosOriginal(productosPorSubcategoria) {
 				const container = document.getElementById('productos-container');
 				const productosRenderizados = new Set();
+
+				function normalizarUrlImagen(url) {
+					if (!url || typeof url !== 'string') return '';
+					const limpia = url.trim();
+					if (limpia.endsWith('.pn')) return `${limpia}g`;
+					if (limpia.endsWith('.jpe')) return `${limpia}g`;
+					return limpia;
+				}
+
+				function obtenerFallbackPiscinas(nombre) {
+					const n = (nombre || '').trim().toUpperCase();
+					const fallback = {
+						'SIMIL BALI': {
+							molde: 'img/products/piscina_borderecto_40x50_molde.jpg',
+							mosaico: 'img/products/piscina_borde_ballena_40x50_mosaico.png'
+						},
+						'TRAVERTINO 50X50X3CM': {
+							molde: 'img/products/piscina_travertino_50x50_molde.jpg',
+							mosaico: 'img/products/piscina_travertino_50x50_mosaico.png'
+						}
+					};
+
+					return fallback[n] || {
+						molde: 'img/placeholder-logo.png',
+						mosaico: 'img/placeholder-logo.png'
+					};
+				}
 				
 				// Crear un mapa de productos por nombre para facilitar el acceso
 				const productosPorNombre = {};
@@ -381,9 +408,12 @@
 
 				// Función auxiliar para crear estructura de producto exacta como en el estático
 				function crearProducto(producto, esColumnaIzquierda, delayImagen1, delayImagen2, botonPlano = null) {
-					const tieneMosaico = producto.imagen_mosaico_url && 
-						producto.imagen_mosaico_url.trim() !== '' && 
-						!producto.imagen_mosaico_url.includes('.html'); // Excluir URLs incorrectas con .html
+					const fallback = obtenerFallbackPiscinas(producto.nombre);
+					const imagenMolde = normalizarUrlImagen(producto.imagen_url) || fallback.molde;
+					const imagenMosaicoNormalizada = normalizarUrlImagen(producto.imagen_mosaico_url);
+					const tieneMosaico = imagenMosaicoNormalizada && 
+						imagenMosaicoNormalizada.trim() !== '' && 
+						!imagenMosaicoNormalizada.includes('.html'); // Excluir URLs incorrectas con .html
 					
 					// Formatear descripción como en el estático
 					let descripcionFormateada = '';
@@ -408,10 +438,10 @@
 									<hr>
 								</div>
 							</div>
-							<img src="${producto.imagen_url}" data-appear-animation="fadeInLeft" data-appear-animation-delay="${delayImagen1}" data-plugin-options="{'accY': 10}" alt class="custom-product-image-pos-1 _relative img-responsive" />
+							<img src="${imagenMolde}" data-appear-animation="fadeInLeft" data-appear-animation-delay="${delayImagen1}" data-plugin-options="{'accY': 10}" alt class="custom-product-image-pos-1 _relative img-responsive" onerror="this.onerror=null; this.src='${fallback.molde}';" />
 							
 							${tieneMosaico ? `
-							<img src="${producto.imagen_mosaico_url}" data-appear-animation="fadeInLeft" data-appear-animation-delay="${delayImagen2}" data-plugin-options="{'accY': 10}" alt class="custom-product-image-pos-5 _absolute img-responsive" />
+							<img src="${imagenMosaicoNormalizada}" data-appear-animation="fadeInLeft" data-appear-animation-delay="${delayImagen2}" data-plugin-options="{'accY': 10}" alt class="custom-product-image-pos-5 _absolute img-responsive" onerror="this.onerror=null; this.src='${fallback.mosaico}';" />
 							` : ''}
 							
 							${botonHTML}
