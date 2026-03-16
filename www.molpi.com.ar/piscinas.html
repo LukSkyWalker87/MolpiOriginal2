@@ -424,11 +424,15 @@
 			}
 
 			function obtenerFallbackPiscinas(nombre) {
-				const n = (nombre || '').trim().toUpperCase();
+				const n = (nombre || '').trim().replace(/\.+$/, '').toUpperCase();
 				const fallback = {
 					'SIMIL BALI': {
 						molde: 'img/products/piscina_borderecto_40x50_molde.jpg',
 						mosaico: 'img/products/piscina_borde_ballena_40x50_mosaico.png'
+					},
+					'CONJUNTO ESQUINERO C/DIENTE 50X50': {
+						molde: 'img/products/piscina_esquinero_50x50_molde.jpg',
+						mosaico: 'img/products/piscina_esquinero_50x50_mosaico.png'
 					},
 					'TRAVERTINO 50X50X3CM': {
 						molde: 'img/products/piscina_travertino_50x50_molde.jpg',
