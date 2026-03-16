@@ -433,13 +433,32 @@
 				'16 PANES LISO': {
 					molde: 'img/products/liso_40_molde.jpg',
 					mosaico: 'img/products/liso_40_mosaico.png'
+				},
+				'ANTIDESLIZANTE': {
+					molde: 'img/products/antideslizante_40x40_molde.jpg',
+					mosaico: 'img/products/liso_40_mosaico.png'
+				},
+				'LAJA SAN PEDRO': {
+					molde: 'img/products/riojana_molde.jpg',
+					mosaico: 'img/products/riojana_mosaico.png'
 				}
 			};
 
 			return porNombre[normalizado] || {
 				molde: 'img/products/default_molde.jpg',
-				mosaico: 'img/products/default_mosaico.png'
+				mosaico: 'img/products/liso_40_mosaico.png'
 			};
+		}
+
+		function manejarErrorImagen(img, fallbackUrl, ocultarSiFalla) {
+			if (!img) return;
+			if (img.dataset.fallbackTried === '1') {
+				if (ocultarSiFalla) img.style.display = 'none';
+				return;
+			}
+
+			img.dataset.fallbackTried = '1';
+			img.src = fallbackUrl;
 		}
 
 		function crearProducto40x40HTML(producto, delay) {
@@ -465,8 +484,8 @@
                     <hr>
                 </div>
             </div>
-			<img src="${imagenMolde}" class="custom-product-image-pos-1 _relative img-responsive producto-imagen" data-delay="${delay + 200}" alt="${producto.nombre}" onerror="this.onerror=null; this.src='${fallback.molde}';" />
-			<img src="${imagenMosaico}" class="custom-product-image-pos-5 _absolute img-responsive producto-imagen" data-delay="${delay + 300}" alt="Mosaico ${producto.nombre}" onerror="this.onerror=null; this.src='${fallback.mosaico}';" />
+			<img src="${imagenMolde}" class="custom-product-image-pos-1 _relative img-responsive producto-imagen" data-delay="${delay + 200}" alt="${producto.nombre}" onerror="manejarErrorImagen(this, '${fallback.molde}', false)" />
+			<img src="${imagenMosaico}" class="custom-product-image-pos-5 _absolute img-responsive producto-imagen" data-delay="${delay + 300}" alt="Mosaico ${producto.nombre}" onerror="manejarErrorImagen(this, '${fallback.mosaico}', true)" />
         </div>
     `;
 		}
