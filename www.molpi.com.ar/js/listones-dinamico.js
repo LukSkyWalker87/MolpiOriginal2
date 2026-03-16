@@ -54,10 +54,28 @@ function renderizarProductosListones(productos) {
     // const ordenProductos = [ ... ];
     // Si quieres un orden fijo, implementa aquí
 
+    const fallbackPorProducto = {
+        'LISTON TRAVERTINO DOBLE': {
+            molde: '/static/uploads/Molde - Liston.png',
+            mosaico: '/static/uploads/Mosaico - Liston.png'
+        },
+        'LISTON TRAVERTINO C/ DIENTE': {
+            molde: '/static/uploads/Liston 1.png'
+        }
+    };
+
+    function getFallback(productoNombre, tipo) {
+        const key = (productoNombre || '').toUpperCase().trim();
+        const cfg = fallbackPorProducto[key] || {};
+        return cfg[tipo] || 'img/placeholder.png';
+    }
+
     let html = '';
     productos.forEach((producto, index) => {
         const imagenMolde = producto.imagen_url || 'img/placeholder.png';
         const imagenMosaico = producto.imagen_mosaico_url || '';
+        const fallbackMolde = getFallback(producto.nombre, 'molde');
+        const fallbackMosaico = getFallback(producto.nombre, 'mosaico');
         let tipoProducto = '';
         let descripcion = producto.descripcion || '';
         switch(producto.nombre) {
@@ -74,6 +92,7 @@ function renderizarProductosListones(productos) {
                 <div style="display: flex; flex-direction: row; gap: 24px; justify-content: center; align-items: flex-end;">
                     ${imagenMolde ? `
                     <img src="${imagenMolde}"
+                        onerror="this.onerror=null; this.src='${fallbackMolde}';"
                          data-appear-animation="fadeInLeft"
                          data-appear-animation-delay="0"
                          data-plugin-options="{'accY': 10}"
@@ -83,6 +102,7 @@ function renderizarProductosListones(productos) {
                     ` : ''}
                     ${imagenMosaico ? `
                     <img src="${imagenMosaico}"
+                        onerror="this.onerror=null; this.src='${fallbackMosaico}';"
                          data-appear-animation="fadeInLeft"
                          data-appear-animation-delay="200"
                          data-plugin-options="{'accY': 10}"
