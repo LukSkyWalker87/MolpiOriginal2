@@ -882,19 +882,89 @@ function getClientesHTML() {
         }
         
         // 6. Función para mostrar vista previa de imagen (molde y mosaico)
+        function normalizarUrlImagenAdmin(url) {
+          if (!url || typeof url !== 'string') return '';
+          const limpia = url.trim();
+          if (limpia.endsWith('.pn')) return `${limpia}g`;
+          if (limpia.endsWith('.jpe')) return `${limpia}g`;
+          return limpia;
+        }
+
+        function obtenerFallbackAdmin(nombre, tipo) {
+          const n = (nombre || '').trim().toUpperCase();
+          const fallback = {
+            'SIMIL BALI': {
+              molde: 'img/products/piscina_borderecto_40x50_molde.jpg',
+              mosaico: 'img/products/piscina_borderecto_40x50_mosaico.png'
+            },
+            '16 PANES LISO': {
+              molde: 'img/products/liso_40_molde.jpg',
+              mosaico: 'img/products/liso_40_mosaico.png'
+            },
+            'ANTIDESLIZANTE': {
+              molde: 'img/products/antideslizante_40x40_molde.jpg',
+              mosaico: 'img/products/liso_40_mosaico.png'
+            },
+            'FLOR CIRCULAR': {
+              molde: 'img/products/flor_circular_molde.jpg',
+              mosaico: 'img/products/liso_40_mosaico.png'
+            },
+            'LAJA SAN PEDRO': {
+              molde: 'img/products/riojana_molde.jpg',
+              mosaico: 'img/products/riojana_mosaico.png'
+            },
+            'VAINILLA DE 4': {
+              molde: 'img/products/vainilla_de_4_molde.jpg',
+              mosaico: 'img/products/vainilla_de_6_mosaico.png'
+            },
+            'VAINILLA DE 5': {
+              molde: 'img/products/vainilla_de_5_molde.jpg',
+              mosaico: 'img/products/vainilla_de_6_mosaico.png'
+            },
+            'PINOTEA': {
+              molde: 'img/products/deck_simil_madera_molde.jpg',
+              mosaico: 'img/products/deck_simil_madera_mosaico.png'
+            }
+          };
+
+          const porProducto = fallback[n] || {};
+          if (tipo === 'molde') return porProducto.molde || 'img/placeholder-logo.png';
+          return porProducto.mosaico || 'img/placeholder-logo.png';
+        }
+
+        function configurarFallbackImagen(img, fallbackUrl, displayVacio = 'block', emptyEl = null) {
+          if (!img) return;
+          img.dataset.fallbackIntentado = '0';
+          img.onerror = function () {
+            if (this.dataset.fallbackIntentado === '1') {
+              this.style.display = 'none';
+              if (emptyEl) emptyEl.style.display = displayVacio;
+              return;
+            }
+            this.dataset.fallbackIntentado = '1';
+            this.src = fallbackUrl;
+          };
+        }
+
         function mostrarVistaPrevia(urlMolde, urlMosaico = '') {
           const vistasIndividuales = document.getElementById('vistasIndividuales');
           const sinImagen = document.getElementById('sinImagen');
+          const nombreProducto = document.getElementById('productoNombre')?.value || '';
           
           // Elementos individuales
           const soloMolde = document.getElementById('soloMolde');
           const soloMosaico = document.getElementById('soloMosaico');
           const sinMosaico = document.getElementById('sinMosaico');
+
+          const moldeNormalizado = normalizarUrlImagenAdmin(urlMolde);
+          const mosaicoNormalizado = normalizarUrlImagenAdmin(urlMosaico);
+          const fallbackMolde = obtenerFallbackAdmin(nombreProducto, 'molde');
+          const fallbackMosaico = obtenerFallbackAdmin(nombreProducto, 'mosaico');
           
           if (!vistasIndividuales || !sinImagen) return;
           
           // Si no hay URL del molde, no mostrar nada
-          if (!urlMolde || urlMolde.trim() === '') {
+          if (!moldeNormalizado || moldeNormalizado.trim() === '') {
             vistasIndividuales.style.display = 'none';
             sinImagen.style.display = 'block';
             return;
@@ -906,16 +976,18 @@ function getClientesHTML() {
           
           // Configurar imagen del molde
           if (soloMolde) {
-            soloMolde.src = urlMolde;
+            soloMolde.src = moldeNormalizado;
             soloMolde.style.display = 'block';
+            configurarFallbackImagen(soloMolde, fallbackMolde, 'block', sinImagen);
           }
           
           // Configurar imagen del mosaico
-          if (urlMosaico && urlMosaico.trim() !== '') {
+          if (mosaicoNormalizado && mosaicoNormalizado.trim() !== '') {
             // Hay mosaico
             if (soloMosaico) {
-              soloMosaico.src = urlMosaico;
+              soloMosaico.src = mosaicoNormalizado;
               soloMosaico.style.display = 'block';
+              configurarFallbackImagen(soloMosaico, fallbackMosaico, 'block', sinMosaico);
             }
             if (sinMosaico) {
               sinMosaico.style.display = 'none';
@@ -928,21 +1000,6 @@ function getClientesHTML() {
             if (sinMosaico) {
               sinMosaico.style.display = 'block';
             }
-          }
-          
-          // Manejar errores de carga
-          if (soloMolde) {
-            soloMolde.onerror = function() {
-              vistasIndividuales.style.display = 'none';
-              sinImagen.style.display = 'block';
-            };
-          }
-          
-          if (soloMosaico) {
-            soloMosaico.onerror = function() {
-              soloMosaico.style.display = 'none';
-              sinMosaico.style.display = 'block';
-            };
           }
         }
         
@@ -971,6 +1028,12 @@ function getClientesHTML() {
         function actualizarVistaPreviaModal() {
           const urlMolde = document.getElementById('productoImagen')?.value || '';
           const urlMosaico = document.getElementById('productoImagenMosaico')?.value || '';
+          const nombreProducto = document.getElementById('productoNombre')?.value || '';
+
+          const moldeNormalizado = normalizarUrlImagenAdmin(urlMolde);
+          const mosaicoNormalizado = normalizarUrlImagenAdmin(urlMosaico);
+          const fallbackMolde = obtenerFallbackAdmin(nombreProducto, 'molde');
+          const fallbackMosaico = obtenerFallbackAdmin(nombreProducto, 'mosaico');
           
           const previewMolde = document.getElementById('previewMolde');
           const previewMoldeEmpty = document.getElementById('previewMoldeEmpty');
@@ -978,14 +1041,11 @@ function getClientesHTML() {
           const previewMosaicoEmpty = document.getElementById('previewMosaicoEmpty');
           
           // Mostrar/ocultar imagen del molde
-          if (urlMolde && urlMolde.trim() !== '') {
+          if (moldeNormalizado && moldeNormalizado.trim() !== '') {
             if (previewMolde) {
-              previewMolde.src = urlMolde;
+              previewMolde.src = moldeNormalizado;
               previewMolde.style.display = 'block';
-              previewMolde.onerror = function() {
-                this.style.display = 'none';
-                if (previewMoldeEmpty) previewMoldeEmpty.style.display = 'flex';
-              };
+              configurarFallbackImagen(previewMolde, fallbackMolde, 'flex', previewMoldeEmpty);
             }
             if (previewMoldeEmpty) previewMoldeEmpty.style.display = 'none';
           } else {
@@ -994,14 +1054,11 @@ function getClientesHTML() {
           }
           
           // Mostrar/ocultar imagen del mosaico
-          if (urlMosaico && urlMosaico.trim() !== '') {
+          if (mosaicoNormalizado && mosaicoNormalizado.trim() !== '') {
             if (previewMosaico) {
-              previewMosaico.src = urlMosaico;
+              previewMosaico.src = mosaicoNormalizado;
               previewMosaico.style.display = 'block';
-              previewMosaico.onerror = function() {
-                this.style.display = 'none';
-                if (previewMosaicoEmpty) previewMosaicoEmpty.style.display = 'flex';
-              };
+              configurarFallbackImagen(previewMosaico, fallbackMosaico, 'flex', previewMosaicoEmpty);
             }
             if (previewMosaicoEmpty) previewMosaicoEmpty.style.display = 'none';
           } else {
