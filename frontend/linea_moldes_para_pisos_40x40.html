@@ -466,15 +466,7 @@
 			const fallback = obtenerFallbackPorProducto(producto.nombre);
 			let imagenMolde = normalizarUrlImagen(producto.imagen_url) || fallback.molde;
 			let imagenMosaico = normalizarUrlImagen(producto.imagen_mosaico_url) || '';
-
-			// Si no viene mosaico en DB, intentar derivarlo desde el molde.
-			if (!imagenMosaico) {
-				if (imagenMolde.includes('_molde.jpg')) {
-					imagenMosaico = imagenMolde.replace('_molde.jpg', '_mosaico.png');
-				} else {
-					imagenMosaico = fallback.mosaico;
-				}
-			}
+			const tieneMosaico = !!(imagenMosaico && imagenMosaico.trim() !== '');
 
 			return `
         <div class="col-md-6 producto-animate" data-delay="${delay}">
@@ -485,7 +477,7 @@
                 </div>
             </div>
 			<img src="${imagenMolde}" class="custom-product-image-pos-1 _relative img-responsive producto-imagen" data-delay="${delay + 200}" alt="${producto.nombre}" onerror="manejarErrorImagen(this, '${fallback.molde}', false)" />
-			<img src="${imagenMosaico}" class="custom-product-image-pos-5 _absolute img-responsive producto-imagen" data-delay="${delay + 300}" alt="Mosaico ${producto.nombre}" onerror="manejarErrorImagen(this, '${fallback.mosaico}', true)" />
+			${tieneMosaico ? `<img src="${imagenMosaico}" class="custom-product-image-pos-5 _absolute img-responsive producto-imagen" data-delay="${delay + 300}" alt="Mosaico ${producto.nombre}" onerror="manejarErrorImagen(this, '${fallback.mosaico}', true)" />` : ''}
         </div>
     `;
 		}
