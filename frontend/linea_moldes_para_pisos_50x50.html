@@ -465,15 +465,7 @@ function crearProducto50x50HTML(producto, delay) {
     // Obtener las imágenes del molde y mosaico basándose en la URL de la base de datos
     let imagenMolde = producto.imagen_url || 'img/products/default_molde.jpg';
 			let imagenMosaico = producto.imagen_mosaico_url || '';
-
-			// Si no viene mosaico en DB, intentar derivarlo desde el molde.
-			if (!imagenMosaico) {
-				if (imagenMolde.includes('_molde.jpg')) {
-					imagenMosaico = imagenMolde.replace('_molde.jpg', '_mosaico.png');
-				} else {
-					imagenMosaico = 'img/products/default_mosaico.png';
-				}
-			}
+			const tieneMosaico = !!(imagenMosaico && imagenMosaico.trim() !== '');
     
     return `
         <div class="col-md-6 producto-animate" data-delay="${delay}">
@@ -484,7 +476,7 @@ function crearProducto50x50HTML(producto, delay) {
                 </div>
             </div>
             <img src="${imagenMolde}" class="custom-product-image-pos-1 _relative img-responsive producto-imagen" data-delay="${delay + 200}" alt />
-            <img src="${imagenMosaico}" class="custom-product-image-pos-5 _absolute img-responsive producto-imagen" data-delay="${delay + 300}" alt />
+						${tieneMosaico ? `<img src="${imagenMosaico}" class="custom-product-image-pos-5 _absolute img-responsive producto-imagen" data-delay="${delay + 300}" alt />` : ''}
         </div>
     `;
 }
