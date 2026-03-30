@@ -332,7 +332,20 @@ Medidas del molde = 25cm x 25cm x 2,5cm.<br>
 
 .producto-imagen-container {
     position: relative;
-    display: inline-block;
+	display: block;
+	width: 100%;
+	min-height: 320px;
+}
+
+.producto-imagen-container .custom-product-image-pos-1 {
+	position: relative !important;
+	left: auto !important;
+	right: auto !important;
+	top: auto !important;
+	bottom: auto !important;
+	width: min(84%, 360px) !important;
+	margin-left: 4%;
+	z-index: 1;
 }
 
 .producto-imagen {
@@ -348,21 +361,25 @@ Medidas del molde = 25cm x 25cm x 2,5cm.<br>
 
 .mosaico-overlay {
     position: absolute;
-    top: 15px;
-    right: 15px;
-    max-width: 80px;
-    max-height: 80px;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-    z-index: 2;
+	left: 35%;
+	bottom: 8%;
+	width: min(62%, 290px);
+	max-width: none;
+	max-height: none;
+	height: auto;
+	object-fit: contain;
+	object-position: center;
+	z-index: 3;
+	pointer-events: none;
+	filter: drop-shadow(0 8px 14px rgba(0, 0, 0, 0.28));
     opacity: 0;
-    transform: translateY(-10px);
+	transform: scale(0.85);
     transition: all 0.6s ease;
 }
 
 .mosaico-overlay.show {
     opacity: 1;
-    transform: translateY(0);
+	transform: scale(1);
 }
 
 .producto-20x20 {
@@ -371,8 +388,24 @@ Medidas del molde = 25cm x 25cm x 2,5cm.<br>
 
 /* Animación para hover en productos con mosaico */
 .producto-imagen-container:hover .mosaico-overlay {
-    transform: translateY(-5px) scale(1.1);
-    box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+	transform: scale(1.03);
+}
+
+@media (max-width: 767px) {
+	.producto-imagen-container {
+		min-height: 250px;
+	}
+
+	.producto-imagen-container .custom-product-image-pos-1 {
+		width: min(90%, 300px) !important;
+		margin-left: 0;
+	}
+
+	.mosaico-overlay {
+		left: 32%;
+		bottom: 5%;
+		width: min(66%, 220px);
+	}
 }
 
 /* Indicador de mosaico disponible */
