@@ -361,9 +361,9 @@ Medidas del molde = 25cm x 25cm x 2,5cm.<br>
 
 .mosaico-overlay {
     position: absolute;
-	left: 35%;
-	bottom: 8%;
-	width: min(62%, 290px);
+	left: var(--mosaico-left, 35%);
+	bottom: var(--mosaico-bottom, 8%);
+	width: var(--mosaico-width, min(62%, 290px));
 	max-width: none;
 	max-height: none;
 	height: auto;
@@ -402,9 +402,9 @@ Medidas del molde = 25cm x 25cm x 2,5cm.<br>
 	}
 
 	.mosaico-overlay {
-		left: 32%;
-		bottom: 5%;
-		width: min(66%, 220px);
+		left: var(--mosaico-left-mobile, 32%);
+		bottom: var(--mosaico-bottom-mobile, 5%);
+		width: var(--mosaico-width-mobile, min(66%, 220px));
 	}
 }
 
@@ -550,6 +550,52 @@ function formatearDescripcionTarjeta(descripcion) {
 	return `<small> / ${descripcionCorta}${necesitaPuntos ? '.' : ''}</small>`;
 }
 
+function obtenerAjusteMosaico20x20(nombreProducto) {
+	const nombre = (nombreProducto || '').toLowerCase();
+
+	if (nombre.includes('vainilla de 3') || nombre.includes('vainilla de 4')) {
+		return {
+			left: '37%',
+			bottom: '7%',
+			width: 'min(58%, 265px)',
+			mobileLeft: '34%',
+			mobileBottom: '5%',
+			mobileWidth: 'min(62%, 205px)'
+		};
+	}
+
+	if (nombre.includes('vainilla de 5') || nombre.includes('vainilla de 6')) {
+		return {
+			left: '36%',
+			bottom: '7%',
+			width: 'min(60%, 275px)',
+			mobileLeft: '33%',
+			mobileBottom: '5%',
+			mobileWidth: 'min(64%, 210px)'
+		};
+	}
+
+	if (nombre.includes('laja 20x40')) {
+		return {
+			left: '38%',
+			bottom: '8%',
+			width: 'min(56%, 255px)',
+			mobileLeft: '35%',
+			mobileBottom: '6%',
+			mobileWidth: 'min(60%, 195px)'
+		};
+	}
+
+	return {
+		left: '35%',
+		bottom: '8%',
+		width: 'min(62%, 290px)',
+		mobileLeft: '32%',
+		mobileBottom: '5%',
+		mobileWidth: 'min(66%, 220px)'
+	};
+}
+
 function crearProducto20x20HTML(producto, delay) {
     // Obtener la imagen del molde
     let imagenMolde = producto.imagen_url || 'img/products/default_molde.jpg';
@@ -557,13 +603,15 @@ function crearProducto20x20HTML(producto, delay) {
     
     // Determinar si tiene mosaico
     const tieneMosaico = imagenMosaico && imagenMosaico.trim() !== '';
+	const ajusteMosaico = obtenerAjusteMosaico20x20(producto.nombre);
+	const estiloMosaico = `--mosaico-left:${ajusteMosaico.left}; --mosaico-bottom:${ajusteMosaico.bottom}; --mosaico-width:${ajusteMosaico.width}; --mosaico-left-mobile:${ajusteMosaico.mobileLeft}; --mosaico-bottom-mobile:${ajusteMosaico.mobileBottom}; --mosaico-width-mobile:${ajusteMosaico.mobileWidth};`;
     
     // HTML para el mosaico overlay (solo si existe)
     let mosaicoHTML = '';
     let indicadorHTML = '';
     
     if (tieneMosaico) {
-        mosaicoHTML = `<img src="${imagenMosaico}" class="mosaico-overlay" data-delay="${delay + 300}" alt="Mosaico ${producto.nombre}" />`;
+		mosaicoHTML = `<img src="${imagenMosaico}" class="mosaico-overlay" style="${estiloMosaico}" data-delay="${delay + 300}" alt="Mosaico ${producto.nombre}" />`;
         indicadorHTML = `<span class="mosaico-indicator" data-delay="${delay + 400}">MOSAICO</span>`;
     }
     

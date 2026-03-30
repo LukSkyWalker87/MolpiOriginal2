@@ -104,9 +104,9 @@
 
 .mosaico-superpuesto {
     position: absolute;
-	left: 35%;
-	bottom: 8%;
-	width: min(62%, 290px);
+	left: var(--mosaico-left, 35%);
+	bottom: var(--mosaico-bottom, 8%);
+	width: var(--mosaico-width, min(62%, 290px));
     height: auto;
     object-fit: contain;
     object-position: center;
@@ -126,9 +126,9 @@
     }
 
     .mosaico-superpuesto {
-		left: 32%;
-		bottom: 5%;
-		width: min(66%, 220px);
+		left: var(--mosaico-left-mobile, 32%);
+		bottom: var(--mosaico-bottom-mobile, 5%);
+		width: var(--mosaico-width-mobile, min(66%, 220px));
     }
 }
 
@@ -595,6 +595,52 @@ function formatearDescripcionTarjeta(descripcion) {
 	return `<small> / ${descripcionCorta}${necesitaPuntos ? '.' : ''}</small>`;
 }
 
+function obtenerAjusteMosaico20x20(nombreProducto) {
+	const nombre = (nombreProducto || '').toLowerCase();
+
+	if (nombre.includes('vainilla de 3') || nombre.includes('vainilla de 4')) {
+		return {
+			left: '37%',
+			bottom: '7%',
+			width: 'min(58%, 265px)',
+			mobileLeft: '34%',
+			mobileBottom: '5%',
+			mobileWidth: 'min(62%, 205px)'
+		};
+	}
+
+	if (nombre.includes('vainilla de 5') || nombre.includes('vainilla de 6')) {
+		return {
+			left: '36%',
+			bottom: '7%',
+			width: 'min(60%, 275px)',
+			mobileLeft: '33%',
+			mobileBottom: '5%',
+			mobileWidth: 'min(64%, 210px)'
+		};
+	}
+
+	if (nombre.includes('laja 20x40')) {
+		return {
+			left: '38%',
+			bottom: '8%',
+			width: 'min(56%, 255px)',
+			mobileLeft: '35%',
+			mobileBottom: '6%',
+			mobileWidth: 'min(60%, 195px)'
+		};
+	}
+
+	return {
+		left: '35%',
+		bottom: '8%',
+		width: 'min(62%, 290px)',
+		mobileLeft: '32%',
+		mobileBottom: '5%',
+		mobileWidth: 'min(66%, 220px)'
+	};
+}
+
 function crearProductoHTML(producto, delay) {
 	// Priorizar imágenes cargadas en admin y usar hardcode solo como fallback.
 	let imagenMolde = producto.imagen_url || '';
@@ -624,6 +670,8 @@ function crearProductoHTML(producto, delay) {
 
 	if (!imagenMolde) imagenMolde = 'img/products/default_molde.jpg';
 	const tieneMosaico = !!(imagenMosaico && imagenMosaico.trim() !== '');
+	const ajusteMosaico = obtenerAjusteMosaico20x20(producto.nombre);
+	const estiloMosaico = `--mosaico-left:${ajusteMosaico.left}; --mosaico-bottom:${ajusteMosaico.bottom}; --mosaico-width:${ajusteMosaico.width}; --mosaico-left-mobile:${ajusteMosaico.mobileLeft}; --mosaico-bottom-mobile:${ajusteMosaico.mobileBottom}; --mosaico-width-mobile:${ajusteMosaico.mobileWidth};`;
     
     return `
         <div class="col-md-6 producto-animate" data-delay="${delay}">
@@ -635,7 +683,7 @@ function crearProductoHTML(producto, delay) {
             </div>
 			<div class="producto-imagen-stack">
 				<img src="${imagenMolde}" class="custom-product-image-pos-1 _relative img-responsive producto-imagen" data-delay="${delay + 200}" alt />
-				${tieneMosaico ? `<img src="${imagenMosaico}" class="mosaico-superpuesto producto-imagen" data-delay="${delay + 300}" alt />` : ''}
+				${tieneMosaico ? `<img src="${imagenMosaico}" class="mosaico-superpuesto producto-imagen" style="${estiloMosaico}" data-delay="${delay + 300}" alt />` : ''}
 			</div>
         </div>
     `;
