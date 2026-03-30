@@ -367,24 +367,57 @@ Medidas del molde = 55cm x 55cm x 3,5cm.<br>
     transform: scale(1);
 }
 
-		.producto-imagen-stack {
-			position: relative;
-			display: inline-block;
-			width: 100%;
-		}
+.producto-imagen-stack {
+    position: relative;
+    display: block;
+    width: 100%;
+    min-height: 320px;
+}
 
-		.mosaico-superpuesto {
-			position: absolute;
-			right: 8%;
-			bottom: 8%;
-			width: clamp(90px, 38%, 170px);
-			height: clamp(90px, 38%, 170px);
-			object-fit: contain;
-			object-position: center;
-			z-index: 3;
-			pointer-events: none;
-			filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.25));
-		}
+.producto-imagen-stack .custom-product-image-pos-1 {
+    position: relative !important;
+    left: auto !important;
+    right: auto !important;
+    top: auto !important;
+    bottom: auto !important;
+    width: min(84%, 360px) !important;
+    margin-left: 4%;
+    z-index: 1;
+}
+
+.mosaico-superpuesto {
+    position: absolute;
+    left: 48%;
+    bottom: 4%;
+    width: min(54%, 250px);
+    height: auto;
+    object-fit: contain;
+    object-position: center;
+    z-index: 3;
+    pointer-events: none;
+    filter: drop-shadow(0 8px 14px rgba(0, 0, 0, 0.28));
+}
+
+@media (max-width: 767px) {
+    .producto-imagen-stack {
+        min-height: 250px;
+    }
+
+    .producto-imagen-stack .custom-product-image-pos-1 {
+        width: min(90%, 300px) !important;
+        margin-left: 0;
+    }
+
+    .mosaico-superpuesto {
+        left: 44%;
+        bottom: 2%;
+        width: min(60%, 190px);
+    }
+}
+
+		
+
+		
 </style>
 
 <script>
@@ -556,6 +589,5 @@ function crearProducto50x50HTML(producto, delay) {
 
 <!-- Mirrored from www.molpi.com.ar/linea_moldes_para_pisos_50x50.html by HTTrack Website Copier/3.x [XR&CO'2014], Sat, 12 Apr 2025 18:25:21 GMT -->
 </html>
-
 
 
