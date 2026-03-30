@@ -530,7 +530,7 @@ function formatearDescripcionTarjeta(descripcion) {
     if (!descripcionLimpia) return '';
     const descripcionCorta = descripcionLimpia.slice(0, 120);
     const necesitaPuntos = !/[.!]$/.test(descripcionCorta);
-	return `<small> / ${descripcionCorta}${necesitaPuntos  '.' : ''}</small>`;
+	return `<small> / ${descripcionCorta}${necesitaPuntos ? '.' : ''}</small>`;
 }
 
 function crearProductoHTML(producto, delay) {
@@ -572,7 +572,7 @@ function crearProductoHTML(producto, delay) {
                 </div>
             </div>
             <img src="${imagenMolde}" class="custom-product-image-pos-1 _relative img-responsive producto-imagen" data-delay="${delay + 200}" alt />
-			${tieneMosaico  `<img src="${imagenMosaico}" class="custom-product-image-pos-5 _absolute img-responsive producto-imagen" data-delay="${delay + 300}" alt />` : ''}
+			${tieneMosaico ? `<img src="${imagenMosaico}" class="custom-product-image-pos-5 _absolute img-responsive producto-imagen" data-delay="${delay + 300}" alt />` : ''}
         </div>
     `;
 }

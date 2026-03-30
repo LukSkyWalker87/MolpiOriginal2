@@ -558,7 +558,7 @@
     if (!descripcionLimpia) return '';
     const descripcionCorta = descripcionLimpia.slice(0, 120);
     const necesitaPuntos = !/[.!]$/.test(descripcionCorta);
-	return `<small> / ${descripcionCorta}${necesitaPuntos  '.' : ''}</small>`;
+	return `<small> / ${descripcionCorta}${necesitaPuntos ? '.' : ''}</small>`;
 }
 
 function crearProducto40x40HTML(producto, delay) {
@@ -577,7 +577,7 @@ function crearProducto40x40HTML(producto, delay) {
                 </div>
             </div>
 			<img src="${imagenMolde}" class="custom-product-image-pos-1 _relative img-responsive producto-imagen" data-delay="${delay + 200}" alt="${producto.nombre}" onerror="manejarErrorImagen(this, '${fallback.molde}', false)" />
-			${tieneMosaico  `<img src="${imagenMosaico}" class="custom-product-image-pos-5 _absolute img-responsive producto-imagen" data-delay="${delay + 300}" alt="Mosaico ${producto.nombre}" onerror="manejarErrorImagen(this, '${fallback.mosaico}', true)" />` : ''}
+			${tieneMosaico ? `<img src="${imagenMosaico}" class="custom-product-image-pos-5 _absolute img-responsive producto-imagen" data-delay="${delay + 300}" alt="Mosaico ${producto.nombre}" onerror="manejarErrorImagen(this, '${fallback.mosaico}', true)" />` : ''}
         </div>
     `;
 		}

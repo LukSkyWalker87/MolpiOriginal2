@@ -514,7 +514,7 @@ function formatearDescripcionTarjeta(descripcion) {
     if (!descripcionLimpia) return '';
     const descripcionCorta = descripcionLimpia.slice(0, 120);
     const necesitaPuntos = !/[.!]$/.test(descripcionCorta);
-	return `<small> / ${descripcionCorta}${necesitaPuntos  '.' : ''}</small>`;
+	return `<small> / ${descripcionCorta}${necesitaPuntos ? '.' : ''}</small>`;
 }
 
 function crearProducto20x20HTML(producto, delay) {
