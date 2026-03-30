@@ -414,6 +414,25 @@
 			opacity: 1;
 			transform: scale(1);
 		}
+
+		.producto-imagen-stack {
+			position: relative;
+			display: inline-block;
+			width: 100%;
+		}
+
+		.mosaico-superpuesto {
+			position: absolute;
+			right: 8%;
+			bottom: 8%;
+			width: clamp(90px, 38%, 170px);
+			height: clamp(90px, 38%, 170px);
+			object-fit: contain;
+			object-position: center;
+			z-index: 3;
+			pointer-events: none;
+			filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.25));
+		}
 	</style>
 
 	<script>
@@ -532,8 +551,10 @@ function crearProducto50x50HTML(producto, delay) {
                     <hr>
                 </div>
             </div>
-            <img src="${imagenMolde}" class="custom-product-image-pos-1 _relative img-responsive producto-imagen" data-delay="${delay + 200}" alt />
-						${tieneMosaico ? `<img src="${imagenMosaico}" class="custom-product-image-pos-5 _absolute img-responsive producto-imagen" data-delay="${delay + 300}" alt />` : ''}
+						<div class="producto-imagen-stack">
+								<img src="${imagenMolde}" class="custom-product-image-pos-1 _relative img-responsive producto-imagen" data-delay="${delay + 200}" alt />
+						${tieneMosaico ? `<img src="${imagenMosaico}" class="mosaico-superpuesto producto-imagen" data-delay="${delay + 300}" alt />` : ''}
+						</div>
         </div>
     `;
 		}
