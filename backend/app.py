@@ -10,6 +10,17 @@ import jwt
 
 # ========= Configuración de Flask =========
 app = Flask(__name__, template_folder="../www.molpi.com.ar", static_folder="../www.molpi.com.ar", static_url_path="")
+
+@app.after_request
+def add_no_cache_headers(response):
+    """Evita que proxies/navegadores reutilicen HTML viejo."""
+    content_type = response.headers.get('Content-Type', '')
+    if 'text/html' in content_type:
+        response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+        response.headers['Pragma'] = 'no-cache'
+        response.headers['Expires'] = '0'
+    return response
+
 # ========= RUTAS DE PÁGINAS PRINCIPALES (FRONTEND) =========
 from flask import render_template
 
