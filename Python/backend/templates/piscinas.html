@@ -433,12 +433,17 @@
 					producto.imagen_mosaico_url.trim() !== '' &&
 					!producto.imagen_mosaico_url.includes('.html'); // Excluir URLs incorrectas con .html
 
-				// Formatear descripción como en el estático
+				// Reflejar siempre la descripcion cargada en admin (resumida y limpia para la tarjeta)
 				let descripcionFormateada = '';
 				if (producto.descripcion) {
-					if (producto.descripcion.includes('piezas por molde') || producto.descripcion.includes('piezas de') ||
-						producto.descripcion.includes('Modelo disponible') || producto.descripcion.includes('metros de diámetro')) {
-						descripcionFormateada = `<small> / ${producto.descripcion}.</small>`;
+					const descripcionLimpia = producto.descripcion
+						.replace(/\s+/g, ' ')
+						.trim();
+
+					if (descripcionLimpia) {
+						const descripcionCorta = descripcionLimpia.slice(0, 120);
+						const necesitaPuntos = !/[.!?]$/.test(descripcionCorta);
+						descripcionFormateada = `<small> / ${descripcionCorta}${necesitaPuntos ? '.' : ''}</small>`;
 					}
 				}
 

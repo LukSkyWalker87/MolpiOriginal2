@@ -379,7 +379,7 @@ Travertino y deck: Permiten obtener  un espacio seguro, atérmico y antideslizan
 						html += `
 							<div class="col-md-6">
 								<div class="col-md-12">
-									<h4 class="mb-xl mt-xlg">${producto.nombre}${producto.descripcion ? `<small> / ${extraerDescripcionCorta(producto.descripcion)}</small>` : ''}</h4>
+									<h4 class="mb-xl mt-xlg">${producto.nombre}${formatearDescripcionTarjeta(producto.descripcion)}</h4>
 									<div class="divider divider-primary divider-small mb-xl"> 
 										<hr>
 									</div>
@@ -400,24 +400,13 @@ Travertino y deck: Permiten obtener  un espacio seguro, atérmico y antideslizan
 			container.innerHTML = html;
 		}
 
-		function extraerDescripcionCorta(descripcion) {
-			// Extraer información relevante de la descripción para el subtítulo
-			if (descripcion.includes('Modelo disponible')) {
-				const match = descripcion.match(/Modelo disponible en (.+?)\./);
-				return match ? match[1] : '';
-			}
-			if (descripcion.includes('piezas por molde')) {
-				const match = descripcion.match(/(\d+ piezas por molde)/);
-				return match ? match[1] : '';
-			}
-			if (descripcion.includes('Modelo con alzada')) {
-				const match = descripcion.match(/Modelo con alzada de (.+?)\./);
-				return match ? 'Modelo con alzada de ' + match[1] : '';
-			}
-			if (descripcion.includes('2 y 3 metros de diámetro')) {
-				return '2 y 3 metros de diámetro';
-			}
-			return '';
+		function formatearDescripcionTarjeta(descripcion) {
+			if (!descripcion) return '';
+			const descripcionLimpia = descripcion.replace(/\s+/g, ' ').trim();
+			if (!descripcionLimpia) return '';
+			const descripcionCorta = descripcionLimpia.slice(0, 120);
+			const necesitaPuntos = !/[.!?]$/.test(descripcionCorta);
+			return `<small> / ${descripcionCorta}${necesitaPuntos ? '.' : ''}</small>`;
 		}
 
 		function mostrarError() {
