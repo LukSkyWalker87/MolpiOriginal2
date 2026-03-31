@@ -81,6 +81,16 @@
 				filter: drop-shadow(0 8px 14px rgba(0, 0, 0, 0.28));
 			}
 
+			.custom-product-image-container .mosaico-pinotea-ajuste {
+				top: 195px !important;
+				left: 90px !important;
+			}
+
+			.custom-product-image-container .molde-pinotea-ajuste {
+				top: 32px !important;
+				left: -32px !important;
+			}
+
 			@media (max-width: 767px) {
 				.custom-product-image-container {
 					min-height: 290px;
@@ -95,6 +105,16 @@
 					left: var(--mosaico-left-mobile, 30%);
 					bottom: var(--mosaico-bottom-mobile, 8%);
 					width: var(--mosaico-width-mobile, min(70%, 250px));
+				}
+
+				.custom-product-image-container .mosaico-pinotea-ajuste {
+					top: 160px !important;
+					left: 72px !important;
+				}
+
+				.custom-product-image-container .molde-pinotea-ajuste {
+					top: 24px !important;
+					left: -26px !important;
 				}
 			}
 		</style>
@@ -476,6 +496,7 @@
 							// Alternar disposición de imágenes como en el diseño original
 							const isEven = index % 2 === 0;
 							const tieneMosaico = producto.imagen_mosaico_url && producto.imagen_mosaico_url.trim() !== '' && !producto.imagen_mosaico_url.includes('.html');
+							const esPinotea = (producto.nombre || '').toLowerCase().includes('pinotea');
 							
 							html += `
 								<div class="col-md-6 col-lg-6">
@@ -493,7 +514,7 @@
 														 data-appear-animation-delay="200" 
 														 data-plugin-options="{'accY': 10}" 
 														 alt="${producto.nombre} molde" 
-														 class="custom-product-image-pos-1 _relative img-responsive" />
+															 class="custom-product-image-pos-1 _relative img-responsive ${esPinotea ? 'molde-pinotea-ajuste' : ''}" />
 													
 													${tieneMosaico ? `
 													<img src="${producto.imagen_mosaico_url}" 
@@ -501,7 +522,7 @@
 														 data-appear-animation-delay="400" 
 														 data-plugin-options="{'accY': 10}" 
 														 alt="${producto.nombre} mosaico" 
-														 class="custom-product-image-pos-5 _absolute img-responsive" />
+														 class="custom-product-image-pos-5 _absolute img-responsive ${esPinotea ? 'mosaico-pinotea-ajuste' : ''}" />
 													` : ''}
 												</div>
 											</div>
