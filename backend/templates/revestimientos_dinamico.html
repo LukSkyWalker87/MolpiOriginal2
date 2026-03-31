@@ -80,14 +80,6 @@
 				pointer-events: none;
 				filter: drop-shadow(0 8px 14px rgba(0, 0, 0, 0.28));
 			}
-
-	
-		.custom-product-image-container .mosaico-pinotea-ajuste {
-			top: 122px !important;
-			left: 68px !important;
-			width: 58% !important;
-		}
-
 		@media (max-width: 767px) {
 				.custom-product-image-container {
 					min-height: 290px;
@@ -103,13 +95,6 @@
 					bottom: var(--mosaico-bottom-mobile, 8%);
 					width: var(--mosaico-width-mobile, min(70%, 250px));
 				}
-
-
-						.custom-product-image-container .mosaico-pinotea-ajuste {
-								top: 98px !important;
-								left: 52px !important;
-								width: 64% !important;
-						}
 				}
 		</style>
 
@@ -479,7 +464,6 @@
 							// Alternar disposición de imágenes como en el diseño original
 							const isEven = index % 2 === 0;
 							const tieneMosaico = producto.imagen_mosaico_url && producto.imagen_mosaico_url.trim() !== '' && !producto.imagen_mosaico_url.includes('.html');
-							const esPinotea = (producto.nombre || '').toLowerCase().includes('pinotea');
 							
 							html += `
 								<div class="col-md-6 col-lg-6">
@@ -505,7 +489,7 @@
 														 data-appear-animation-delay="400" 
 														 data-plugin-options="{'accY': 10}" 
 														 alt="${producto.nombre} mosaico" 
-														 class="custom-product-image-pos-5 _absolute img-responsive ${esPinotea ? 'mosaico-pinotea-ajuste' : ''}" />
+														 class="custom-product-image-pos-5 _absolute img-responsive" />
 													` : ''}
 												</div>
 											</div>
