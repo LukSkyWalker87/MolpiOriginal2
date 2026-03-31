@@ -102,6 +102,12 @@
 			filter: drop-shadow(0 8px 14px rgba(0, 0, 0, 0.28));
 		}
 
+
+		.custom-product-image-container .mosaico-pinotea-ajuste {
+			top: 90px !important;
+			left: 60px !important;
+		}
+
 		@media (max-width: 767px) {
 			.producto-imagen-stack {
 				min-height: 290px;
@@ -118,6 +124,11 @@
 				width: var(--mosaico-width-mobile, min(70%, 250px));
 			}
 
+
+			.custom-product-image-container .mosaico-pinotea-ajuste {
+				top: 70px !important;
+				left: 45px !important;
+			}
 		}
 	</style>
 
@@ -478,6 +489,7 @@
 				const tieneMosaico = producto.imagen_mosaico_url &&
 					producto.imagen_mosaico_url.trim() !== '' &&
 					!producto.imagen_mosaico_url.includes('.html'); // Excluir URLs incorrectas con .html
+				const esPinotea = (producto.nombre || '').toLowerCase().includes('pinotea');
 
 				// Reflejar siempre la descripcion cargada en admin (resumida y limpia para la tarjeta)
 				let descripcionFormateada = '';
@@ -504,7 +516,7 @@
 							<div class="custom-product-image-container">
 								<img src="${producto.imagen_url}" data-appear-animation="fadeInLeft" data-appear-animation-delay="${delayImagen1}" data-plugin-options="{'accY': 10}" alt class="custom-product-image-pos-1 _relative img-responsive" />
 								${tieneMosaico ? `
-								<img src="${producto.imagen_mosaico_url}" data-appear-animation="fadeInLeft" data-appear-animation-delay="${delayImagen2}" data-plugin-options="{'accY': 10}" alt class="custom-product-image-pos-5 _absolute img-responsive" />
+								<img src="${producto.imagen_mosaico_url}" data-appear-animation="fadeInLeft" data-appear-animation-delay="${delayImagen2}" data-plugin-options="{'accY': 10}" alt class="custom-product-image-pos-5 _absolute img-responsive ${esPinotea ? 'mosaico-pinotea-ajuste' : ''}" />
 								` : ''}
 							</div>
 						</div>
