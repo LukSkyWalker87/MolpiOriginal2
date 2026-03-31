@@ -366,6 +366,15 @@
 				}
 			}
 
+			function formatearDescripcionTarjeta(descripcion) {
+				if (!descripcion) return '';
+				const descripcionLimpia = descripcion.replace(/\s+/g, ' ').trim();
+				if (!descripcionLimpia) return '';
+				const descripcionCorta = descripcionLimpia.slice(0, 120);
+				const necesitaPuntos = !/[.!?]$/.test(descripcionCorta);
+				return `.<small> / ${descripcionCorta}${necesitaPuntos ? '.' : ''}</small>`;
+			}
+
 			function mostrarProductos(productosPorSubcategoria) {
 				const container = document.getElementById('productos-container');
 				let html = '';
@@ -390,7 +399,7 @@
 									<div class="custom-product-item mb-5">
 										<div class="row">
 											<div class="col-md-12">
-												<h4 class="mb-xl mt-xlg">${producto.nombre}${producto.descripcion ? `.<small> / ${producto.descripcion}</small>` : '.'}</h4>
+												<h4 class="mb-xl mt-xlg">${producto.nombre}${formatearDescripcionTarjeta(producto.descripcion) || '.'}</h4>
 												<div class="divider divider-primary divider-small mb-xl"> 
 													<hr>
 												</div>

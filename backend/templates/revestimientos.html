@@ -488,8 +488,6 @@
 				const tieneMosaico = producto.imagen_mosaico_url &&
 					producto.imagen_mosaico_url.trim() !== '' &&
 					!producto.imagen_mosaico_url.includes('.html'); // Excluir URLs incorrectas con .html
-				const ajusteMosaico = obtenerAjusteMosaicoRevestimientos(producto.nombre);
-				const estiloMosaico = `--mosaico-left:${ajusteMosaico.left}; --mosaico-bottom:${ajusteMosaico.bottom}; --mosaico-width:${ajusteMosaico.width}; --mosaico-left-mobile:${ajusteMosaico.mobileLeft}; --mosaico-bottom-mobile:${ajusteMosaico.mobileBottom}; --mosaico-width-mobile:${ajusteMosaico.mobileWidth};`;
 
 				// Reflejar siempre la descripcion cargada en admin (resumida y limpia para la tarjeta)
 				let descripcionFormateada = '';
@@ -513,10 +511,10 @@
 									<hr>
 								</div>
 							</div>
-							<div class="producto-imagen-stack">
+							<div class="custom-product-image-container">
 								<img src="${producto.imagen_url}" data-appear-animation="fadeInLeft" data-appear-animation-delay="${delayImagen1}" data-plugin-options="{'accY': 10}" alt class="custom-product-image-pos-1 _relative img-responsive" />
 								${tieneMosaico ? `
-								<img src="${producto.imagen_mosaico_url}" style="${estiloMosaico}" data-appear-animation="fadeInLeft" data-appear-animation-delay="${delayImagen2}" data-plugin-options="{'accY': 10}" alt class="mosaico-superpuesto img-responsive" />
+								<img src="${producto.imagen_mosaico_url}" data-appear-animation="fadeInLeft" data-appear-animation-delay="${delayImagen2}" data-plugin-options="{'accY': 10}" alt class="custom-product-image-pos-5 _absolute img-responsive" />
 								` : ''}
 							</div>
 						</div>
