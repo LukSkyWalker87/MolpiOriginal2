@@ -49,6 +49,56 @@
 		<!-- Theme Custom CSS -->
 		<link rel="stylesheet" href="{{ url_for(\'static\', filename=\'css/custom.css\') }}">
 
+		<style>
+			.custom-product-image-container {
+				position: relative;
+				display: block;
+				width: 100%;
+				min-height: 360px;
+			}
+
+			.custom-product-image-container .custom-product-image-pos-1 {
+				position: relative !important;
+				left: auto !important;
+				right: auto !important;
+				top: auto !important;
+				bottom: auto !important;
+				width: min(80%, 360px) !important;
+				margin-left: 6%;
+				z-index: 1;
+			}
+
+			.mosaico-superpuesto {
+				position: absolute;
+				left: var(--mosaico-left, 34%);
+				bottom: var(--mosaico-bottom, 10%);
+				width: var(--mosaico-width, min(64%, 300px));
+				height: auto;
+				object-fit: contain;
+				object-position: center;
+				z-index: 3;
+				pointer-events: none;
+				filter: drop-shadow(0 8px 14px rgba(0, 0, 0, 0.28));
+			}
+
+			@media (max-width: 767px) {
+				.custom-product-image-container {
+					min-height: 290px;
+				}
+
+				.custom-product-image-container .custom-product-image-pos-1 {
+					width: min(88%, 320px) !important;
+					margin-left: 0;
+				}
+
+				.mosaico-superpuesto {
+					left: var(--mosaico-left-mobile, 30%);
+					bottom: var(--mosaico-bottom-mobile, 8%);
+					width: var(--mosaico-width-mobile, min(70%, 250px));
+				}
+			}
+		</style>
+
 		<!-- Head Libs -->
 		<script src="vendor/modernizr/modernizr.min.js"></script>
 
@@ -369,6 +419,41 @@
 				}
 			}
 
+			function obtenerAjusteMosaicoRevestimientos(nombreProducto) {
+				const nombre = (nombreProducto || '').toLowerCase();
+
+				if (nombre.includes('pinotea')) {
+					return {
+						left: '26%',
+						bottom: '20%',
+						width: 'min(76%, 360px)',
+						mobileLeft: '20%',
+						mobileBottom: '16%',
+						mobileWidth: 'min(82%, 300px)'
+					};
+				}
+
+				if (nombre.includes('madera') || nombre.includes('quebracho') || nombre.includes('corteza')) {
+					return {
+						left: '30%',
+						bottom: '14%',
+						width: 'min(70%, 330px)',
+						mobileLeft: '24%',
+						mobileBottom: '11%',
+						mobileWidth: 'min(76%, 280px)'
+					};
+				}
+
+				return {
+					left: '34%',
+					bottom: '10%',
+					width: 'min(64%, 300px)',
+					mobileLeft: '30%',
+					mobileBottom: '8%',
+					mobileWidth: 'min(70%, 250px)'
+				};
+			}
+
 			function mostrarProductos(productosPorSubcategoria) {
 				const container = document.getElementById('productos-container');
 				let html = '';
@@ -390,6 +475,9 @@
 						productos.forEach((producto, index) => {
 							// Alternar disposición de imágenes como en el diseño original
 							const isEven = index % 2 === 0;
+							const tieneMosaico = producto.imagen_mosaico_url && producto.imagen_mosaico_url.trim() !== '' && !producto.imagen_mosaico_url.includes('.html');
+							const ajusteMosaico = obtenerAjusteMosaicoRevestimientos(producto.nombre);
+							const estiloMosaico = `--mosaico-left:${ajusteMosaico.left}; --mosaico-bottom:${ajusteMosaico.bottom}; --mosaico-width:${ajusteMosaico.width}; --mosaico-left-mobile:${ajusteMosaico.mobileLeft}; --mosaico-bottom-mobile:${ajusteMosaico.mobileBottom}; --mosaico-width-mobile:${ajusteMosaico.mobileWidth};`;
 							
 							html += `
 								<div class="col-md-6 col-lg-6">
@@ -409,13 +497,14 @@
 														 alt="${producto.nombre} molde" 
 														 class="custom-product-image-pos-1 _relative img-responsive" />
 													
-													${producto.imagen_mosaico_url ? `
+													${tieneMosaico ? `
 													<img src="${producto.imagen_mosaico_url}" 
+														 style="${estiloMosaico}"
 														 data-appear-animation="fadeInLeft" 
 														 data-appear-animation-delay="400" 
 														 data-plugin-options="{'accY': 10}" 
 														 alt="${producto.nombre} mosaico" 
-														 class="custom-product-image-pos-5 _absolute img-responsive" />
+														 class="mosaico-superpuesto img-responsive" />
 													` : ''}
 												</div>
 											</div>

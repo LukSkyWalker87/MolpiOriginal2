@@ -70,6 +70,54 @@
 			animation-duration: 1s;
 			animation-fill-mode: both;
 		}
+
+		.producto-imagen-stack {
+			position: relative;
+			display: block;
+			width: 100%;
+			min-height: 360px;
+		}
+
+		.producto-imagen-stack .custom-product-image-pos-1 {
+			position: relative !important;
+			left: auto !important;
+			right: auto !important;
+			top: auto !important;
+			bottom: auto !important;
+			width: min(80%, 360px) !important;
+			margin-left: 6%;
+			z-index: 1;
+		}
+
+		.mosaico-superpuesto {
+			position: absolute;
+			left: var(--mosaico-left, 34%);
+			bottom: var(--mosaico-bottom, 10%);
+			width: var(--mosaico-width, min(64%, 300px));
+			height: auto;
+			object-fit: contain;
+			object-position: center;
+			z-index: 3;
+			pointer-events: none;
+			filter: drop-shadow(0 8px 14px rgba(0, 0, 0, 0.28));
+		}
+
+		@media (max-width: 767px) {
+			.producto-imagen-stack {
+				min-height: 290px;
+			}
+
+			.producto-imagen-stack .custom-product-image-pos-1 {
+				width: min(88%, 320px) !important;
+				margin-left: 0;
+			}
+
+			.mosaico-superpuesto {
+				left: var(--mosaico-left-mobile, 30%);
+				bottom: var(--mosaico-bottom-mobile, 8%);
+				width: var(--mosaico-width-mobile, min(70%, 250px));
+			}
+		}
 	</style>
 
 	<!-- Head Libs -->
@@ -400,11 +448,48 @@
 				return productosPorNombre[nombre] || null;
 			}
 
+			function obtenerAjusteMosaicoRevestimientos(nombreProducto) {
+				const nombre = (nombreProducto || '').toLowerCase();
+
+				if (nombre.includes('pinotea')) {
+					return {
+						left: '26%',
+						bottom: '20%',
+						width: 'min(76%, 360px)',
+						mobileLeft: '20%',
+						mobileBottom: '16%',
+						mobileWidth: 'min(82%, 300px)'
+					};
+				}
+
+				if (nombre.includes('madera') || nombre.includes('quebracho') || nombre.includes('corteza')) {
+					return {
+						left: '30%',
+						bottom: '14%',
+						width: 'min(70%, 330px)',
+						mobileLeft: '24%',
+						mobileBottom: '11%',
+						mobileWidth: 'min(76%, 280px)'
+					};
+				}
+
+				return {
+					left: '34%',
+					bottom: '10%',
+					width: 'min(64%, 300px)',
+					mobileLeft: '30%',
+					mobileBottom: '8%',
+					mobileWidth: 'min(70%, 250px)'
+				};
+			}
+
 			// Función auxiliar para crear estructura de producto exacta como en el estático
 			function crearProducto(producto, esColumnaIzquierda, delayImagen1, delayImagen2) {
 				const tieneMosaico = producto.imagen_mosaico_url &&
 					producto.imagen_mosaico_url.trim() !== '' &&
 					!producto.imagen_mosaico_url.includes('.html'); // Excluir URLs incorrectas con .html
+				const ajusteMosaico = obtenerAjusteMosaicoRevestimientos(producto.nombre);
+				const estiloMosaico = `--mosaico-left:${ajusteMosaico.left}; --mosaico-bottom:${ajusteMosaico.bottom}; --mosaico-width:${ajusteMosaico.width}; --mosaico-left-mobile:${ajusteMosaico.mobileLeft}; --mosaico-bottom-mobile:${ajusteMosaico.mobileBottom}; --mosaico-width-mobile:${ajusteMosaico.mobileWidth};`;
 
 				// Reflejar siempre la descripcion cargada en admin (resumida y limpia para la tarjeta)
 				let descripcionFormateada = '';
@@ -428,11 +513,12 @@
 									<hr>
 								</div>
 							</div>
-							<img src="${producto.imagen_url}" data-appear-animation="fadeInLeft" data-appear-animation-delay="${delayImagen1}" data-plugin-options="{'accY': 10}" alt class="custom-product-image-pos-1 _relative img-responsive" />
-							
-							${tieneMosaico ? `
-							<img src="${producto.imagen_mosaico_url}" data-appear-animation="fadeInLeft" data-appear-animation-delay="${delayImagen2}" data-plugin-options="{'accY': 10}" alt class="custom-product-image-pos-5 _absolute img-responsive" />
-							` : ''}
+							<div class="producto-imagen-stack">
+								<img src="${producto.imagen_url}" data-appear-animation="fadeInLeft" data-appear-animation-delay="${delayImagen1}" data-plugin-options="{'accY': 10}" alt class="custom-product-image-pos-1 _relative img-responsive" />
+								${tieneMosaico ? `
+								<img src="${producto.imagen_mosaico_url}" style="${estiloMosaico}" data-appear-animation="fadeInLeft" data-appear-animation-delay="${delayImagen2}" data-plugin-options="{'accY': 10}" alt class="mosaico-superpuesto img-responsive" />
+								` : ''}
+							</div>
 						</div>
 					`;
 			}
