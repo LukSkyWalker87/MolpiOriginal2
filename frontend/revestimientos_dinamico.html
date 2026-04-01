@@ -69,48 +69,53 @@
 			}
 
 			.mosaico-superpuesto {
-				position: absolute;
-				left: var(--mosaico-left, 34%);
-				bottom: var(--mosaico-bottom, 10%);
-				width: var(--mosaico-width, min(64%, 300px));
-				height: auto;
-				object-fit: contain;
-				object-position: center;
-				z-index: 3;
-				pointer-events: none;
-				filter: drop-shadow(0 8px 14px rgba(0, 0, 0, 0.28));
-			}
-		.custom-product-image-container .mosaico-pinotea-ajuste {
-			top: 220px !important;
-			left: 98px !important;
-			width: 74% !important;
-			transform: none !important;
-		}
+position: absolute;
+left: var(--mosaico-left, 34%);
+bottom: var(--mosaico-bottom, 10%);
+width: var(--mosaico-width, min(64%, 300px));
+height: auto;
+object-fit: contain;
+object-position: center;
+z-index: 3;
+pointer-events: none;
+filter: drop-shadow(0 8px 14px rgba(0, 0, 0, 0.28));
+}
+.custom-product-image-container .mosaico-pinotea-ajuste {
+top: 220px !important;
+left: 98px !important;
+width: 74% !important;
+transform: none !important;
+}
+.custom-product-image-container.pinotea-bloque-ajuste {
+margin-top: -58px;
+}
 
-		@media (max-width: 767px) {
-			.custom-product-image-container {
-				min-height: 290px;
-			}
+@media (max-width: 767px) {
+.custom-product-image-container {
+min-height: 290px;
+}
 
-			.custom-product-image-container .custom-product-image-pos-1 {
-				width: min(88%, 320px) !important;
-				margin-left: 0;
-			}
+.custom-product-image-container .custom-product-image-pos-1 {
+width: min(88%, 320px) !important;
+margin-left: 0;
+}
 
-			.mosaico-superpuesto {
-				left: var(--mosaico-left-mobile, 30%);
-				bottom: var(--mosaico-bottom-mobile, 8%);
-				width: var(--mosaico-width-mobile, min(70%, 250px));
-			}
+.mosaico-superpuesto {
+left: var(--mosaico-left-mobile, 30%);
+bottom: var(--mosaico-bottom-mobile, 8%);
+width: var(--mosaico-width-mobile, min(70%, 250px));
+}
 
-			.custom-product-image-container .mosaico-pinotea-ajuste {
-				top: 160px !important;
-				left: 64px !important;
-				width: 76% !important;
-				transform: none !important;
-			}
-		}
-		</style>
+.custom-product-image-container .mosaico-pinotea-ajuste {
+top: 160px !important;
+left: 64px !important;
+width: 76% !important;
+transform: none !important;
+}
+.custom-product-image-container.pinotea-bloque-ajuste {
+margin-top: -38px;
+}
+}</style>
 
 		<!-- Head Libs -->
 		<script src="vendor/modernizr/modernizr.min.js"></script>
@@ -490,7 +495,7 @@
 										</div>
 										<div class="row">
 											<div class="col-md-12 position-relative">
-												<div class="custom-product-image-container">
+												<div class="custom-product-image-container ${esPinotea ? 'pinotea-bloque-ajuste' : ''}">
 													<img src="${producto.imagen_url}" 
 														 data-appear-animation="fadeInLeft" 
 														 data-appear-animation-delay="200" 

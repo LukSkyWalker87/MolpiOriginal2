@@ -90,46 +90,51 @@
 		}
 
 		.mosaico-superpuesto {
-			position: absolute;
-			left: var(--mosaico-left, 34%);
-			bottom: var(--mosaico-bottom, 10%);
-			width: var(--mosaico-width, min(64%, 300px));
-			height: auto;
-			object-fit: contain;
-			object-position: center;
-			z-index: 3;
-			pointer-events: none;
-			filter: drop-shadow(0 8px 14px rgba(0, 0, 0, 0.28));
-		}
-		.custom-product-image-container .mosaico-pinotea-ajuste {
-			top: 220px !important;
-			left: 98px !important;
-			width: 74% !important;
-			transform: none !important;
-		}
-		@media (max-width: 767px) {
-			.producto-imagen-stack {
-				min-height: 290px;
-			}
+position: absolute;
+left: var(--mosaico-left, 34%);
+bottom: var(--mosaico-bottom, 10%);
+width: var(--mosaico-width, min(64%, 300px));
+height: auto;
+object-fit: contain;
+object-position: center;
+z-index: 3;
+pointer-events: none;
+filter: drop-shadow(0 8px 14px rgba(0, 0, 0, 0.28));
+}
+.custom-product-image-container .mosaico-pinotea-ajuste {
+top: 220px !important;
+left: 98px !important;
+width: 74% !important;
+transform: none !important;
+}
+.custom-product-image-container.pinotea-bloque-ajuste {
+margin-top: -58px;
+}
+@media (max-width: 767px) {
+.producto-imagen-stack {
+min-height: 290px;
+}
 
-			.producto-imagen-stack .custom-product-image-pos-1 {
-				width: min(88%, 320px) !important;
-				margin-left: 0;
-			}
+.producto-imagen-stack .custom-product-image-pos-1 {
+width: min(88%, 320px) !important;
+margin-left: 0;
+}
 
-			.mosaico-superpuesto {
-				left: var(--mosaico-left-mobile, 30%);
-				bottom: var(--mosaico-bottom-mobile, 8%);
-				width: var(--mosaico-width-mobile, min(70%, 250px));
-			}
-			.custom-product-image-container .mosaico-pinotea-ajuste {
-				top: 160px !important;
-				left: 64px !important;
-				width: 76% !important;
-				transform: none !important;
-			}
-		}
-	</style>
+.mosaico-superpuesto {
+left: var(--mosaico-left-mobile, 30%);
+bottom: var(--mosaico-bottom-mobile, 8%);
+width: var(--mosaico-width-mobile, min(70%, 250px));
+}
+.custom-product-image-container .mosaico-pinotea-ajuste {
+top: 160px !important;
+left: 64px !important;
+width: 76% !important;
+transform: none !important;
+}
+.custom-product-image-container.pinotea-bloque-ajuste {
+margin-top: -38px;
+}
+}</style>
 
 	<!-- Head Libs -->
 	<script src="vendor/modernizr/modernizr.min.js"></script>
@@ -536,7 +541,7 @@
 									<hr>
 								</div>
 							</div>
-							<div class="custom-product-image-container">
+							<div class="custom-product-image-container ${esPinotea ? 'pinotea-bloque-ajuste' : ''}">
 								<img src="${producto.imagen_url}" data-appear-animation="fadeInLeft" data-appear-animation-delay="${delayImagen1}" data-plugin-options="{'accY': 10}" alt class="custom-product-image-pos-1 _relative img-responsive" />
 								${tieneMosaico ? `
 								<img src="${producto.imagen_mosaico_url}" data-appear-animation="fadeInLeft" data-appear-animation-delay="${delayImagen2}" data-plugin-options="{'accY': 10}" alt class="custom-product-image-pos-5 _absolute img-responsive ${esPinotea ? 'mosaico-pinotea-ajuste' : ''}" />
