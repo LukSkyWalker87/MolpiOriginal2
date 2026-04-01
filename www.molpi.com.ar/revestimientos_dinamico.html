@@ -80,15 +80,6 @@ z-index: 3;
 pointer-events: none;
 filter: drop-shadow(0 8px 14px rgba(0, 0, 0, 0.28));
 }
-.custom-product-image-container .mosaico-nuevo-ajuste {
-top: 220px !important;
-left: 98px !important;
-width: 74% !important;
-transform: none !important;
-}
-.custom-product-image-container.mosaico-bloque-ajuste {
-margin-top: -58px;
-}
 
 @media (max-width: 767px) {
 .custom-product-image-container {
@@ -104,16 +95,6 @@ margin-left: 0;
 left: var(--mosaico-left-mobile, 30%);
 bottom: var(--mosaico-bottom-mobile, 8%);
 width: var(--mosaico-width-mobile, min(70%, 250px));
-}
-
-.custom-product-image-container .mosaico-nuevo-ajuste {
-top: 160px !important;
-left: 64px !important;
-width: 76% !important;
-transform: none !important;
-}
-.custom-product-image-container.mosaico-bloque-ajuste {
-margin-top: -38px;
 }
 }</style>
 
@@ -483,8 +464,7 @@ margin-top: -38px;
 							// Alternar disposición de imágenes como en el diseño original
 							const isEven = index % 2 === 0;
 							const tieneMosaico = producto.imagen_mosaico_url && producto.imagen_mosaico_url.trim() !== '' && !producto.imagen_mosaico_url.includes('.html');
-							const tieneMosaicoAjuste = tieneMosaico;
-							
+														
 							html += `
 								<div class="col-md-6 col-lg-6">
 									<div class="custom-product-item mb-5">
@@ -495,7 +475,7 @@ margin-top: -38px;
 										</div>
 										<div class="row">
 											<div class="col-md-12 position-relative">
-												<div class="custom-product-image-container ${tieneMosaicoAjuste ? 'mosaico-bloque-ajuste' : ''}">
+												<div class="custom-product-image-container">
 													<img src="${producto.imagen_url}" 
 														 data-appear-animation="fadeInLeft" 
 														 data-appear-animation-delay="200" 
@@ -509,7 +489,7 @@ margin-top: -38px;
 														 data-appear-animation-delay="400" 
 														 data-plugin-options="{'accY': 10}" 
 														 alt="${producto.nombre} mosaico" 
-														 class="custom-product-image-pos-5 _absolute img-responsive ${tieneMosaicoAjuste ? 'mosaico-nuevo-ajuste' : ''}" />
+														 class="custom-product-image-pos-5 _absolute img-responsive" />
 													` : ''}
 												</div>
 											</div>
