@@ -110,6 +110,14 @@ left: 88px !important;
 width: 58% !important;
 transform: none !important;
 }
+.custom-product-image-container.mosaico-upload-bloque-ajuste.mosaico-upload-bloque-ajuste-tall {
+margin-top: -30px;
+}
+.custom-product-image-container .mosaico-upload-ajuste.mosaico-upload-ajuste-tall {
+top: 156px !important;
+left: 82px !important;
+width: 64% !important;
+}
 @media (max-width: 767px) {
 .producto-imagen-stack {
 min-height: 290px;
@@ -133,6 +141,14 @@ top: 128px !important;
 left: 52px !important;
 width: 62% !important;
 transform: none !important;
+}
+.custom-product-image-container.mosaico-upload-bloque-ajuste.mosaico-upload-bloque-ajuste-tall {
+margin-top: -20px;
+}
+.custom-product-image-container .mosaico-upload-ajuste.mosaico-upload-ajuste-tall {
+top: 120px !important;
+left: 46px !important;
+width: 66% !important;
 }
 }</style>
 
@@ -487,8 +503,34 @@ transform: none !important;
 					mobileWidth: 'min(56%, 200px)'
 				};
 			}
+function ajustarUploadsPorProporcion(container) {
+const uploads = container.querySelectorAll('.custom-product-image-container.mosaico-upload-bloque-ajuste');
+uploads.forEach((wrap) => {
+const mosaico = wrap.querySelector('.mosaico-upload-ajuste');
+if (!mosaico) return;
 
-			// Función auxiliar para crear estructura de producto exacta como en el estático
+const aplicarPorRatio = () => {
+const h = mosaico.naturalHeight || 0;
+const w = mosaico.naturalWidth || 0;
+if (!h || !w) return;
+const ratio = w / h;
+if (ratio < 1.25) {
+wrap.classList.add('mosaico-upload-bloque-ajuste-tall');
+mosaico.classList.add('mosaico-upload-ajuste-tall');
+} else {
+wrap.classList.remove('mosaico-upload-bloque-ajuste-tall');
+mosaico.classList.remove('mosaico-upload-ajuste-tall');
+}
+};
+
+if (mosaico.complete) {
+aplicarPorRatio();
+} else {
+mosaico.addEventListener('load', aplicarPorRatio, { once: true });
+}
+});
+}
+
 			function crearProducto(producto, esColumnaIzquierda, delayImagen1, delayImagen2) {
 				const tieneMosaico = producto.imagen_mosaico_url &&
 					producto.imagen_mosaico_url.trim() !== '' &&
@@ -624,6 +666,7 @@ transform: none !important;
 
 			html += '</div>';
 			container.innerHTML = html;
+\t\t\tajustarUploadsPorProporcion(container);
 
 			// Reinicializar animaciones usando el método exacto del tema
 			setTimeout(function () {

@@ -89,6 +89,14 @@ left: 88px !important;
 width: 58% !important;
 transform: none !important;
 }
+.custom-product-image-container.mosaico-upload-bloque-ajuste.mosaico-upload-bloque-ajuste-tall {
+margin-top: -30px;
+}
+.custom-product-image-container .mosaico-upload-ajuste.mosaico-upload-ajuste-tall {
+top: 156px !important;
+left: 82px !important;
+width: 64% !important;
+}
 
 @media (max-width: 767px) {
 .custom-product-image-container {
@@ -114,6 +122,14 @@ top: 128px !important;
 left: 52px !important;
 width: 62% !important;
 transform: none !important;
+}
+.custom-product-image-container.mosaico-upload-bloque-ajuste.mosaico-upload-bloque-ajuste-tall {
+margin-top: -20px;
+}
+.custom-product-image-container .mosaico-upload-ajuste.mosaico-upload-ajuste-tall {
+top: 120px !important;
+left: 46px !important;
+width: 66% !important;
 }
 }</style>
 
@@ -461,7 +477,34 @@ transform: none !important;
 				};
 			}
 
-			function mostrarProductos(productosPorSubcategoria) {
+			function ajustarUploadsPorProporcion(container) {
+const uploads = container.querySelectorAll('.custom-product-image-container.mosaico-upload-bloque-ajuste');
+uploads.forEach((wrap) => {
+const mosaico = wrap.querySelector('.mosaico-upload-ajuste');
+if (!mosaico) return;
+
+const aplicarPorRatio = () => {
+const h = mosaico.naturalHeight || 0;
+const w = mosaico.naturalWidth || 0;
+if (!h || !w) return;
+const ratio = w / h;
+if (ratio < 1.25) {
+wrap.classList.add('mosaico-upload-bloque-ajuste-tall');
+mosaico.classList.add('mosaico-upload-ajuste-tall');
+} else {
+wrap.classList.remove('mosaico-upload-bloque-ajuste-tall');
+mosaico.classList.remove('mosaico-upload-ajuste-tall');
+}
+};
+
+if (mosaico.complete) {
+aplicarPorRatio();
+} else {
+mosaico.addEventListener('load', aplicarPorRatio, { once: true });
+}
+});
+}
+function mostrarProductos(productosPorSubcategoria) {
 				const container = document.getElementById('productos-container');
 				let html = '';
 
@@ -542,6 +585,7 @@ transform: none !important;
 				});
 
 				container.innerHTML = html;
+\t\t\tajustarUploadsPorProporcion(container);
 				
 				// Reinicializar animaciones y efectos después de cargar el contenido
 				if (window.theme && window.theme.PluginAppear) {
