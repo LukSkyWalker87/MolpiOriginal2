@@ -559,8 +559,7 @@ mosaico.addEventListener('load', aplicarPorRatio, { once: true });
 				const tieneMosaico = producto.imagen_mosaico_url &&
 					producto.imagen_mosaico_url.trim() !== '' &&
 					!producto.imagen_mosaico_url.includes('.html');
-							const esAssetSubido = ((producto.imagen_url || '').includes('uploads/') || (producto.imagen_mosaico_url || '').includes('uploads/'));
-							const aplicarAjusteUpload = tieneMosaico && esAssetSubido;
+							const aplicarAjusteUpload = false;
 				
 				// Reflejar siempre la descripcion cargada en admin (resumida y limpia para la tarjeta)
 				let descripcionFormateada = '';

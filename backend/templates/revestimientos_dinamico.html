@@ -526,8 +526,7 @@ function mostrarProductos(productosPorSubcategoria) {
 							// Alternar disposición de imágenes como en el diseño original
 							const isEven = index % 2 === 0;
 							const tieneMosaico = producto.imagen_mosaico_url && producto.imagen_mosaico_url.trim() !== '' && !producto.imagen_mosaico_url.includes('.html');
-							const esAssetSubido = ((producto.imagen_url || '').includes('uploads/') || (producto.imagen_mosaico_url || '').includes('uploads/'));
-							const aplicarAjusteUpload = tieneMosaico && esAssetSubido;
+							const aplicarAjusteUpload = false;
 														
 							html += `
 								<div class="col-md-6 col-lg-6">
