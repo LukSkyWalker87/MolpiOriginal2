@@ -70,19 +70,6 @@
 			animation-duration: 1s;
 			animation-fill-mode: both;
 		}
-
-		/* Ajuste puntual para Pinotea: bajar el mosaico para superposición correcta */
-		.mosaico-pinotea-ajuste {
-			top: 210px !important;
-			left: 95px !important;
-		}
-
-		@media (max-width: 767px) {
-			.mosaico-pinotea-ajuste {
-				top: 180px !important;
-				left: 80px !important;
-			}
-		}
 	</style>
 
 	<!-- Head Libs -->
@@ -450,7 +437,6 @@
 						   const producto = productosActivos[i + j];
 						   if (producto) {
 							   const tieneBotella = producto.imagen_mosaico_url && producto.imagen_mosaico_url.trim() !== '';
-							   const esPinotea = (producto.nombre || '').toLowerCase().includes('pinotea');
 							   const delay1 = j === 0 ? 0 : 200;
 							   const delay2 = j === 0 ? 200 : 400;
 							   html += `
@@ -473,7 +459,7 @@
 										   data-appear-animation-delay="${delay2}" 
 										   data-plugin-options="{'accY': 10}" 
 										   alt="${producto.nombre} botella" 
-										   class="custom-product-image-pos-5 _absolute img-responsive ${esPinotea ? 'mosaico-pinotea-ajuste' : ''}" />` : ''}
+										   class="custom-product-image-pos-5 _absolute img-responsive" />` : ''}
 								   </div>
 							   `;
 						   }
