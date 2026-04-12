@@ -70,6 +70,19 @@
 			animation-duration: 1s;
 			animation-fill-mode: both;
 		}
+
+		/* Ajuste puntual para Pinotea: bajar el mosaico para superposición correcta */
+		.mosaico-pinotea-ajuste {
+			top: 210px !important;
+			left: 95px !important;
+		}
+
+		@media (max-width: 767px) {
+			.mosaico-pinotea-ajuste {
+				top: 180px !important;
+				left: 80px !important;
+			}
+		}
 	</style>
 
 	<!-- Head Libs -->
@@ -415,6 +428,7 @@
 			// Función auxiliar para crear estructura de producto con diseño original
 			function crearProducto(producto, esColumnaIzquierda, indexEnFila) {
 				const tieneBotella = producto.imagen_mosaico_url && producto.imagen_mosaico_url.trim() !== '';
+				const esPinotea = (producto.nombre || '').toLowerCase().includes('pinotea');
 
 				// Usar delays simples como en revestimientos
 				const delayImagen1 = esColumnaIzquierda ? 0 : 200;
@@ -443,7 +457,7 @@
 								 data-appear-animation-delay="${delayImagen2}" 
 								 data-plugin-options="{'accY': 10}" 
 								 alt="${producto.nombre} botella" 
-								 class="custom-product-image-pos-5 _absolute img-responsive" />
+								 class="custom-product-image-pos-5 _absolute img-responsive ${esPinotea ? 'mosaico-pinotea-ajuste' : ''}" />
 							` : ''}
 						</div>
 					`;
